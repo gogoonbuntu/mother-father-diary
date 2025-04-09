@@ -28,6 +28,14 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+        final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
+        if (existingEntry != null) {
+          _controller.text = existingEntry.content;
+          _selectedMood = existingEntry.mood;
+        } else {
+          _controller.clear();
+          _selectedMood = 'Happy';
+        }
       });
     }
   }
