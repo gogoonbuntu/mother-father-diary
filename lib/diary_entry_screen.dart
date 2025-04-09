@@ -62,7 +62,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
 
   void _saveDiaryEntry() {
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(seconds: 3), () async {
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
       if (_controller.text.isNotEmpty) {
         final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
         DiaryEntry entry = DiaryEntry.create(
@@ -100,13 +100,20 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
   Future<void> _saveDiaryEntryImmediately() async {
     _debounceTimer?.cancel();
     if (_controller.text.isNotEmpty) {
+      final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
       DiaryEntry entry = DiaryEntry.create(
         date: _selectedDate,
         mood: _selectedMood,
         content: _controller.text,
       );
-      if (widget.diaryEntry != null) {
-        await DiaryService().updateDiaryEntry(widget.diaryEntry!.id, entry);
+      entry = DiaryEntry(
+        id: existingEntry?.id ?? entry.id,
+        date: entry.date,
+        mood: entry.mood,
+        content: entry.content,
+      );
+      if (existingEntry != null) {
+        await DiaryService().updateDiaryEntry(existingEntry.id, entry);
       } else {
         await DiaryService().addDiaryEntry(entry);
       }
@@ -115,60 +122,67 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.diaryEntry != null ? '일기 수정' : '일기 쓰기'),
-      ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: () => _selectDate(context),
-                child: Text(
-                    '${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}'),
-              ),
-              const SizedBox(width: 16),
-              DropdownButton<String>(
-                value: _selectedMood,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedMood = newValue!;
-                  });
-                },
-                items: <String>['Happy', 'Sad', 'Neutral']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-            ],
-          ),
-          Expanded(
-            child: CustomPaint(
-              painter: LinePainter(),
-              child: Container(
-                padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  controller: _controller,
-                  maxLines: null,
-                  expands: true,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: '일기를 입력하세요',
-                    contentPadding: const EdgeInsets.all(16.0),
-                  ),
-                  style: TextStyle(
-                    fontSize: 16,
-                    height: 1.5,
+    return WillPopScope(
+      onWillPop: () async {
+        await _saveDiaryEntryImmediately();
+        Navigator.pop(context, true); // Return true to indicate refresh is needed
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.diaryEntry != null ? '일기 수정' : '일기 쓰기'),
+        ),
+        body: Column(
+          children: [
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () => _selectDate(context),
+                  child: Text(
+                      '${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}'),
+                ),
+                const SizedBox(width: 16),
+                DropdownButton<String>(
+                  value: _selectedMood,
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedMood = newValue!;
+                    });
+                  },
+                  items: <String>['Happy', 'Sad', 'Neutral']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+            Expanded(
+              child: CustomPaint(
+                painter: LinePainter(),
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TextField(
+                    controller: _controller,
+                    maxLines: null,
+                    expands: true,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: '일기를 입력하세요',
+                      contentPadding: const EdgeInsets.all(16.0),
+                    ),
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.5,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

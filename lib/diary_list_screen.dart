@@ -38,18 +38,19 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
           return ListTile(
             title: Text(_diaryEntries[index].toString()),
             onTap: () async {
-              await Navigator.push(
+              final refresh = await Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => DiaryEntryScreen(diaryEntry: _diaryEntries[index])),
               );
+              if (refresh ?? false) {
+                _loadDiaryEntries();
+              }
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () async {
                 await DiaryService().deleteDiaryEntry(_diaryEntries[index].id);
-                setState(() {
-                  _diaryEntries = DiaryService().getDiaryEntries().reversed.toList();
-                });
+                _loadDiaryEntries();
               },
             ),
           );
