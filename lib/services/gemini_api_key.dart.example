@@ -1,0 +1,2 @@
+// Gemini API 키 예시 파일 (실제 키는 이 파일에 넣지 마세요)
+const String geminiApiKey = 'YOUR_GEMINI_API_KEY_HERE';

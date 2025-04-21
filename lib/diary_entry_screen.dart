@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:diary_app/models/diary_entry.dart';
 import 'package:diary_app/services/diary_service.dart';
+import 'package:diary_app/services/gemini_service.dart';
+import 'package:diary_app/services/gemini_api_key.dart';
+import 'package:diary_app/ad_manager.dart';
 
 class DiaryEntryScreen extends StatefulWidget {
   final DiaryEntry? diaryEntry;
@@ -17,6 +20,26 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
   late DateTime _selectedDate;
   late String _selectedMood;
 
+  String? _positiveVersion;
+  bool _isLoadingPositive = false;
+  bool _showSavedNotification = false;
+
+  Future<void> _convertToPositiveVersion() async {
+    setState(() {
+      _isLoadingPositive = true;
+      _positiveVersion = null;
+    });
+    debugPrint('[API] 긍정 버전 요청 시작: ${_controller.text}');
+    final gemini = GeminiService(apiKey: geminiApiKey);
+    final result = await gemini.getPositiveVersion(_controller.text);
+    debugPrint('[API] 긍정 버전 응답: $result');
+    setState(() {
+      _positiveVersion = result;
+      _isLoadingPositive = false;
+    });
+    // 긍정 변환 성공 후 일정 빈도로 광고 노출
+    AdManager().showAdIfNeeded();
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -63,68 +86,56 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
   void _saveDiaryEntry() {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
-      if (_controller.text.isNotEmpty) {
-        final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
-        DiaryEntry entry = DiaryEntry.create(
+      final content = _controller.text.trim();
+      if (content.isEmpty) return;
+      final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
+      DiaryEntry entry;
+      if (existingEntry != null) {
+        entry = DiaryEntry(
+          id: existingEntry.id,
           date: _selectedDate,
           mood: _selectedMood,
-          content: _controller.text,
+          content: content,
         );
-        entry = DiaryEntry(
-          id: existingEntry?.id ?? entry.id,
-          date: entry.date,
-          mood: entry.mood,
-          content: entry.content,
+        debugPrint('[DiaryService] updateDiaryEntry 호출');
+        await DiaryService().updateDiaryEntry(existingEntry.id, entry);
+      } else {
+        entry = DiaryEntry.create(
+          date: _selectedDate,
+          mood: _selectedMood,
+          content: content,
         );
-        if (existingEntry != null) {
-          await DiaryService().updateDiaryEntry(existingEntry.id, entry);
-        } else {
-          await DiaryService().addDiaryEntry(entry);
-        }
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('일기가 저장되었습니다')),
-          );
-        }
+        debugPrint('[DiaryService] addDiaryEntry 호출');
+        await DiaryService().addDiaryEntry(entry);
       }
+      setState(() {
+        _showSavedNotification = true;
+      });
+      Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          _showSavedNotification = false;
+        });
+      });
+      // 일기 저장 후 일정 빈도로 광고 노출
+      AdManager().showAdIfNeeded();
     });
   }
 
   @override
   void dispose() {
-    _saveDiaryEntryImmediately();
+    _debounceTimer?.cancel();
     _controller.dispose();
     super.dispose();
-  }
-
-  Future<void> _saveDiaryEntryImmediately() async {
-    _debounceTimer?.cancel();
-    if (_controller.text.isNotEmpty) {
-      final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
-      DiaryEntry entry = DiaryEntry.create(
-        date: _selectedDate,
-        mood: _selectedMood,
-        content: _controller.text,
-      );
-      entry = DiaryEntry(
-        id: existingEntry?.id ?? entry.id,
-        date: entry.date,
-        mood: entry.mood,
-        content: entry.content,
-      );
-      if (existingEntry != null) {
-        await DiaryService().updateDiaryEntry(existingEntry.id, entry);
-      } else {
-        await DiaryService().addDiaryEntry(entry);
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        await _saveDiaryEntryImmediately();
+        // 저장 필요시만 저장, 중복 메서드 제거
+        if (_controller.text.trim().isNotEmpty) {
+          _saveDiaryEntry();
+        }
         Navigator.pop(context, true); // Return true to indicate refresh is needed
         return true;
       },
@@ -159,6 +170,13 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
                 ),
               ],
             ),
+            ElevatedButton(
+              onPressed: _isLoadingPositive ? null : _convertToPositiveVersion,
+              child: _isLoadingPositive
+                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Text('긍정 버전으로 변환'),
+            ),
+            const SizedBox(height: 8),
             Expanded(
               child: CustomPaint(
                 painter: LinePainter(),
@@ -181,12 +199,26 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            if (_positiveVersion != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('긍정 버전:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text(_positiveVersion!),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 }
+
 
 class LinePainter extends CustomPainter {
   @override
