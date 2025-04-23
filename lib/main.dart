@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:diary_app/diary_entry_screen.dart';
 import 'package:diary_app/diary_list_screen.dart';
 import 'package:diary_app/services/diary_service.dart';
-import 'package:diary_app/ad_manager.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DiaryService().init();
-  await AdManager().initialize();
   runApp(const MyApp());
 }
 
@@ -42,10 +39,6 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
-    // 앱 시작 시 짧은 광고 노출 (1초 후)
-    Future.delayed(const Duration(seconds: 1), () {
-      AdManager().showAdIfNeeded(force: true);
-    });
   }
 
   @override

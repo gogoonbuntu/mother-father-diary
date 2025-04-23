@@ -4,7 +4,6 @@ import 'package:diary_app/models/diary_entry.dart';
 import 'package:diary_app/services/diary_service.dart';
 import 'package:diary_app/services/gemini_service.dart';
 import 'package:diary_app/services/gemini_api_key.dart';
-import 'package:diary_app/ad_manager.dart';
 
 class DiaryEntryScreen extends StatefulWidget {
   final DiaryEntry? diaryEntry;
@@ -37,8 +36,6 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
       _positiveVersion = result;
       _isLoadingPositive = false;
     });
-    // 긍정 변환 성공 후 일정 빈도로 광고 노출
-    AdManager().showAdIfNeeded();
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -116,8 +113,6 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
           _showSavedNotification = false;
         });
       });
-      // 일기 저장 후 일정 빈도로 광고 노출
-      AdManager().showAdIfNeeded();
     });
   }
 
