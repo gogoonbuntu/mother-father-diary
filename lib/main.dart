@@ -2,15 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:diary_app/diary_entry_screen.dart';
 import 'package:diary_app/diary_list_screen.dart';
 import 'package:diary_app/services/diary_service.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:diary_app/opening_banner.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DiaryService().init();
+  // 광고 SDK 초기화
+  await MobileAds.instance.initialize();
+  print('[광고] MobileAds SDK 초기화 완료');
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _showOpening = true;
+
+  void _finishOpening() {
+    setState(() {
+      _showOpening = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +37,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MainScreen(),
+      home: _showOpening
+          ? OpeningBanner(onFinish: _finishOpening)
+          : const MainScreen(),
     );
   }
 }
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
