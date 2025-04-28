@@ -33,6 +33,16 @@ migrate_working_dir/
 .pub/
 /build/
 lib/services/gemini_api_key.dart
+android/app/google-services.json
+android/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
+assets/fonts/*.ttf
+assets/fonts/*.otf
+.env
+.pub-cache/
+pubspec.lock
+.DS_Store
 
 # Symbolication related
 app.*.symbols

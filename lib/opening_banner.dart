@@ -50,10 +50,10 @@ class _OpeningBannerState extends State<OpeningBanner> {
     // 실제 광고 단위 ID (테스트 후 사용)
     // final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
     // final adUnitId = isIOS
-    //     ? 'ca-app-pub-3343461027648901/9169459723'
-    //     : 'ca-app-pub-3343461027648901/9978919028';
-    // 테스트 광고 단위 ID (플랫폼 구분 없이 테스트)
-    final adUnitId = 'ca-app-pub-3940256099942544/6300978111';
+    final isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    final adUnitId = isIOS
+        ? 'ca-app-pub-3343461027648901/9169459723' // 실제 iOS 광고 단위 ID
+        : 'ca-app-pub-3343461027648901/9978919028'; // 실제 Android 광고 단위 ID
     if (_bannerAd == null && !_adTried) {
       _loadAd(adUnitId);
     }
