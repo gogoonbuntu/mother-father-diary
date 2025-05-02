@@ -1,0 +1,25 @@
+{
+  "appTitle": "다이어리 앱",
+  "settings": "설정",
+  "logout": "로그아웃",
+  "theme": "테마",
+  "font": "폰트",
+  "selectTheme": "테마 선택",
+  "selectFont": "폰트 선택",
+  "diaryEntry": "일기 쓰기",
+  "diaryList": "일기 목록",
+  "login": "로그인",
+  "googleSignIn": "구글로 로그인",
+  "logoutConfirm": "정말 로그아웃 하시겠습니까?"
+,
+  "colorSelected": "배경색이 변경되었습니다.",
+  "fontSelected": "폰트가 변경되었습니다.",
+  "editDiary": "일기 수정",
+  "positiveVersion": "긍정 버전:",
+  "convertToPositive": "긍정 버전으로 변환",
+  "diaryHint": "일기를 입력하세요",
+  "moodHappy": "행복",
+  "moodSad": "슬픔",
+  "moodNeutral": "보통",
+  "loginSubtitle": "소중한 하루를 따뜻하게 기록하세요"
+}

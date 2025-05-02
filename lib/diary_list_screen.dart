@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:diary_app/models/diary_entry.dart';
 import 'package:diary_app/services/diary_service.dart';
 import 'package:diary_app/diary_entry_screen.dart';
 
 class DiaryListScreen extends StatefulWidget {
-  const DiaryListScreen({super.key});
+  final Color? bgColor;
+  final String? fontFamily;
+  const DiaryListScreen({super.key, this.bgColor, this.fontFamily});
 
   @override
   State<DiaryListScreen> createState() => _DiaryListScreenState();
@@ -30,9 +33,11 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('일기 목록'),
+        title: Text(AppLocalizations.of(context)!.diaryList),
       ),
-      body: ListView.builder(
+      body: Container(
+        color: widget.bgColor ?? Colors.white,
+        child: ListView.builder(
         itemCount: _diaryEntries.length,
         itemBuilder: (context, index) {
           int actualIndex = _diaryEntries.length - 1 - index; // Correct index for reversed list
@@ -73,7 +78,8 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
             ),
           );
         },
-      ),
-    );
-  }
+            ),
+          ),
+        );
+      }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:diary_app/models/diary_entry.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:diary_app/services/diary_service.dart';
 import 'package:diary_app/services/gemini_service.dart';
 import 'package:diary_app/services/gemini_api_key.dart';
@@ -10,8 +11,10 @@ import 'confetti_themes.dart';
 
 class DiaryEntryScreen extends StatefulWidget {
   final DiaryEntry? diaryEntry;
+  final Color? bgColor;
+  final String? fontFamily;
 
-  const DiaryEntryScreen({super.key, this.diaryEntry});
+  const DiaryEntryScreen({super.key, this.diaryEntry, this.bgColor, this.fontFamily});
 
   @override
   State<DiaryEntryScreen> createState() => _DiaryEntryScreenState();
@@ -89,6 +92,9 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     }
 
     _controller.addListener(_saveDiaryEntry);
+    _controller.addListener(() {
+      setState(() {}); // 입력값 변경 시 버튼 상태 갱신
+    });
   }
 
   Timer? _debounceTimer;
@@ -150,105 +156,114 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.diaryEntry != null ? '일기 수정' : '일기 쓰기'),
+          title: Text(widget.diaryEntry != null ? AppLocalizations.of(context)!.editDiary : AppLocalizations.of(context)!.diaryEntry),
         ),
-        body: Stack(
-          children: [
-            // 샤랄라/별빛 효과 (confetti)
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController,
-                blastDirectionality: BlastDirectionality.explosive,
-                shouldLoop: false,
-                maxBlastForce: 20,
-                minBlastForce: 8,
-                emissionFrequency: 0.15,
-                numberOfParticles: 30,
-                gravity: 0.4,
-                colors: _selectedConfettiTheme.colors,
-                createParticlePath: _selectedConfettiTheme.particleShape,
+        body: Container(
+          decoration: BoxDecoration(
+            color: widget.bgColor ?? Colors.white,
+          ),
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirectionality: BlastDirectionality.explosive,
+                  shouldLoop: false,
+                  maxBlastForce: 20,
+                  minBlastForce: 8,
+                  emissionFrequency: 0.15,
+                  numberOfParticles: 30,
+                  gravity: 0.4,
+                  colors: _selectedConfettiTheme.colors,
+                  createParticlePath: _selectedConfettiTheme.particleShape,
+                ),
               ),
-            ),
-            // 기존 Column UI
-            Column(
-              children: [
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => _selectDate(context),
-                      child: Text(
-                          '${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}'),
-                    ),
-                    const SizedBox(width: 16),
-                    DropdownButton<String>(
-                      value: _selectedMood,
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedMood = newValue!;
-                        });
-                      },
-                      items: <String>['Happy', 'Sad', 'Neutral']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: _isLoadingPositive ? null : _convertToPositiveVersion,
-                  child: _isLoadingPositive
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('긍정 버전으로 변환'),
-                ),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: CustomPaint(
-                    painter: LinePainter(),
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      child: TextField(
-                        controller: _controller,
-                        maxLines: null,
-                        expands: true,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: '일기를 입력하세요',
-                          contentPadding: const EdgeInsets.all(16.0),
-                        ),
-                        style: TextStyle(
-                          fontSize: 16,
-                          height: 1.5,
+              Column(
+                children: [
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _selectDate(context),
+                        child: Text('${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}'),
+                      ),
+                      const SizedBox(width: 16),
+                      DropdownButton<String>(
+                        value: _selectedMood,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedMood = newValue!;
+                          });
+                        },
+                        items: <String>[
+                            AppLocalizations.of(context)!.moodHappy,
+                            AppLocalizations.of(context)!.moodSad,
+                            AppLocalizations.of(context)!.moodNeutral,
+                          ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: _isLoadingPositive || _controller.text.trim().isEmpty ? null : _convertToPositiveVersion,
+                    child: _isLoadingPositive
+                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        : Text(AppLocalizations.of(context)!.convertToPositive),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: CustomPaint(
+                      painter: LinePainter(),
+                      child: Container(
+                        padding: const EdgeInsets.all(16.0),
+                        child: TextField(
+                          controller: _controller,
+                          maxLines: null,
+                          expands: true,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: AppLocalizations.of(context)!.diaryHint,
+                            contentPadding: const EdgeInsets.all(16.0),
+                          ),
+                          style: TextStyle(
+                            fontSize: 16,
+                            height: 1.5,
+                            fontFamily: widget.fontFamily,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-                if (_positiveVersion != null)
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('긍정 버전:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 8),
-                        Text(_positiveVersion!),
-                      ],
+                  const SizedBox(height: 16),
+                  if (_positiveVersion != null)
+                    SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(AppLocalizations.of(context)!.positiveVersion, style: const TextStyle(fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 8),
+                              Text(_positiveVersion!),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
-
 
 class LinePainter extends CustomPainter {
   @override

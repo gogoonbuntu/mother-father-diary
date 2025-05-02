@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:diary_app/diary_entry_screen.dart';
 import 'package:diary_app/diary_list_screen.dart';
 import 'package:diary_app/services/diary_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:diary_app/opening_banner.dart';
 import 'package:diary_app/login_screen.dart';
+import 'package:diary_app/settings_screen.dart';
 import 'package:diary_app/google_sign_in_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -49,6 +52,17 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: WidgetsBinding.instance.window.locale.languageCode == 'ko'
+          ? const Locale('ko')
+          : null,
+
       home: _showOpening
           ? OpeningBanner(onFinish: _finishOpening)
           : StreamBuilder(
@@ -81,6 +95,32 @@ class _MainScreenState extends State<MainScreen> {
   late PageController _pageController;
   GoogleSignInAccount? _user;
   bool _loading = false;
+
+  // 테마/색상 상태를 MainScreen에서 관리
+  Color _bgColor = const Color(0xFFFFE0E6);
+  String _fontFamily = 'NanumPenScript';
+
+  static const List<Color> _colorOptions = [
+    Color(0xFFFFE0E6), // soft pink
+    Color(0xFFFFF2E0), // warm cream
+    Color(0xFFFFB6A6), // peach
+    Color(0xFFFFD6C0), // light apricot
+    Color(0xFFFFB6B9), // pink
+    Color(0xFFFFE6C0), // yellow-peach
+    Color(0xFFFAF4E6), // ivory
+    Color(0xFFF9E7E7), // light rose
+  ];
+
+  static const List<String> _fontOptions = [
+    'NanumPenScript',
+    'NanumBrushScript',
+    'DancingScript',
+    'Jua',
+    'Sunflower',
+    'GothicA1',
+    'DoHyeon',
+    'Stylish',
+  ];
 
   @override
   void initState() {
@@ -117,7 +157,26 @@ class _MainScreenState extends State<MainScreen> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
             ),
             centerTitle: true,
-            actions: [],
+            actions: [
+  IconButton(
+    icon: const Icon(Icons.settings),
+    tooltip: '설정',
+    onPressed: () async {
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SettingsScreen(
+            currentColor: _bgColor,
+            colorOptions: _colorOptions,
+            currentFont: _fontFamily,
+            fontOptions: _fontOptions,
+            onColorSelected: (color) => setState(() => _bgColor = color),
+            onFontSelected: (font) => setState(() => _fontFamily = font),
+          ),
+        ),
+      );
+    },
+  ),
+],
           ),
         ),
       ),
@@ -132,10 +191,9 @@ class _MainScreenState extends State<MainScreen> {
         child: PageView(
           controller: _pageController,
           onPageChanged: (index) => setState(() => _currentIndex = index),
-          children: const [
-            // You can further wrap these screens in Card or Container for more style
-            DiaryEntryScreen(),
-            DiaryListScreen(),
+          children: [
+            DiaryEntryScreen(bgColor: _bgColor, fontFamily: _fontFamily),
+            DiaryListScreen(bgColor: _bgColor, fontFamily: _fontFamily),
           ],
         ),
       ),
@@ -148,9 +206,9 @@ class _MainScreenState extends State<MainScreen> {
             curve: Curves.easeInOut,
           );
         },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.edit), label: '일기 쓰기'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: '일기 목록'),
+        items: [
+          BottomNavigationBarItem(icon: const Icon(Icons.edit), label: AppLocalizations.of(context)!.diaryEntry),
+          BottomNavigationBarItem(icon: const Icon(Icons.list), label: AppLocalizations.of(context)!.diaryList),
         ],
       ),
     );

@@ -1,0 +1,25 @@
+{
+  "appTitle": "Diary App",
+  "settings": "Settings",
+  "logout": "Logout",
+  "theme": "Theme",
+  "font": "Font",
+  "selectTheme": "Select Theme",
+  "selectFont": "Select Font",
+  "diaryEntry": "Write Diary",
+  "diaryList": "Diary List",
+  "login": "Login",
+  "googleSignIn": "Sign in with Google",
+  "logoutConfirm": "Are you sure you want to logout?"
+,
+  "colorSelected": "Background color changed.",
+  "fontSelected": "Font changed.",
+  "editDiary": "Edit Diary",
+  "positiveVersion": "Positive Version:",
+  "convertToPositive": "Convert to Positive Version",
+  "diaryHint": "Enter your diary entry",
+  "moodHappy": "Happy",
+  "moodSad": "Sad",
+  "moodNeutral": "Neutral",
+  "loginSubtitle": "Warmly record your precious day"
+}

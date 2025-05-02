@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'animated_warm_background.dart';
 import 'theme_selector.dart';
 import 'package:diary_app/google_sign_in_service.dart';
@@ -67,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 28),
                           Text(
-                            'Welcome to\nMother-Father Diary',
+                            AppLocalizations.of(context)!.appTitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 27,
@@ -79,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            '소중한 하루를 따뜻하게 기록하세요',
+                            AppLocalizations.of(context)!.loginSubtitle,
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 17, color: Color(0xFF9E616A), fontFamily: _fontFamily),
                           ),
@@ -96,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       errorBuilder: (c, e, s) => const Icon(Icons.login),
                                     ),
                                     label: Text(
-                                      'Google로 시작하기',
+                                      AppLocalizations.of(context)!.googleSignIn,
                                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF9E616A), fontFamily: _fontFamily),
                                     ),
                                     style: ElevatedButton.styleFrom(
@@ -109,8 +110,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     onPressed: () async {
                                       setState(() => _loading = true);
-                                      await GoogleSignInService.signInWithGoogle();
-                                      setState(() => _loading = false);
+                                      try {
+                                        await GoogleSignInService.signInWithGoogle();
+                                      } catch (e) {
+                                        String msg;
+                                        if (e.toString().contains('network_offline')) {
+                                          msg = '네트워크 연결을 확인해주세요.';
+                                        } else {
+                                          msg = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
+                                        }
+                                        if (mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text(msg)),
+                                          );
+                                        }
+                                      } finally {
+                                        if (mounted) setState(() => _loading = false);
+                                      }
                                     },
                                   ),
                                 ),
