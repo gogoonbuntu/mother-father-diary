@@ -21,5 +21,6 @@
   "moodHappy": "Happy",
   "moodSad": "Sad",
   "moodNeutral": "Neutral",
-  "loginSubtitle": "Warmly record your precious day"
+  "loginSubtitle": "Warmly record your precious day",
+  "noDiaries": "No diary entries yet. Create your first entry!"
 }

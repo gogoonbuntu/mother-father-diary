@@ -21,5 +21,6 @@
   "moodHappy": "행복",
   "moodSad": "슬픔",
   "moodNeutral": "보통",
-  "loginSubtitle": "소중한 하루를 따뜻하게 기록하세요"
+  "loginSubtitle": "소중한 하루를 따뜻하게 기록하세요",
+  "noDiaries": "아직 일기가 없습니다. 첫 번째 일기를 작성해보세요!"
 }

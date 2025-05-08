@@ -63,15 +63,21 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
-        final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
-        if (existingEntry != null) {
+      });
+      
+      // 비동기로 일기 데이터 가져오기
+      final existingEntry = await DiaryService().getDiaryEntryForDate(_selectedDate);
+      if (existingEntry != null) {
+        setState(() {
           _controller.text = existingEntry.content;
           _selectedMood = existingEntry.mood;
-        } else {
+        });
+      } else {
+        setState(() {
           _controller.clear();
           _selectedMood = 'Happy';
-        }
-      });
+        });
+      }
     }
   }
 
@@ -84,11 +90,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     _controller.text = widget.diaryEntry?.content ?? '';
 
     if (_controller.text.isEmpty) {
-      final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
-      if (existingEntry != null) {
-        _controller.text = existingEntry.content;
-        _selectedMood = existingEntry.mood;
-      }
+      // initState에서는 async를 직접 사용할 수 없으므로 별도 메서드로 추출
+      _loadExistingEntry();
     }
 
     _controller.addListener(_saveDiaryEntry);
@@ -98,14 +101,28 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
   }
 
   Timer? _debounceTimer;
+  
+  // 기존 일기 데이터 로드하는 메서드
+  Future<void> _loadExistingEntry() async {
+    final existingEntry = await DiaryService().getDiaryEntryForDate(_selectedDate);
+    if (existingEntry != null && mounted) {
+      setState(() {
+        _controller.text = existingEntry.content;
+        _selectedMood = existingEntry.mood;
+      });
+    }
+  }
 
   void _saveDiaryEntry() {
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 500), () async {
       final content = _controller.text.trim();
       if (content.isEmpty) return;
-      final existingEntry = DiaryService().getDiaryEntryForDate(_selectedDate);
+      
+      // 비동기로 기존 일기 확인
+      final existingEntry = await DiaryService().getDiaryEntryForDate(_selectedDate);
       DiaryEntry entry;
+      
       if (existingEntry != null) {
         entry = DiaryEntry(
           id: existingEntry.id,
