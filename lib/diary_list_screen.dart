@@ -3,7 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:diary_app/models/diary_entry.dart';
 import 'package:diary_app/services/diary_service.dart';
-import 'package:diary_app/diary_entry_screen.dart';
+// 클래스만 import하여 충돌 방지
+import 'package:diary_app/diary_entry_screen.dart' show DiaryEntryScreen;
 
 class DiaryListScreen extends StatefulWidget {
   final Color? bgColor;

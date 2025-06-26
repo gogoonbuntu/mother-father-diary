@@ -111,7 +111,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     onPressed: () async {
                                       setState(() => _loading = true);
                                       try {
-                                        await GoogleSignInService.signInWithGoogle();
+                                        final userCredential = await GoogleSignInService.signInWithGoogle();
+                                        // 로그인 성공 시 오류 메시지 표시하지 않음
+                                        if (userCredential == null) {
+                                          // 사용자가 로그인을 취소한 경우
+                                          print('로그인이 취소되었습니다.');
+                                        }
                                       } catch (e) {
                                         String msg;
                                         if (e.toString().contains('network_offline')) {

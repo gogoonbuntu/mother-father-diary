@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ad-services-config>
+    <ad-services-settings>
+        <ad-id-permission>
+            <allow>com.google.android.gms.ads</allow>
+        </ad-id-permission>
+    </ad-services-settings>
+</ad-services-config>

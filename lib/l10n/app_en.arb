@@ -22,5 +22,8 @@
   "moodSad": "Sad",
   "moodNeutral": "Neutral",
   "loginSubtitle": "Warmly record your precious day",
-  "noDiaries": "No diary entries yet. Create your first entry!"
+  "noDiaries": "No diary entries yet. Create your first entry!",
+  "hidePositive": "Hide Positive Version",
+  "showPositive": "Show Positive Version",
+  "positiveButton": "Generate Positive Version"
 }

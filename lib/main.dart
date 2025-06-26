@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:diary_app/login_screen.dart';
+import 'package:diary_app/opening_banner.dart';
+import 'package:diary_app/settings_screen.dart';
+import 'package:diary_app/google_sign_in_service.dart';
 import 'package:diary_app/diary_entry_screen.dart';
 import 'package:diary_app/diary_list_screen.dart';
 import 'package:diary_app/services/diary_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:diary_app/opening_banner.dart';
-import 'package:diary_app/login_screen.dart';
-import 'package:diary_app/settings_screen.dart';
-import 'package:diary_app/google_sign_in_service.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_fonts/google_fonts.dart'; // 한글 글씨체 사용을 위한 패키지 추가
 import 'firebase_options.dart';
 // [중요] firebase_options.dart 파일은 flutterfire CLI로 생성된 실제 파일로 교체해야 합니다.
 // 현재 파일이 비어있거나 DefaultFirebaseOptions가 없다면 앱이 실행되지 않습니다.
@@ -22,11 +24,39 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+  // Google Fonts 캐시 초기화 및 미리 로딩
+  await _preloadGoogleFonts();
   await DiaryService().init();
   // 광고 SDK 초기화
   await MobileAds.instance.initialize();
   print('[광고] MobileAds SDK 초기화 완료');
   runApp(const MyApp());
+}
+
+// Google Fonts 미리 로딩 함수
+Future<void> _preloadGoogleFonts() async {
+  // 지원되는 폰트 목록
+  final fontList = [
+    'Roboto',      // 기본 영문 폰트
+    'NotoSansKR',  // 한글 기본 폰트
+    'NanumGothic', // 한글 기본 폰트
+    'NanumMyeongjo', // 한글 글씨체
+    'Jua',         // 한글 글씨체
+    'GamjaFlower', // 한글 글씨체
+    'DoHyeon',     // 한글 글씨체
+    'PoorStory',   // 한글 글씨체
+  ];
+  
+  for (final fontFamily in fontList) {
+    try {
+      await GoogleFonts.getFont(fontFamily);
+      debugPrint('폰트 로딩 성공: $fontFamily');
+    } catch (e) {
+      debugPrint('폰트 로딩 실패: $fontFamily - $e');
+      // 실패해도 계속 진행
+    }
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -111,15 +141,19 @@ class _MainScreenState extends State<MainScreen> {
     Color(0xFFF9E7E7), // light rose
   ];
 
+  // Google Fonts를 통해 사용할 글씨체 목록 - 지원되는 폰트만 포함
   static const List<String> _fontOptions = [
-    'NanumPenScript',
-    'NanumBrushScript',
-    'DancingScript',
+    // 한글 글씨체
     'Jua',
-    'Sunflower',
-    'GothicA1',
     'DoHyeon',
-    'Stylish',
+    'GamjaFlower',
+    'HiMelody',
+    'EastSeaDokdo',
+    'PoorStory',
+    // 영어 글씨체
+    'Roboto',
+    'Lato',
+    'OpenSans',
   ];
 
   @override

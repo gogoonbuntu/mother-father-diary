@@ -39,6 +39,8 @@ dependencies:
   connectivity_plus: ^6.0.3
   cloud_firestore: ^4.17.5
   firebase_database: ^10.5.7
+  flutter_launcher_icons: ^0.14.4
+  google_fonts: ^6.2.1  # 한글 글씨체 사용을 위한 패키지 추가
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
