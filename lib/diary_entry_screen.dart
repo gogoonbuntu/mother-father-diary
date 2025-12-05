@@ -28,6 +28,11 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
   final TextEditingController _controller = TextEditingController();
   late DateTime _selectedDate;
   late String _selectedMood;
+  // 기분 상태에 대한 상수 정의
+  static const String MOOD_HAPPY = 'Happy';
+  static const String MOOD_SAD = 'Sad';
+  static const String MOOD_NEUTRAL = 'Neutral';
+
   List<String> _moodOptions = [];
 
   String? _positiveVersion;
@@ -93,6 +98,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
+
       });
       
       // 비동기로 일기 데이터 가져오기
@@ -121,9 +127,10 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     _selectedDate = widget.diaryEntry?.date ?? DateTime.now();
     
     // 기본 기분 설정 - build 메서드에서 초기화
-    _selectedMood = 'Happy'; // 기본값으로 설정
+    _selectedMood = MOOD_HAPPY; // 기본값으로 설정
     
     // 텍스트 변경 감지
+    _controller.addListener(_saveDiaryEntry);
     _controller.addListener(() {
       setState(() {}); // 입력값 변경 시 버튼 상태 갱신
     });
@@ -296,10 +303,14 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
                             _selectedMood = newValue!;
                           });
                         },
-                        items: _moodOptions.map<DropdownMenuItem<String>>((String value) {
+                        items: <Map<String, String>>[
+                            {'value': MOOD_HAPPY, 'label': AppLocalizations.of(context)!.moodHappy},
+                            {'value': MOOD_SAD, 'label': AppLocalizations.of(context)!.moodSad},
+                            {'value': MOOD_NEUTRAL, 'label': AppLocalizations.of(context)!.moodNeutral},
+                          ].map<DropdownMenuItem<String>>((Map<String, String> item) {
                           return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
+                            value: item['value'],
+                            child: Text(item['label']!),
                           );
                         }).toList(),
                       ),

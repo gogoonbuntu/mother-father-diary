@@ -45,5 +45,51 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- Google AdMob 필수 설정 -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+	
+	<!-- SKAdNetwork 설정 (iOS 14.5+ 광고 추적) -->
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
+	
+	<!-- Privacy - Tracking Usage Description (iOS 14.5+) -->
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This app uses your device's advertising identifier to show you personalized ads. 이 앱은 맞춤형 광고를 제공하기 위해 기기의 광고 식별자를 사용합니다.</string>
+	
+	<!-- Privacy - Photo Library Usage Description -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to attach images to your diary entries. 일기에 사진을 첨부하기 위해 사진 라이브러리 접근 권한이 필요합니다.</string>
+	
+	<!-- Privacy - Photo Library Add Usage Description -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs permission to save images to your photo library. 사진 라이브러리에 이미지를 저장하기 위한 권한이 필요합니다.</string>
+	
+	<!-- Privacy - Camera Usage Description -->
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to your camera to take photos for your diary entries. 일기에 사진을 촬영하기 위해 카메라 접근 권한이 필요합니다.</string>
+	<!-- Google 로그인(google_sign_in) 권한 및 설정 -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.57660610615-50n9244l2gtdjf48n47oe61p7jvm403r</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>google</string>
+		<string>com-google-gidconsent</string>
+	</array>
 </dict>
 </plist>
