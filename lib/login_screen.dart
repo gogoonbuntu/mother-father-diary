@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:diary_app/generated/app_localizations.dart';
 import 'animated_warm_background.dart';
 import 'theme_selector.dart';
 import 'package:diary_app/google_sign_in_service.dart';

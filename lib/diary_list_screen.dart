@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:diary_app/generated/app_localizations.dart';
 import 'package:diary_app/models/diary_entry.dart';
 import 'package:diary_app/services/diary_service.dart';
 // 클래스만 import하여 충돌 방지

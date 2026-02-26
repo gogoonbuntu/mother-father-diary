@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:diary_app/generated/app_localizations.dart';
 import 'package:diary_app/login_screen.dart';
 import 'package:diary_app/opening_banner.dart';
 import 'package:diary_app/settings_screen.dart';
