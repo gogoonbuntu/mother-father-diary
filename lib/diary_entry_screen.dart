@@ -242,7 +242,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
       if (existingEntry != null) {
         setState(() {
           _controller.text = existingEntry.content;
-          _selectedMood = _englishMoodToLocalized(existingEntry.mood);
+          _selectedMood = existingEntry.mood;
           _positiveVersion = existingEntry.positiveVersion;
           _showPositiveVersion = _positiveVersion != null;
         });
@@ -262,7 +262,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
     _selectedDate = widget.diaryEntry?.date ?? DateTime.now();
     
-    // 기본 기분 설정 - build 메서드에서 초기화
+    // 기본 기분 설정 - 영어 상수 사용
     _selectedMood = MOOD_HAPPY; // 기본값으로 설정
     
     // 텍스트 변경 감지 (디바운스 적용)
@@ -288,7 +288,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     if (existingEntry != null && mounted) {
       setState(() {
         _controller.text = existingEntry.content;
-        _selectedMood = _englishMoodToLocalized(existingEntry.mood);
+        _selectedMood = existingEntry.mood;
         _positiveVersion = existingEntry.positiveVersion;
         _showPositiveVersion = _positiveVersion != null;
       });
@@ -384,10 +384,6 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
         localizations.moodSad,
         localizations.moodNeutral,
       ];
-      // 초기 기분 설정
-      if (_selectedMood == 'Happy') {
-        _selectedMood = localizations.moodHappy;
-      }
     }
     
     return WillPopScope(
