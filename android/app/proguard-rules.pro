@@ -53,8 +53,11 @@
 # Keep the version of play-services-measurement-sdk-api that is being used
 -keep class com.google.android.gms.measurement.sdk.api.** { *; }
 
-# Play Core Library
--keep class com.google.android.play.core.** { *; }
--keep class com.google.android.play.core.splitcompat.** { *; }
--keep class com.google.android.play.core.splitinstall.** { *; }
--keep class com.google.android.play.core.tasks.** { *; }
+# Play Core Library (dontwarn for deprecated play-core references from Flutter engine)
+-dontwarn com.google.android.play.core.**
+
+# Google Sign-In
+-keep class com.google.android.gms.auth.** { *; }
+-keep class com.google.android.gms.signin.** { *; }
+-keep class com.google.android.gms.common.api.** { *; }
+-keep class com.google.android.gms.internal.** { *; }

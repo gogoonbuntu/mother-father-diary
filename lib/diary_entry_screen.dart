@@ -99,23 +99,31 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     }
 
     final completer = Completer<bool>();
+    bool rewarded = false;
+
     _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
         _rewardedAd = null;
         _loadRewardedAd(); // 다음 광고 미리 로드
+        // 광고 닫힐 때 최종 결과 전달 (reward 콜백이 먼저 호출됨)
+        if (!completer.isCompleted) {
+          completer.complete(rewarded);
+        }
       },
       onAdFailedToShowFullScreenContent: (ad, error) {
         ad.dispose();
         _rewardedAd = null;
         _loadRewardedAd();
-        completer.complete(false);
+        if (!completer.isCompleted) {
+          completer.complete(false);
+        }
       },
     );
     _rewardedAd!.show(
       onUserEarnedReward: (ad, reward) {
         debugPrint('[광고] 리워드 획득: ${reward.amount} ${reward.type}');
-        completer.complete(true);
+        rewarded = true;
       },
     );
     return completer.future;

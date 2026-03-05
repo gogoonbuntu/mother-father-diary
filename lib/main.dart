@@ -15,6 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_fonts/google_fonts.dart'; // 한글 글씨체 사용을 위한 패키지 추가
 import 'firebase_options.dart';
+import 'package:clarity_flutter/clarity_flutter.dart';
 // [중요] firebase_options.dart 파일은 flutterfire CLI로 생성된 실제 파일로 교체해야 합니다.
 // 현재 파일이 비어있거나 DefaultFirebaseOptions가 없다면 앱이 실행되지 않습니다.
 
@@ -31,7 +32,17 @@ Future<void> main() async {
   // 광고 SDK 초기화
   await MobileAds.instance.initialize();
   print('[광고] MobileAds SDK 초기화 완료');
-  runApp(const MyApp());
+
+  // Microsoft Clarity 초기화
+  final clarityConfig = ClarityConfig(
+    projectId: "vqwdhsd5ex",
+    logLevel: LogLevel.None,
+  );
+
+  runApp(ClarityWidget(
+    app: const MyApp(),
+    clarityConfig: clarityConfig,
+  ));
 }
 
 // Google Fonts 미리 로딩 함수
@@ -170,7 +181,32 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldExit = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('앱 종료'),
+            content: const Text('앱을 종료하시겠습니까?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('취소'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('종료'),
+              ),
+            ],
+          ),
+        );
+        if (shouldExit == true) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
         child: Container(
@@ -245,6 +281,7 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(icon: const Icon(Icons.list), label: AppLocalizations.of(context)!.diaryList),
         ],
       ),
+    ),
     );
   }
 }

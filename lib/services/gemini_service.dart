@@ -68,13 +68,13 @@ $originalText
 
       debugPrint('[AI] Groq 응답 코드: ${response.statusCode}');
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
         final text = data['choices']?[0]?['message']?['content'] as String?;
         debugPrint('[AI] ✅ Groq 응답 성공: ${text?.substring(0, text.length > 50 ? 50 : text.length)}...');
         if (text != null) return AiResult(text: text, provider: 'Groq');
         return null;
       } else {
-        debugPrint('[AI] ❌ Groq 에러 (${response.statusCode}): ${response.body}');
+        debugPrint('[AI] ❌ Groq 에러 (${response.statusCode}): ${utf8.decode(response.bodyBytes)}');
         return null;
       }
     } catch (e) {
