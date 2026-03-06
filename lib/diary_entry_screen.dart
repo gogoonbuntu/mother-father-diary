@@ -394,11 +394,12 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
       ];
     }
     
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
         await _saveDiaryEntry();
-        Navigator.pop(context);
-        return false;
+        if (context.mounted) Navigator.pop(context);
       },
       child: Scaffold(
         // 키보드가 나타날 때 화면 레이아웃 자동 조정
@@ -413,24 +414,6 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
           ),
           child: Stack(
             children: [
-              // 그래픽 버퍼 할당 문제 방지를 위해 최적화된 confetti 위젯
-              Align(
-                alignment: Alignment.topCenter,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirectionality: BlastDirectionality.explosive,
-                  shouldLoop: false,
-                  maxBlastForce: 15, // 낮춤
-                  minBlastForce: 5,  // 낮춤
-                  emissionFrequency: 0.1, // 낮춤
-                  numberOfParticles: 20, // 줄임
-                  gravity: 0.3, // 낮춤
-                  minimumSize: const Size(5, 5), // 최소 크기 제한
-                  maximumSize: const Size(10, 10), // 최대 크기 제한
-                  colors: _selectedConfettiTheme.colors,
-                  createParticlePath: _selectedConfettiTheme.particleShape,
-                ),
-              ),
               // 키보드 팝업시 스크롤 가능하게 하는 구조
               SingleChildScrollView(
                 child: Column(
@@ -520,6 +503,34 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
                         ),
                       ),
                     ),
+                    // 첫 사용자를 위한 안내 가이드
+                    if (_controller.text.isEmpty && _positiveVersion == null && widget.diaryEntry == null)
+                      IgnorePointer(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50.withValues(alpha: 0.7),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.blue.shade200, width: 1),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('📝 사용 방법', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.blue.shade700)),
+                                const SizedBox(height: 8),
+                                Text('Step 1️⃣  위 입력칸에 오늘의 일기를 자유롭게 적어보세요',
+                                    style: TextStyle(fontSize: 13, color: Colors.blue.shade600)),
+                                const SizedBox(height: 4),
+                                Text('Step 2️⃣  "긍정 버전으로 변환" 버튼을 누르면 AI가\n             따뜻한 긍정 버전으로 바꿔드려요 ✨',
+                                    style: TextStyle(fontSize: 13, color: Colors.blue.shade600)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 16),
                     if ((_positiveVersion != null || _isLoadingPositive) && _showPositiveVersion)
                       SafeArea(
@@ -611,6 +622,26 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
                         ),
                       ),
                   ],
+                ),
+              ),
+              // confetti 위젯 — Stack 맨 위에 위치해야 콘텐츠 앞에 표시됨
+              Align(
+                alignment: Alignment.topCenter,
+                child: IgnorePointer(
+                  child: ConfettiWidget(
+                    confettiController: _confettiController,
+                    blastDirectionality: BlastDirectionality.explosive,
+                    shouldLoop: false,
+                    maxBlastForce: 15,
+                    minBlastForce: 5,
+                    emissionFrequency: 0.1,
+                    numberOfParticles: 20,
+                    gravity: 0.3,
+                    minimumSize: const Size(5, 5),
+                    maximumSize: const Size(10, 10),
+                    colors: _selectedConfettiTheme.colors,
+                    createParticlePath: _selectedConfettiTheme.particleShape,
+                  ),
                 ),
               ),
             ],

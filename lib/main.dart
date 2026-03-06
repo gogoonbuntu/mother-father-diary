@@ -5,14 +5,13 @@ import 'package:diary_app/generated/app_localizations.dart';
 import 'package:diary_app/login_screen.dart';
 import 'package:diary_app/opening_banner.dart';
 import 'package:diary_app/settings_screen.dart';
-import 'package:diary_app/google_sign_in_service.dart';
+
 import 'package:diary_app/diary_entry_screen.dart';
 import 'package:diary_app/diary_list_screen.dart';
 import 'package:diary_app/services/diary_service.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_fonts/google_fonts.dart'; // 한글 글씨체 사용을 위한 패키지 추가
 import 'firebase_options.dart';
 import 'package:clarity_flutter/clarity_flutter.dart';
@@ -22,16 +21,16 @@ import 'package:clarity_flutter/clarity_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
-  // Google Fonts 캐시 초기화 및 미리 로딩
-  await _preloadGoogleFonts();
-  await DiaryService().init();
-  // 광고 SDK 초기화
-  await MobileAds.instance.initialize();
-  print('[광고] MobileAds SDK 초기화 완료');
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    // iOS에서 GoogleService-Info.plist가 자동으로 초기화하는 경우
+    // [core/duplicate-app] 에러를 무시
+    if (Firebase.apps.isEmpty) rethrow;
+    debugPrint('[Firebase] 이미 초기화됨: $e');
+  }
 
   // Microsoft Clarity 초기화
   final clarityConfig = ClarityConfig(
@@ -39,10 +38,20 @@ Future<void> main() async {
     logLevel: LogLevel.None,
   );
 
+  // 먼저 앱을 띄우고, 나머지 초기화는 백그라운드에서 병렬로 실행
   runApp(ClarityWidget(
     app: const MyApp(),
     clarityConfig: clarityConfig,
   ));
+
+  // 앱이 뜬 후 백그라운드에서 병렬 초기화 (OpeningBanner 동안 완료됨)
+  Future.wait([
+    _preloadGoogleFonts(),
+    DiaryService().init(),
+    MobileAds.instance.initialize().then((_) {
+      debugPrint('[광고] MobileAds SDK 초기화 완료');
+    }),
+  ]);
 }
 
 // Google Fonts 미리 로딩 함수
@@ -59,15 +68,14 @@ Future<void> _preloadGoogleFonts() async {
     'PoorStory',   // 한글 글씨체
   ];
   
-  for (final fontFamily in fontList) {
+  await Future.wait(fontList.map((fontFamily) async {
     try {
-      await GoogleFonts.getFont(fontFamily);
+      GoogleFonts.getFont(fontFamily);
       debugPrint('폰트 로딩 성공: $fontFamily');
     } catch (e) {
       debugPrint('폰트 로딩 실패: $fontFamily - $e');
-      // 실패해도 계속 진행
     }
-  }
+  }));
 }
 
 class MyApp extends StatefulWidget {
@@ -134,8 +142,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   late PageController _pageController;
-  GoogleSignInAccount? _user;
-  bool _loading = false;
+
 
   // 테마/색상 상태를 MainScreen에서 관리
   Color _bgColor = const Color(0xFFFFE0E6);
