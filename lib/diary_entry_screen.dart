@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:diary_app/models/diary_entry.dart';
 import 'package:diary_app/generated/app_localizations.dart';
 import 'package:diary_app/services/diary_service.dart';
@@ -24,9 +25,13 @@ class DiaryEntryScreen extends StatefulWidget {
   State<DiaryEntryScreen> createState() => _DiaryEntryScreenState();
 }
 
-class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
+class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProviderStateMixin {
   late ConfettiController _confettiController;
   late ConfettiTheme _selectedConfettiTheme = confettiThemes[0];
+
+  // 화면 플래시 애니메이션
+  late AnimationController _flashController;
+  late Animation<double> _flashAnimation;
   final TextEditingController _controller = TextEditingController();
   Timer? _saveDebounceTimer;
   late DateTime _selectedDate;
@@ -222,11 +227,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
       _showPositiveVersion = true; // 긍정 버전 생성 후 표시
     });
     if (result != null) {
-      try {
-        _confettiController.play();
-      } catch (e) {
-        print('컨페티 재생 오류: $e');
-      }
+      _playCelebration();
       // 긍정 버전 생성 후 일기장 저장
       _saveDiaryEntryWithPositive();
     }
@@ -264,10 +265,48 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
     }
   }
 
+  // 🎉 프리미엄 축하 이펙트
+  void _playCelebration() {
+    // 햅틱 피드백
+    HapticFeedback.heavyImpact();
+
+    // 흰색 플래시
+    _flashController.forward(from: 0.0);
+
+    // 1차 폭발
+    try { _confettiController.play(); } catch (_) {}
+
+    // 2차 폭발 (0.4초 후)
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) {
+        HapticFeedback.mediumImpact();
+        try { _confettiController.play(); } catch (_) {}
+      }
+    });
+
+    // 3차 폭발 (0.9초 후)
+    Future.delayed(const Duration(milliseconds: 900), () {
+      if (mounted) {
+        HapticFeedback.lightImpact();
+        try { _confettiController.play(); } catch (_) {}
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    _confettiController = ConfettiController(duration: const Duration(seconds: 4));
+
+    // 플래시 애니메이션 (0 → 0.7 → 0, 600ms)
+    _flashController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _flashAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.7), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 0.7, end: 0.0), weight: 70),
+    ]).animate(CurvedAnimation(parent: _flashController, curve: Curves.easeOut));
     _selectedDate = widget.diaryEntry?.date ?? DateTime.now();
     
     // 기본 기분 설정 - 영어 상수 사용
@@ -377,6 +416,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
   void dispose() {
     _saveDebounceTimer?.cancel();
     _confettiController.dispose();
+    _flashController.dispose();
     _controller.dispose();
     _rewardedAd?.dispose();
     super.dispose();
@@ -624,7 +664,21 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
                   ],
                 ),
               ),
-              // confetti 위젯 — Positioned.fill로 전체 화면 덮어야 콘텐츠 앞에 표시됨
+              // 흰색 플래시 오버레이
+              AnimatedBuilder(
+                animation: _flashAnimation,
+                builder: (context, child) {
+                  if (_flashAnimation.value == 0) return const SizedBox.shrink();
+                  return Positioned.fill(
+                    child: IgnorePointer(
+                      child: Container(
+                        color: Colors.white.withValues(alpha: _flashAnimation.value),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              // confetti 위젯 — 전체 화면 덮어 콘텐츠 앞에 표시
               Positioned.fill(
                 child: IgnorePointer(
                   child: Align(
@@ -633,13 +687,13 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
                       confettiController: _confettiController,
                       blastDirectionality: BlastDirectionality.explosive,
                       shouldLoop: false,
-                      maxBlastForce: 15,
-                      minBlastForce: 5,
-                      emissionFrequency: 0.1,
-                      numberOfParticles: 20,
-                      gravity: 0.3,
-                      minimumSize: const Size(5, 5),
-                      maximumSize: const Size(10, 10),
+                      maxBlastForce: 25,
+                      minBlastForce: 8,
+                      emissionFrequency: 0.05,
+                      numberOfParticles: 40,
+                      gravity: 0.15,
+                      minimumSize: const Size(8, 8),
+                      maximumSize: const Size(16, 16),
                       colors: _selectedConfettiTheme.colors,
                       createParticlePath: _selectedConfettiTheme.particleShape,
                     ),
