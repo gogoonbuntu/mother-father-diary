@@ -624,23 +624,25 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> {
                   ],
                 ),
               ),
-              // confetti 위젯 — Stack 맨 위에 위치해야 콘텐츠 앞에 표시됨
-              Align(
-                alignment: Alignment.topCenter,
+              // confetti 위젯 — Positioned.fill로 전체 화면 덮어야 콘텐츠 앞에 표시됨
+              Positioned.fill(
                 child: IgnorePointer(
-                  child: ConfettiWidget(
-                    confettiController: _confettiController,
-                    blastDirectionality: BlastDirectionality.explosive,
-                    shouldLoop: false,
-                    maxBlastForce: 15,
-                    minBlastForce: 5,
-                    emissionFrequency: 0.1,
-                    numberOfParticles: 20,
-                    gravity: 0.3,
-                    minimumSize: const Size(5, 5),
-                    maximumSize: const Size(10, 10),
-                    colors: _selectedConfettiTheme.colors,
-                    createParticlePath: _selectedConfettiTheme.particleShape,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: ConfettiWidget(
+                      confettiController: _confettiController,
+                      blastDirectionality: BlastDirectionality.explosive,
+                      shouldLoop: false,
+                      maxBlastForce: 15,
+                      minBlastForce: 5,
+                      emissionFrequency: 0.1,
+                      numberOfParticles: 20,
+                      gravity: 0.3,
+                      minimumSize: const Size(5, 5),
+                      maximumSize: const Size(10, 10),
+                      colors: _selectedConfettiTheme.colors,
+                      createParticlePath: _selectedConfettiTheme.particleShape,
+                    ),
                   ),
                 ),
               ),
