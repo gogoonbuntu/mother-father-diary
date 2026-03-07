@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:diary_app/generated/app_localizations.dart';
 import 'package:diary_app/theme_selector.dart';
 import 'package:diary_app/google_sign_in_service.dart';
+import 'package:diary_app/privacy_info_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io' show Platform;
 
@@ -171,6 +172,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 🔒 데이터 보호
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.green.shade200),
+              ),
+              child: ListTile(
+                leading: Icon(Icons.shield_rounded, color: Colors.green.shade600),
+                title: const Text('데이터 보호', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text('종단간 암호화(E2EE) 적용', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PrivacyInfoScreen()),
+                  );
+                },
               ),
             ),
 

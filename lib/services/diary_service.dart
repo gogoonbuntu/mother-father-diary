@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:diary_app/models/diary_entry.dart';
+import 'package:diary_app/services/encryption_service.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
@@ -20,12 +21,15 @@ class DiaryService {
   bool _initialized = false;
   
   // 캐싱 및 최적화 관련 변수
-  Map<String, DiaryEntry> _cachedEntries = {}; // 메모리 캐시
+  Map<String, DiaryEntry> _cachedEntries = {}; // 메모리 캐시 (복호화된 원문)
   Timer? _saveDebounceTimer; // 저장 디바운스 타이머
   bool _hasPendingChanges = false; // 대기 중인 변경사항 여부
   DateTime _lastSyncTime = DateTime.now(); // 마지막 동기화 시간
   static const Duration _syncInterval = Duration(minutes: 5); // 동기화 간격
   static const Duration _debounceTime = Duration(seconds: 3); // 디바운스 시간
+
+  // 암호화 서비스
+  final EncryptionService _encryption = EncryptionService();
 
   factory DiaryService() => _instance;
 
@@ -44,6 +48,9 @@ class DiaryService {
 
   Future<void> init() async {
     if (_initialized) return;
+    
+    // 암호화 서비스 초기화
+    _encryption.initialize();
     
     // 로컬 저장소 초기화
     final directory = await getApplicationDocumentsDirectory();
@@ -66,6 +73,9 @@ class DiaryService {
       debugPrint('Firebase error, falling back to local storage: $e');
     }
     
+    // 기존 비암호화 데이터 마이그레이션
+    await _migrateUnencryptedEntries();
+    
     _initialized = true;
   }
   
@@ -78,7 +88,7 @@ class DiaryService {
     });
   }
   
-  // 원격 데이터를 가져와서 캐싱
+  // 원격 데이터를 가져와서 캐싱 (복호화 후 캐시에 저장)
   Future<void> _loadAndCacheRemoteEntries() async {
     try {
       final snapshot = await _userDiariesRef.get();
@@ -90,7 +100,8 @@ class DiaryService {
               final Map<String, dynamic> entryMap = {};
               value.forEach((k, v) => entryMap[k.toString()] = v);
               final entry = DiaryEntry.fromJson(entryMap);
-              _cachedEntries[entry.id] = entry;
+              // 복호화 후 캐시에 저장
+              _cachedEntries[entry.id] = _decryptEntry(entry);
             }
           });
           debugPrint('Cached ${_cachedEntries.length} entries from remote database');
@@ -101,7 +112,7 @@ class DiaryService {
     }
   }
 
-  // 로컬 저장소 관련 메서드
+  // 로컬 저장소 관련 메서드 (복호화 후 캐시에 저장)
   Future<void> _loadLocalDiaryEntries() async {
     try {
       if (await _diaryFile.exists()) {
@@ -109,9 +120,9 @@ class DiaryService {
         final jsonList = jsonDecode(contents);
         _localDiaryEntries = jsonList.map<DiaryEntry>((json) => DiaryEntry.fromJson(json)).toList();
         
-        // 로컬 데이터도 캐싱
+        // 로컬 데이터 복호화 후 캐싱
         for (var entry in _localDiaryEntries) {
-          _cachedEntries[entry.id] = entry;
+          _cachedEntries[entry.id] = _decryptEntry(entry);
         }
       }
     } catch (e) {
@@ -122,8 +133,10 @@ class DiaryService {
 
   Future<void> _saveLocalDiaryEntries() async {
     try {
-      // 캐시에서 로컬 리스트 업데이트
-      _localDiaryEntries = _cachedEntries.values.toList();
+      // 캐시(복호화 상태)에서 암호화하여 저장
+      _localDiaryEntries = _cachedEntries.values
+          .map((entry) => _encryptEntry(entry))
+          .toList();
       
       final jsonList = _localDiaryEntries.map((entry) => entry.toJson()).toList();
       await _diaryFile.writeAsString(jsonEncode(jsonList));
@@ -143,21 +156,21 @@ class DiaryService {
     });
   }
   
-  // 데이터베이스와 동기화
+  // 데이터베이스와 동기화 (암호화 후 업로드)
   Future<void> _syncToDatabase() async {
     if (!_useFirestore || !_hasPendingChanges) return;
     
     try {
-      // 배치 업데이트 사용
+      // 배치 업데이트 사용 (암호화 후)
       final updates = <String, dynamic>{};
       _cachedEntries.forEach((id, entry) {
-        updates[id] = entry.toJson();
+        updates[id] = _encryptEntry(entry).toJson();
       });
       
       await _userDiariesRef.update(updates);
       _lastSyncTime = DateTime.now();
       _hasPendingChanges = false;
-      debugPrint('Synced ${updates.length} entries to database');
+      debugPrint('Synced ${updates.length} encrypted entries to database');
     } catch (e) {
       debugPrint('Error syncing to database: $e');
     }
@@ -273,5 +286,57 @@ class DiaryService {
   // For compatibility: fetch all entries and find by date
   bool isSameDate(DateTime date1, DateTime date2) {
     return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
+  }
+
+  // === 암호화 헬퍼 ===
+
+  /// 일기 엔트리 암호화 (content, positiveVersion)
+  DiaryEntry _encryptEntry(DiaryEntry entry) {
+    return DiaryEntry(
+      id: entry.id,
+      date: entry.date,
+      mood: entry.mood,
+      content: _encryption.encrypt(entry.content, entry.id) ?? entry.content,
+      positiveVersion: entry.positiveVersion != null
+          ? _encryption.encrypt(entry.positiveVersion!, entry.id)
+          : null,
+    );
+  }
+
+  /// 일기 엔트리 복호화 (content, positiveVersion)
+  DiaryEntry _decryptEntry(DiaryEntry entry) {
+    return DiaryEntry(
+      id: entry.id,
+      date: entry.date,
+      mood: entry.mood,
+      content: _encryption.decrypt(entry.content, entry.id) ?? entry.content,
+      positiveVersion: entry.positiveVersion != null
+          ? _encryption.decrypt(entry.positiveVersion!, entry.id)
+          : null,
+    );
+  }
+
+  /// 기존 비암호화 데이터 자동 마이그레이션
+  Future<void> _migrateUnencryptedEntries() async {
+    if (!_encryption.isEnabled) return;
+    
+    bool needsSave = false;
+    for (final entry in _cachedEntries.values) {
+      // content가 암호화되지 않은 평문이면 마이그레이션 필요
+      if (entry.content.isNotEmpty && !_encryption.isEncrypted(entry.content)) {
+        needsSave = true;
+        break;
+      }
+    }
+    
+    if (needsSave) {
+      debugPrint('[암호화] 기존 비암호화 데이터 마이그레이션 시작...');
+      await _saveLocalDiaryEntries(); // 캐시(평문) → 암호화 후 저장
+      if (_useFirestore) {
+        _hasPendingChanges = true;
+        await _syncToDatabase();
+      }
+      debugPrint('[암호화] 마이그레이션 완료');
+    }
   }
 }
