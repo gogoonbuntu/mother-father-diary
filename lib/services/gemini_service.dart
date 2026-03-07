@@ -28,11 +28,10 @@ class GeminiService {
     );
   }
 
-  // Groq 모델 목록 (한국어 성능 순)
+  // Groq 모델 목록 (한국어 성능 순, 모델별 독립 한도)
   static const List<Map<String, String>> _groqModels = [
-    {'id': 'qwen-qwq-32b', 'name': 'Qwen3 32B'},           // 한국어 최강
-    {'id': 'deepseek-r1-distill-llama-70b', 'name': 'DeepSeek R1'}, // 한국어 우수
-    {'id': 'llama-3.3-70b-versatile', 'name': 'Llama 3.3'},  // 영어 중심 폴백
+    {'id': 'qwen-qwq-32b', 'name': 'Qwen3 32B'},                    // 한국어 최강
+    {'id': 'deepseek-r1-distill-llama-70b', 'name': 'DeepSeek R1'},  // 한국어 우수
   ];
 
   String _buildPrompt(String originalText) {
