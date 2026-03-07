@@ -14,19 +14,26 @@ class AiResult {
 class GeminiService {
   final String apiKey;
   final String? grokApiKey; // 실제로는 Groq API 키
-  late final GenerativeModel _primaryModel;
-  late final GenerativeModel _fallbackModel;
+  late final GenerativeModel _geminiFlashLite;
+  late final GenerativeModel _geminiFlash;
 
   GeminiService({required this.apiKey, this.grokApiKey}) {
-    _primaryModel = GenerativeModel(
+    _geminiFlashLite = GenerativeModel(
       model: 'gemini-2.5-flash-lite',
       apiKey: apiKey,
     );
-    _fallbackModel = GenerativeModel(
+    _geminiFlash = GenerativeModel(
       model: 'gemini-2.5-flash',
       apiKey: apiKey,
     );
   }
+
+  // Groq 모델 목록 (한국어 성능 순)
+  static const List<Map<String, String>> _groqModels = [
+    {'id': 'qwen-qwq-32b', 'name': 'Qwen3 32B'},           // 한국어 최강
+    {'id': 'deepseek-r1-distill-llama-70b', 'name': 'DeepSeek R1'}, // 한국어 우수
+    {'id': 'llama-3.3-70b-versatile', 'name': 'Llama 3.3'},  // 영어 중심 폴백
+  ];
 
   String _buildPrompt(String originalText) {
     return '''
@@ -45,12 +52,13 @@ $originalText
 ''';
   }
 
-  /// Groq API 호출 (OpenAI-compatible, llama-3.3-70b-versatile)
-  Future<AiResult?> _callGroq(String prompt) async {
+  /// Groq API 호출 (OpenAI-compatible)
+  /// 429(rate limit) / 5xx 에러 시 null 반환하여 다음 모델로 자동 폴백
+  Future<AiResult?> _callGroq(String prompt, String modelId, String modelName) async {
     if (grokApiKey == null || grokApiKey!.isEmpty) return null;
 
     try {
-      debugPrint('[AI] 🟢 Groq API 요청 시작 (llama-3.3-70b)...');
+      debugPrint('[AI] 🟢 Groq $modelName 요청 시작...');
       final response = await http.post(
         Uri.parse('https://api.groq.com/openai/v1/chat/completions'),
         headers: {
@@ -58,27 +66,34 @@ $originalText
           'Authorization': 'Bearer $grokApiKey',
         },
         body: jsonEncode({
-          'model': 'llama-3.3-70b-versatile',
+          'model': modelId,
           'messages': [
             {'role': 'user', 'content': prompt}
           ],
           'temperature': 0.8,
         }),
-      );
+      ).timeout(const Duration(seconds: 30));
 
-      debugPrint('[AI] Groq 응답 코드: ${response.statusCode}');
+      debugPrint('[AI] Groq $modelName 응답 코드: ${response.statusCode}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         final text = data['choices']?[0]?['message']?['content'] as String?;
-        debugPrint('[AI] ✅ Groq 응답 성공: ${text?.substring(0, text.length > 50 ? 50 : text.length)}...');
-        if (text != null) return AiResult(text: text, provider: 'Groq');
+        if (text != null && text.trim().isNotEmpty) {
+          debugPrint('[AI] ✅ Groq $modelName 성공: ${text.substring(0, text.length > 50 ? 50 : text.length)}...');
+          return AiResult(text: text, provider: 'Groq $modelName');
+        }
+        debugPrint('[AI] ⚠️ Groq $modelName 빈 응답');
+        return null;
+      } else if (response.statusCode == 429) {
+        debugPrint('[AI] ⏳ Groq $modelName 무료 한도 초과 (429) → 다음 모델로 폴백');
         return null;
       } else {
-        debugPrint('[AI] ❌ Groq 에러 (${response.statusCode}): ${utf8.decode(response.bodyBytes)}');
+        debugPrint('[AI] ❌ Groq $modelName 에러 (${response.statusCode}): ${utf8.decode(response.bodyBytes)}');
         return null;
       }
     } catch (e) {
-      debugPrint('[AI] ❌ Groq 예외: $e');
+      debugPrint('[AI] ❌ Groq $modelName 예외: $e');
       return null;
     }
   }
@@ -98,19 +113,26 @@ $originalText
     }
   }
 
-  /// 긍정 버전 변환 (Groq → Gemini Flash-Lite → Gemini Flash 순서로 시도)
+  /// 긍정 버전 변환 — 다단계 자동 폴백
+  ///
+  /// 순서: Groq Qwen3 → Groq DeepSeek → Groq Llama → Gemini Flash-Lite → Gemini Flash
+  /// 429(무료 한도 초과) 또는 에러 발생 시 자동으로 다음 모델 시도
   Future<AiResult?> getPositiveVersion(String originalText) async {
     final prompt = _buildPrompt(originalText);
 
-    // 1차: Groq 시도 (가장 빠름)
-    final groqResult = await _callGroq(prompt);
-    if (groqResult != null) return groqResult;
+    // 1단계: Groq 모델들 순차 시도 (한국어 성능 순)
+    for (final model in _groqModels) {
+      final result = await _callGroq(prompt, model['id']!, model['name']!);
+      if (result != null) return result;
+    }
 
-    // 2차: Gemini 2.5 Flash-Lite
-    final primaryResult = await _callGemini(prompt, _primaryModel, 'Gemini Flash-Lite');
+    // 2단계: Gemini Flash-Lite
+    debugPrint('[AI] 🔄 모든 Groq 모델 실패 → Gemini Flash-Lite 폴백');
+    final primaryResult = await _callGemini(prompt, _geminiFlashLite, 'Gemini Flash-Lite');
     if (primaryResult != null) return primaryResult;
 
-    // 3차: Gemini 2.5 Flash 폴백
-    return await _callGemini(prompt, _fallbackModel, 'Gemini Flash');
+    // 3단계: Gemini Flash (최종 폴백)
+    debugPrint('[AI] 🔄 Gemini Flash-Lite 실패 → Gemini Flash 최종 폴백');
+    return await _callGemini(prompt, _geminiFlash, 'Gemini Flash');
   }
 }
