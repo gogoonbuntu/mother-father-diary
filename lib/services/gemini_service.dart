@@ -28,10 +28,10 @@ class GeminiService {
     );
   }
 
-  // Groq 모델 목록 (한국어 성능 순, 모델별 독립 한도)
+  // Groq 모델 목록 (한국어 자연스러움 순)
   static const List<Map<String, String>> _groqModels = [
-    {'id': 'qwen/qwen3-32b', 'name': 'Qwen3 32B'},                    // 한국어 100+언어 최강
-    {'id': 'openai/gpt-oss-120b', 'name': 'GPT-OSS 120B'},            // 범용 백업
+    {'id': 'moonshotai/kimi-k2-instruct-0905', 'name': 'Kimi K2'},     // Moonshot AI, 아시아 언어 강점
+    {'id': 'openai/gpt-oss-120b', 'name': 'GPT-OSS 120B'},             // OpenAI 오픈소스 120B
   ];
 
   /// 천사 버전 프롬프트 (긍정적 변환)
