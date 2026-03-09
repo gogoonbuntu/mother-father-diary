@@ -30,8 +30,8 @@ class GeminiService {
 
   // Groq 모델 목록 (한국어 자연스러움 순)
   static const List<Map<String, String>> _groqModels = [
-    {'id': 'moonshotai/kimi-k2-instruct-0905', 'name': 'Kimi K2'},     // Moonshot AI, 아시아 언어 강점
-    {'id': 'openai/gpt-oss-120b', 'name': 'GPT-OSS 120B'},             // OpenAI 오픈소스 120B
+    {'id': 'openai/gpt-oss-120b', 'name': 'GPT-OSS 120B'},             // OpenAI 오픈소스 120B (1순위)
+    {'id': 'moonshotai/kimi-k2-instruct-0905', 'name': 'Kimi K2'},     // Moonshot AI 백업
   ];
 
   /// 천사 버전 프롬프트 (긍정적 변환)
