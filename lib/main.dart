@@ -99,7 +99,47 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: 'Diary App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF7C5CFC), // 부드러운 보라
+          brightness: Brightness.light,
+          primary: const Color(0xFF7C5CFC),
+          secondary: const Color(0xFFFF8FAB), // 코랄 핑크
+          surface: const Color(0xFFF8F5FF),
+          onSurface: const Color(0xFF2D2D3A),
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF8F5FF),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          foregroundColor: Color(0xFF2D2D3A),
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF2D2D3A),
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+        ),
+        cardTheme: CardThemeData(
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          color: Colors.white,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+        ),
       ),
       localizationsDelegates: const [
         AppLocalizations.delegate,

@@ -515,130 +515,265 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
         if (context.mounted) Navigator.pop(context);
       },
       child: Scaffold(
-        // 키보드가 나타날 때 화면 레이아웃 자동 조정
         resizeToAvoidBottomInset: true,
-        backgroundColor: widget.bgColor ?? Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
-          title: Text(widget.diaryEntry == null ? AppLocalizations.of(context)!.diaryEntry : AppLocalizations.of(context)!.editDiary),
+          title: Text(
+            widget.diaryEntry == null ? AppLocalizations.of(context)!.diaryEntry : AppLocalizations.of(context)!.editDiary,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,
         ),
         body: Container(
-          decoration: BoxDecoration(
-            color: widget.bgColor ?? Colors.white,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFF3EEFF), // 연보라
+                Color(0xFFFFF0F5), // 연핑크
+                Color(0xFFEEF7FF), // 연하늘
+              ],
+            ),
           ),
           child: Stack(
             children: [
               // 키보드 팝업시 스크롤 가능하게 하는 구조
               SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => _selectDate(context),
-                          child: Text('${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}'),
-                        ),
-                        const SizedBox(width: 16),
-                        DropdownButton<String>(
-                          value: _selectedMood,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedMood = newValue!;
-                            });
-                          },
-                          items: <Map<String, String>>[
-                              {'value': MOOD_HAPPY, 'label': AppLocalizations.of(context)!.moodHappy},
-                              {'value': MOOD_SAD, 'label': AppLocalizations.of(context)!.moodSad},
-                              {'value': MOOD_NEUTRAL, 'label': AppLocalizations.of(context)!.moodNeutral},
-                            ].map<DropdownMenuItem<String>>((Map<String, String> item) {
-                            return DropdownMenuItem<String>(
-                              value: item['value'],
-                              child: Text(item['label']!),
-                            );
-                          }).toList(),
-                        ),
-                      ],
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).padding.top + kToolbarHeight + 8,
+                    left: 16, right: 16, bottom: 24,
+                  ),
+                  child: Column(
+                    children: [
+                    // 📅 날짜 & 기분 선택 카드
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF7C5CFC).withValues(alpha: 0.08),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          // 날짜 버튼
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => _selectDate(context),
+                              borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF3EEFF),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(Icons.calendar_today_rounded, size: 16, color: Color(0xFF7C5CFC)),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '${_selectedDate.year}.${_selectedDate.month.toString().padLeft(2, '0')}.${_selectedDate.day.toString().padLeft(2, '0')}',
+                                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF5A3ED9)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          // 기분 선택
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF0F5),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _selectedMood,
+                                isDense: true,
+                                icon: const Icon(Icons.expand_more_rounded, size: 18, color: Color(0xFFE8577E)),
+                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFFE8577E)),
+                                onChanged: (String? newValue) {
+                                  setState(() { _selectedMood = newValue!; });
+                                },
+                                items: <Map<String, String>>[
+                                  {'value': MOOD_HAPPY, 'label': '😊 ${AppLocalizations.of(context)!.moodHappy}'},
+                                  {'value': MOOD_SAD, 'label': '😢 ${AppLocalizations.of(context)!.moodSad}'},
+                                  {'value': MOOD_NEUTRAL, 'label': '😐 ${AppLocalizations.of(context)!.moodNeutral}'},
+                                ].map<DropdownMenuItem<String>>((Map<String, String> item) {
+                                  return DropdownMenuItem<String>(
+                                    value: item['value'],
+                                    child: Text(item['label']!),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    Row(
-                      children: [
-                        // 😇 천사 버전 버튼
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: (_isLoadingPositive || _isLoadingDevil || _controller.text.trim().isEmpty) ? null : () => _onModeButtonPressed('angel'),
-                            icon: _isLoadingPositive
-                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                : const Text('😇', style: TextStyle(fontSize: 16)),
-                            label: Text(
-                              _positiveVersion != null ? '천사 재생성' : '천사 버전',
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal.shade400,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    const SizedBox(height: 12),
+                    // 천사/악마 버튼 영역
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF7C5CFC).withValues(alpha: 0.06),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          // 😇 천사 버전 버튼
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFF7C5CFC), Color(0xFF9B7DFF)],
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF7C5CFC).withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: (_isLoadingPositive || _isLoadingDevil || _controller.text.trim().isEmpty) ? null : () => _onModeButtonPressed('angel'),
+                                icon: _isLoadingPositive
+                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                    : const Text('😇', style: TextStyle(fontSize: 16)),
+                                label: Text(
+                                  _positiveVersion != null ? '천사 재생성' : '천사 버전',
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: Colors.white,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        // 😈 악마 버전 버튼
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: (_isLoadingPositive || _isLoadingDevil || _controller.text.trim().isEmpty) ? null : () => _onModeButtonPressed('devil'),
-                            icon: _isLoadingDevil
-                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                                : const Text('😈', style: TextStyle(fontSize: 16)),
-                            label: Text(
-                              _devilVersion != null ? '악마 재생성' : '악마 버전',
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red.shade600,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          const SizedBox(width: 8),
+                          // 😈 악마 버전 버튼
+                          Expanded(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [Color(0xFFE8577E), Color(0xFFFF7E9D)],
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFE8577E).withValues(alpha: 0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: (_isLoadingPositive || _isLoadingDevil || _controller.text.trim().isEmpty) ? null : () => _onModeButtonPressed('devil'),
+                                icon: _isLoadingDevil
+                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                    : const Text('😈', style: TextStyle(fontSize: 16)),
+                                label: Text(
+                                  _devilVersion != null ? '악마 재생성' : '악마 버전',
+                                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: Colors.white,
+                                  shadowColor: Colors.transparent,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '🎫 $_remainingFree/$_dailyFreeLimit',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: _remainingFree > 0 ? Colors.grey[600] : Colors.red,
-                            fontWeight: FontWeight.w500,
+                          const SizedBox(width: 8),
+                          // 잔여 횟수
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: _remainingFree > 0 ? const Color(0xFFF3EEFF) : const Color(0xFFFFEEF0),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '🎫 $_remainingFree/$_dailyFreeLimit',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: _remainingFree > 0 ? const Color(0xFF7C5CFC) : const Color(0xFFE8577E),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    // 일기 작성 영역 - 키보드 여부에 따라 높이 조절
+                    const SizedBox(height: 12),
+                    // 일기 작성 영역
                     Container(
                       height: MediaQuery.of(context).viewInsets.bottom > 0
                           ? MediaQuery.of(context).size.height * 0.25
-                          : MediaQuery.of(context).size.height * 0.4,
+                          : MediaQuery.of(context).size.height * 0.35,
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF7C5CFC).withValues(alpha: 0.08),
+                            blurRadius: 16,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
-                      child: CustomPaint(
-                        painter: LinePainter(),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: TextField(
-                            controller: _controller,
-                            maxLines: null,
-                            expands: true,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: AppLocalizations.of(context)!.diaryHint,
-                              contentPadding: const EdgeInsets.all(16.0),
-                            ),
-                            style: widget.fontFamily != null
-                            ? _getFontStyle(widget.fontFamily!, 16)
-                            : const TextStyle(
-                                fontSize: 16,
-                                height: 1.5,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: CustomPaint(
+                          painter: LinePainter(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: TextField(
+                              controller: _controller,
+                              maxLines: null,
+                              expands: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: AppLocalizations.of(context)!.diaryHint,
+                                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+                                contentPadding: const EdgeInsets.all(16.0),
+                                filled: false,
                               ),
+                              style: widget.fontFamily != null
+                              ? _getFontStyle(widget.fontFamily!, 16)
+                              : const TextStyle(
+                                  fontSize: 16,
+                                  height: 1.6,
+                                  color: Color(0xFF2D2D3A),
+                                ),
+                            ),
                           ),
                         ),
                       ),
@@ -646,33 +781,38 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                     // 첫 사용자를 위한 안내 가이드
                     if (_controller.text.isEmpty && _positiveVersion == null && _devilVersion == null && widget.diaryEntry == null)
                       IgnorePointer(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50.withValues(alpha: 0.7),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.blue.shade200, width: 1),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('📝 사용 방법', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.blue.shade700)),
-                                const SizedBox(height: 8),
-                                Text('Step 1️⃣  위 입력칸에 오늘의 일기를 자유롭게 적어보세요',
-                                    style: TextStyle(fontSize: 13, color: Colors.blue.shade600)),
-                                const SizedBox(height: 4),
-                                Text('Step 2️⃣  원하는 버전을 선택하세요',
-                                    style: TextStyle(fontSize: 13, color: Colors.blue.shade600)),
-                                const SizedBox(height: 2),
-                                Text('      😇 천사: 긍정적이고 따뜻한 버전으로 변환',
-                                    style: TextStyle(fontSize: 12, color: Colors.teal.shade600)),
-                                Text('      😈 악마: 함께 공감하고 통쾌하게 욕해주는 버전',
-                                    style: TextStyle(fontSize: 12, color: Colors.red.shade600)),
-                              ],
-                            ),
+                        child: Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(top: 8),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: const Color(0xFF7C5CFC).withValues(alpha: 0.15), width: 1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF7C5CFC).withValues(alpha: 0.06),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('📝 사용 방법', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF5A3ED9))),
+                              const SizedBox(height: 8),
+                              Text('Step 1️⃣  위 입력칸에 오늘의 일기를 자유롭게 적어보세요',
+                                  style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+                              const SizedBox(height: 4),
+                              Text('Step 2️⃣  원하는 버전을 선택하세요',
+                                  style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+                              const SizedBox(height: 4),
+                              const Text('      😇 천사: 긍정적이고 따뜻한 버전으로 변환',
+                                  style: TextStyle(fontSize: 12, color: Color(0xFF7C5CFC))),
+                              const Text('      😈 악마: 함께 공감하고 통쾌하게 욕해주는 버전',
+                                  style: TextStyle(fontSize: 12, color: Color(0xFFE8577E))),
+                            ],
                           ),
                         ),
                       ),
@@ -680,172 +820,203 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                     // 😇 천사 버전 결과 카드 (activeResultMode == 'angel'일 때만)
                     if ((_positiveVersion != null || _isLoadingPositive) && _activeResultMode == 'angel')
                       SafeArea(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFF7C5CFC).withValues(alpha: 0.15)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF7C5CFC).withValues(alpha: 0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Flexible(
+                                    child: Text('😇 천사 버전',
+                                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Color(0xFF5A3ED9)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.text_decrease, size: 18, color: Color(0xFF7C5CFC)),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                        onPressed: () => _adjustPositiveTextSize(-1),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.text_increase, size: 18, color: Color(0xFF7C5CFC)),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                        onPressed: () => _adjustPositiveTextSize(1),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                height: MediaQuery.of(context).size.height * 0.28,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [Color(0xFFF5F0FF), Color(0xFFF0EBFF)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                padding: const EdgeInsets.all(16.0),
+                                child: _isLoadingPositive
+                                  ? const Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          CircularProgressIndicator(color: Color(0xFF7C5CFC)),
+                                          SizedBox(height: 12),
+                                          Text('✨ 천사 버전 생성 중...', style: TextStyle(color: Color(0xFF7C5CFC))),
+                                        ],
+                                      ),
+                                    )
+                                  : SingleChildScrollView(
+                                      child: Text(
+                                        _positiveVersion ?? '',
+                                        style: widget.fontFamily != null
+                                          ? _getFontStyle(widget.fontFamily!, _positiveTextSize, fontWeight: FontWeight.w500, color: const Color(0xFF2D2D3A))
+                                          : TextStyle(
+                                              fontSize: _positiveTextSize,
+                                              height: 1.6,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color(0xFF2D2D3A),
+                                            ),
+                                      ),
+                                    ),
+                              ),
+                              if (_aiProvider.isNotEmpty && !_isLoadingPositive)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
                                   child: Text(
-                                    '😇 천사 버전',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                    'Powered by $_aiProvider · E2E 암호화 저장 🔑',
+                                    style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.text_decrease, size: 18),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                      onPressed: () => _adjustPositiveTextSize(-1),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.text_increase, size: 18),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                      onPressed: () => _adjustPositiveTextSize(1),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              height: MediaQuery.of(context).size.height * 0.3,
-                              decoration: BoxDecoration(
-                                color: Colors.yellow.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.all(16.0),
-                              child: _isLoadingPositive
-                                ? const Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CircularProgressIndicator(),
-                                        SizedBox(height: 12),
-                                        Text('✨ 천사 버전 생성 중...', style: TextStyle(color: Colors.grey)),
-                                      ],
-                                    ),
-                                  )
-                                : SingleChildScrollView(
-                                    child: Text(
-                                      _positiveVersion ?? '',
-                                      style: widget.fontFamily != null
-                                        ? _getFontStyle(widget.fontFamily!, _positiveTextSize, fontWeight: FontWeight.w500, color: Colors.black87)
-                                        : TextStyle(
-                                            fontSize: _positiveTextSize,
-                                            height: 1.5,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black87,
-                                          ),
-                                    ),
-                                  ),
-                            ),
-                            if (_aiProvider.isNotEmpty && !_isLoadingPositive)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  'Powered by $_aiProvider · E2E 암호화 저장 🔑',
-                                  style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     // 😈 악마 버전 결과 카드 (activeResultMode == 'devil'일 때만)
                     if ((_devilVersion != null || _isLoadingDevil) && _activeResultMode == 'devil')
                       SafeArea(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFFE8577E).withValues(alpha: 0.15)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFE8577E).withValues(alpha: 0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Flexible(
+                                    child: Text('😈 악마 버전',
+                                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: Color(0xFFE8577E)),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.text_decrease, size: 18, color: Color(0xFFE8577E)),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                        onPressed: () => _adjustDevilTextSize(-1),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.text_increase, size: 18, color: Color(0xFFE8577E)),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                        onPressed: () => _adjustDevilTextSize(1),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                height: MediaQuery.of(context).size.height * 0.28,
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [Color(0xFFFFF0F3), Color(0xFFFFE8ED)],
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                padding: const EdgeInsets.all(16.0),
+                                child: _isLoadingDevil
+                                  ? const Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          CircularProgressIndicator(color: Color(0xFFE8577E)),
+                                          SizedBox(height: 12),
+                                          Text('🔥 악마 버전 생성 중...', style: TextStyle(color: Color(0xFFE8577E))),
+                                        ],
+                                      ),
+                                    )
+                                  : SingleChildScrollView(
+                                      child: Text(
+                                        _devilVersion ?? '',
+                                        style: widget.fontFamily != null
+                                          ? _getFontStyle(widget.fontFamily!, _devilTextSize, fontWeight: FontWeight.w500, color: const Color(0xFF8B2252))
+                                          : TextStyle(
+                                              fontSize: _devilTextSize,
+                                              height: 1.6,
+                                              fontWeight: FontWeight.w500,
+                                              color: const Color(0xFF8B2252),
+                                            ),
+                                      ),
+                                    ),
+                              ),
+                              if (_aiProvider.isNotEmpty && !_isLoadingDevil)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8),
                                   child: Text(
-                                    '😈 악마 버전',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.red,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
+                                    'Powered by $_aiProvider · E2E 암호화 저장 🔑',
+                                    style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.text_decrease, size: 18),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                      onPressed: () => _adjustDevilTextSize(-1),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.text_increase, size: 18),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                                      onPressed: () => _adjustDevilTextSize(1),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              height: MediaQuery.of(context).size.height * 0.3,
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.red.shade200),
-                              ),
-                              padding: const EdgeInsets.all(16.0),
-                              child: _isLoadingDevil
-                                ? const Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CircularProgressIndicator(color: Colors.red),
-                                        SizedBox(height: 12),
-                                        Text('🔥 악마 버전 생성 중...', style: TextStyle(color: Colors.red)),
-                                      ],
-                                    ),
-                                  )
-                                : SingleChildScrollView(
-                                    child: Text(
-                                      _devilVersion ?? '',
-                                      style: widget.fontFamily != null
-                                        ? _getFontStyle(widget.fontFamily!, _devilTextSize, fontWeight: FontWeight.w500, color: Colors.red.shade900)
-                                        : TextStyle(
-                                            fontSize: _devilTextSize,
-                                            height: 1.5,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.red.shade900,
-                                          ),
-                                    ),
-                                  ),
-                            ),
-                            if (_aiProvider.isNotEmpty && !_isLoadingDevil)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  'Powered by $_aiProvider · E2E 암호화 저장 🔑',
-                                  style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                   ],
+                  ),
                 ),
               ),
               // 흰색 플래시 오버레이
