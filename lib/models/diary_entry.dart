@@ -6,7 +6,8 @@ class DiaryEntry {
   final DateTime date;
   final String mood;
   final String content;
-  final String? positiveVersion; // 긍정 버전 텍스트 저장 필드 추가
+  final String? positiveVersion; // 천사 버전 (긍정)
+  final String? devilVersion;    // 악마 버전 (공감+분노)
 
   DiaryEntry({
     required this.id,
@@ -14,6 +15,7 @@ class DiaryEntry {
     required this.mood,
     required this.content,
     this.positiveVersion,
+    this.devilVersion,
   });
 
   factory DiaryEntry.create({
@@ -21,6 +23,7 @@ class DiaryEntry {
     required String mood,
     required String content,
     String? positiveVersion,
+    String? devilVersion,
   }) {
     return DiaryEntry(
       id: const Uuid().v4(),
@@ -28,6 +31,7 @@ class DiaryEntry {
       mood: mood,
       content: content,
       positiveVersion: positiveVersion,
+      devilVersion: devilVersion,
     );
   }
 
@@ -38,6 +42,7 @@ class DiaryEntry {
       mood: json['mood'],
       content: json['content'],
       positiveVersion: json['positiveVersion'],
+      devilVersion: json['devilVersion'],
     );
   }
 
@@ -48,6 +53,7 @@ class DiaryEntry {
       'mood': mood,
       'content': content,
       'positiveVersion': positiveVersion,
+      'devilVersion': devilVersion,
     };
   }
 

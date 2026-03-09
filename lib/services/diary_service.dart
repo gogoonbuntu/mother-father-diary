@@ -290,7 +290,7 @@ class DiaryService {
 
   // === 암호화 헬퍼 ===
 
-  /// 일기 엔트리 암호화 (content, positiveVersion)
+  /// 일기 엔트리 암호화 (content, positiveVersion, devilVersion)
   DiaryEntry _encryptEntry(DiaryEntry entry) {
     return DiaryEntry(
       id: entry.id,
@@ -300,10 +300,13 @@ class DiaryService {
       positiveVersion: entry.positiveVersion != null
           ? _encryption.encrypt(entry.positiveVersion!, entry.id)
           : null,
+      devilVersion: entry.devilVersion != null
+          ? _encryption.encrypt(entry.devilVersion!, entry.id)
+          : null,
     );
   }
 
-  /// 일기 엔트리 복호화 (content, positiveVersion)
+  /// 일기 엔트리 복호화 (content, positiveVersion, devilVersion)
   DiaryEntry _decryptEntry(DiaryEntry entry) {
     return DiaryEntry(
       id: entry.id,
@@ -312,6 +315,9 @@ class DiaryService {
       content: _encryption.decrypt(entry.content, entry.id) ?? entry.content,
       positiveVersion: entry.positiveVersion != null
           ? _encryption.decrypt(entry.positiveVersion!, entry.id)
+          : null,
+      devilVersion: entry.devilVersion != null
+          ? _encryption.decrypt(entry.devilVersion!, entry.id)
           : null,
     );
   }

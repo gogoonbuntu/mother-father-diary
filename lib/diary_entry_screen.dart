@@ -44,11 +44,15 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   List<String> _moodOptions = [];
 
   String? _positiveVersion;
+  String? _devilVersion;
   bool _isLoadingPositive = false;
+  bool _isLoadingDevil = false;
   bool _showSavedNotification = false;
-  double _positiveTextSize = 18.0; // 긍정 버전 텍스트 크기
-  bool _showPositiveVersion = false; // 긍정 버전 표시 여부
-  String _aiProvider = ''; // 어떤 AI가 응답했는지 표시
+  double _positiveTextSize = 18.0;
+  double _devilTextSize = 18.0;
+  bool _showPositiveVersion = false;
+  bool _showDevilVersion = false;
+  String _aiProvider = '';
 
   // 일일 생성 제한
   static const int _dailyFreeLimit = 3;
@@ -134,37 +138,39 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
     return completer.future;
   }
 
-  // 생성 가능 여부 확인 후 생성
-  Future<void> _tryGenerate({bool isRegenerate = false}) async {
+  // 생성 가능 여부 확인 후 생성 (mode: 'angel' 또는 'devil')
+  Future<void> _tryGenerate({bool isRegenerate = false, String mode = 'angel'}) async {
     FocusScope.of(context).unfocus();
 
-    // 이미 긍정 버전이 있고, 재생성이 아닌 경우 → 토글
-    if (_positiveVersion != null && !isRegenerate) {
-      setState(() {
-        _showPositiveVersion = !_showPositiveVersion;
-      });
+    // 이미 버전이 있고 재생성이 아닌 경우 → 토글
+    if (mode == 'angel' && _positiveVersion != null && !isRegenerate) {
+      setState(() { _showPositiveVersion = !_showPositiveVersion; });
+      return;
+    }
+    if (mode == 'devil' && _devilVersion != null && !isRegenerate) {
+      setState(() { _showDevilVersion = !_showDevilVersion; });
       return;
     }
 
     // 광고 보너스가 있으면 사용
     if (_adGranted) {
       _adGranted = false;
-      await _convertToPositiveVersion();
+      mode == 'angel' ? await _convertToAngelVersion() : await _convertToDevilVersion();
       return;
     }
 
     // 일일 한도 체크
     if (_remainingFree <= 0) {
-      _showLimitDialog();
+      _showLimitDialog(mode: mode);
       return;
     }
 
     await _incrementDailyCount();
-    await _convertToPositiveVersion();
+    mode == 'angel' ? await _convertToAngelVersion() : await _convertToDevilVersion();
   }
 
   // 한도 초과 다이얼로그
-  void _showLimitDialog() {
+  void _showLimitDialog({String mode = 'angel'}) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -195,7 +201,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
               }
               // 광고 성공/실패 무관하게 1회 추가 허용
               setState(() { _adGranted = true; });
-              await _tryGenerate(isRegenerate: true);
+              await _tryGenerate(isRegenerate: true, mode: mode);
             },
             icon: const Icon(Icons.play_circle_outline),
             label: const Text('광고 보고 생성하기'),
@@ -205,31 +211,46 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
     );
   }
 
-  // 긍정 버전 생성 기능
-  Future<void> _convertToPositiveVersion() async {
-    // 랜덤 테마 선택
+  // 😇 천사 버전 생성
+  Future<void> _convertToAngelVersion() async {
     setState(() {
       _selectedConfettiTheme = (confettiThemes..shuffle()).first;
-    });
-    setState(() {
       _isLoadingPositive = true;
       _positiveVersion = null;
       _aiProvider = '';
     });
-    debugPrint('[API] 긍정 버전 요청 시작: ${_controller.text}');
     final gemini = GeminiService(apiKey: geminiApiKey, grokApiKey: grokApiKey);
-    final result = await gemini.getPositiveVersion(_controller.text);
-    debugPrint('[API] 긍정 버전 응답: ${result?.text} (provider: ${result?.provider})');
+    final result = await gemini.getAngelVersion(_controller.text);
     setState(() {
       _positiveVersion = result?.text;
       _aiProvider = result?.provider ?? '';
       _isLoadingPositive = false;
-      _showPositiveVersion = true; // 긍정 버전 생성 후 표시
+      _showPositiveVersion = true;
     });
     if (result != null) {
       _playCelebration();
-      // 긍정 버전 생성 후 일기장 저장
-      _saveDiaryEntryWithPositive();
+      _saveDiaryEntryWithVersions();
+    }
+  }
+
+  // 😈 악마 버전 생성
+  Future<void> _convertToDevilVersion() async {
+    setState(() {
+      _isLoadingDevil = true;
+      _devilVersion = null;
+      _aiProvider = '';
+    });
+    final gemini = GeminiService(apiKey: geminiApiKey, grokApiKey: grokApiKey);
+    final result = await gemini.getDevilVersion(_controller.text);
+    setState(() {
+      _devilVersion = result?.text;
+      _aiProvider = result?.provider ?? '';
+      _isLoadingDevil = false;
+      _showDevilVersion = true;
+    });
+    if (result != null) {
+      HapticFeedback.heavyImpact();
+      _saveDiaryEntryWithVersions();
     }
   }
 
@@ -253,13 +274,17 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
           _controller.text = existingEntry.content;
           _selectedMood = existingEntry.mood;
           _positiveVersion = existingEntry.positiveVersion;
+          _devilVersion = existingEntry.devilVersion;
           _showPositiveVersion = _positiveVersion != null;
+          _showDevilVersion = _devilVersion != null;
         });
       } else {
         setState(() {
           _controller.text = '';
           _positiveVersion = null;
+          _devilVersion = null;
           _showPositiveVersion = false;
+          _showDevilVersion = false;
         });
       }
     }
@@ -337,12 +362,14 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
         _controller.text = existingEntry.content;
         _selectedMood = existingEntry.mood;
         _positiveVersion = existingEntry.positiveVersion;
+        _devilVersion = existingEntry.devilVersion;
         _showPositiveVersion = _positiveVersion != null;
+        _showDevilVersion = _devilVersion != null;
       });
     }
   }
 
-  Future<void> _saveDiaryEntryWithPositive() async {
+  Future<void> _saveDiaryEntryWithVersions() async {
     final content = _controller.text.trim();
     if (content.isEmpty) return;
     final existingEntry = await DiaryService().getDiaryEntryForDate(_selectedDate);
@@ -354,6 +381,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
         mood: _moodToEnglish(_selectedMood),
         content: content,
         positiveVersion: _positiveVersion,
+        devilVersion: _devilVersion,
       );
       await DiaryService().updateDiaryEntry(existingEntry.id, entry);
     } else {
@@ -362,15 +390,23 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
         mood: _moodToEnglish(_selectedMood),
         content: content,
         positiveVersion: _positiveVersion,
+        devilVersion: _devilVersion,
       );
       await DiaryService().addDiaryEntry(entry);
     }
   }
 
-  // 긍정 버전 텍스트 크기 조절
+  // 천사 버전 텍스트 크기 조절
   void _adjustPositiveTextSize(double change) {
     setState(() {
       _positiveTextSize = math.max(14.0, math.min(24.0, _positiveTextSize + change));
+    });
+  }
+
+  // 악마 버전 텍스트 크기 조절
+  void _adjustDevilTextSize(double change) {
+    setState(() {
+      _devilTextSize = math.max(14.0, math.min(24.0, _devilTextSize + change));
     });
   }
 
@@ -487,23 +523,54 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                     ),
                     Row(
                       children: [
+                        // 😇 천사 버전 버튼
                         Expanded(
-                          child: ElevatedButton(
-                            onPressed: _isLoadingPositive || _controller.text.trim().isEmpty ? null : () => _tryGenerate(),
-                            child: _isLoadingPositive
-                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                                : Text(_positiveVersion != null 
-                                    ? (_showPositiveVersion 
-                                        ? AppLocalizations.of(context)!.hidePositive 
-                                        : AppLocalizations.of(context)!.showPositive)
-                                    : AppLocalizations.of(context)!.convertToPositive),
+                          child: ElevatedButton.icon(
+                            onPressed: (_isLoadingPositive || _isLoadingDevil || _controller.text.trim().isEmpty) ? null : () => _tryGenerate(mode: 'angel'),
+                            icon: _isLoadingPositive
+                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                : const Text('😇', style: TextStyle(fontSize: 16)),
+                            label: Text(
+                              _positiveVersion != null
+                                  ? (_showPositiveVersion ? '천사 숨기기' : '천사 보기')
+                                  : '천사 버전',
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.teal.shade400,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
+                        // 😈 악마 버전 버튼
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: (_isLoadingPositive || _isLoadingDevil || _controller.text.trim().isEmpty) ? null : () => _tryGenerate(mode: 'devil'),
+                            icon: _isLoadingDevil
+                                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                : const Text('😈', style: TextStyle(fontSize: 16)),
+                            label: Text(
+                              _devilVersion != null
+                                  ? (_showDevilVersion ? '악마 숨기기' : '악마 보기')
+                                  : '악마 버전',
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red.shade600,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
                         Text(
                           '🎫 $_remainingFree/$_dailyFreeLimit',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 12,
                             color: _remainingFree > 0 ? Colors.grey[600] : Colors.red,
                             fontWeight: FontWeight.w500,
                           ),
@@ -544,7 +611,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                       ),
                     ),
                     // 첫 사용자를 위한 안내 가이드
-                    if (_controller.text.isEmpty && _positiveVersion == null && widget.diaryEntry == null)
+                    if (_controller.text.isEmpty && _positiveVersion == null && _devilVersion == null && widget.diaryEntry == null)
                       IgnorePointer(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -564,8 +631,13 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                 Text('Step 1️⃣  위 입력칸에 오늘의 일기를 자유롭게 적어보세요',
                                     style: TextStyle(fontSize: 13, color: Colors.blue.shade600)),
                                 const SizedBox(height: 4),
-                                Text('Step 2️⃣  "긍정 버전으로 변환" 버튼을 누르면 AI가\n             따뜻한 긍정 버전으로 바꿔드려요 ✨',
+                                Text('Step 2️⃣  원하는 버전을 선택하세요',
                                     style: TextStyle(fontSize: 13, color: Colors.blue.shade600)),
+                                const SizedBox(height: 2),
+                                Text('      😇 천사: 긍정적이고 따뜻한 버전으로 변환',
+                                    style: TextStyle(fontSize: 12, color: Colors.teal.shade600)),
+                                Text('      😈 악마: 함께 공감하고 통쾌하게 욕해주는 버전',
+                                    style: TextStyle(fontSize: 12, color: Colors.red.shade600)),
                               ],
                             ),
                           ),
@@ -582,7 +654,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                               children: [
                                 Flexible(
                                   child: Text(
-                                    '${AppLocalizations.of(context)!.positiveVersion}${_aiProvider.isNotEmpty ? " ($_aiProvider)" : ""}',
+                                    '😇 천사 버전${_aiProvider.isNotEmpty ? " ($_aiProvider)" : ""}',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -597,7 +669,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     SizedBox(
                                       height: 32,
                                       child: ElevatedButton.icon(
-                                        onPressed: _isLoadingPositive ? null : () => _tryGenerate(isRegenerate: true),
+                                        onPressed: _isLoadingPositive ? null : () => _tryGenerate(isRegenerate: true, mode: 'angel'),
                                         icon: const Icon(Icons.refresh, size: 16),
                                         label: const Text('새로 만들기', style: TextStyle(fontSize: 12)),
                                         style: ElevatedButton.styleFrom(
@@ -654,6 +726,98 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                             height: 1.5,
                                             fontWeight: FontWeight.w500,
                                             color: Colors.black87,
+                                          ),
+                                    ),
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    // 😈 악마 버전 결과 카드
+                    if ((_devilVersion != null || _isLoadingDevil) && _showDevilVersion)
+                      SafeArea(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    '😈 악마 버전${_aiProvider.isNotEmpty ? " ($_aiProvider)" : ""}',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      height: 32,
+                                      child: ElevatedButton.icon(
+                                        onPressed: _isLoadingDevil ? null : () => _tryGenerate(isRegenerate: true, mode: 'devil'),
+                                        icon: const Icon(Icons.refresh, size: 16),
+                                        label: const Text('새로 만들기', style: TextStyle(fontSize: 12)),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red.shade700,
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.text_decrease, size: 18),
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                      onPressed: () => _adjustDevilTextSize(-1),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.text_increase, size: 18),
+                                      padding: EdgeInsets.zero,
+                                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                      onPressed: () => _adjustDevilTextSize(1),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            // 악마 버전 본문
+                            Container(
+                              height: MediaQuery.of(context).size.height * 0.3,
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red.shade200),
+                              ),
+                              padding: const EdgeInsets.all(16.0),
+                              child: _isLoadingDevil
+                                ? const Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        CircularProgressIndicator(color: Colors.red),
+                                        SizedBox(height: 12),
+                                        Text('🔥 악마 버전 생성 중...', style: TextStyle(color: Colors.red)),
+                                      ],
+                                    ),
+                                  )
+                                : SingleChildScrollView(
+                                    child: Text(
+                                      _devilVersion ?? '',
+                                      style: widget.fontFamily != null
+                                        ? _getFontStyle(widget.fontFamily!, _devilTextSize, fontWeight: FontWeight.w500, color: Colors.red.shade900)
+                                        : TextStyle(
+                                            fontSize: _devilTextSize,
+                                            height: 1.5,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.red.shade900,
                                           ),
                                     ),
                                   ),
