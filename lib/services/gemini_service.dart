@@ -104,8 +104,12 @@ $originalText
         final data = jsonDecode(utf8.decode(response.bodyBytes));
         final text = data['choices']?[0]?['message']?['content'] as String?;
         if (text != null && text.trim().isNotEmpty) {
-          debugPrint('[AI] ✅ Groq $modelName 성공: ${text.substring(0, text.length > 50 ? 50 : text.length)}...');
-          return AiResult(text: text, provider: 'Groq $modelName');
+          // Qwen3 등 추론 모델의 <think>...</think> 태그 제거
+          final cleaned = text.replaceAll(RegExp(r'<think>[\s\S]*?</think>', caseSensitive: false), '').trim();
+          if (cleaned.isNotEmpty) {
+            debugPrint('[AI] ✅ Groq $modelName 성공: ${cleaned.substring(0, cleaned.length > 50 ? 50 : cleaned.length)}...');
+            return AiResult(text: cleaned, provider: 'Groq $modelName');
+          }
         }
         debugPrint('[AI] ⚠️ Groq $modelName 빈 응답');
         return null;
