@@ -77,7 +77,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        '프리미엄 월 50회',
+                        '프리미엄 월 300회',
                         style: TextStyle(
                           fontSize: 26, fontWeight: FontWeight.w800,
                           color: Color(0xFF2D2D3A),
@@ -165,7 +165,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
       ),
       child: Column(
         children: [
-          _benefitRow(Icons.bolt_rounded, '월 50회 AI 일기 변환'),
+          _benefitRow(Icons.bolt_rounded, '월 300회 AI 일기 변환'),
           const SizedBox(height: 12),
           _benefitRow(Icons.flash_on_rounded, '광고 없이 바로 사용'),
           const SizedBox(height: 12),

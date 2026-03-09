@@ -57,7 +57,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
 
   // 생성 제한
   static const int _dailyFreeLimit = 3;
-  static const int _monthlyPremiumLimit = 50;
+  static const int _monthlyPremiumLimit = 300;
   int _todayCount = 0;
   int _monthCount = 0;
   bool _adGranted = false; // 광고 시청으로 1회 추가 허용
@@ -296,7 +296,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                         setState(() {});
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text('🎉 프리미엄 활성화! 월 50회까지 사용하세요!'),
+                            content: const Text('🎉 프리미엄 활성화! 월 300회까지 사용하세요!'),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             backgroundColor: const Color(0xFF7C5CFC),
@@ -306,7 +306,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                     });
                   },
                   icon: const Icon(Icons.diamond_rounded, size: 18),
-                  label: const Text('프리미엄 구독 (월 50회)'),
+                  label: const Text('프리미엄 구독 (월 300회)'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFE8577E),
                     side: const BorderSide(color: Color(0xFFE8577E), width: 1.5),
@@ -798,7 +798,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                             ),
                           ),
                           const SizedBox(width: 8),
-                          // 잔여 횟수
+                          // 잔여 횟수 (길게 누르면 디버그 프리미엄 토글)
                           GestureDetector(
                             onTap: () {
                               if (!_purchaseService.isPremium) {
@@ -808,6 +808,24 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                 ).then((purchased) {
                                   if (purchased == true && mounted) setState(() {});
                                 });
+                              }
+                            },
+                            onLongPress: () async {
+                              // 디버그: 프리미엄 상태 토글
+                              final newState = !_purchaseService.isPremium;
+                              await _purchaseService.debugSetPremium(newState);
+                              await _loadDailyCount();
+                              if (mounted) {
+                                setState(() {});
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(newState ? '💎 디버그: 프리미엄 ON' : '🎫 디버그: 프리미엄 OFF'),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    backgroundColor: const Color(0xFF7C5CFC),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
                               }
                             },
                             child: Container(
