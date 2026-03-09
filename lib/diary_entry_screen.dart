@@ -13,6 +13,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'line_painter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:diary_app/services/purchase_service.dart';
+import 'package:diary_app/premium_screen.dart';
 
 class DiaryEntryScreen extends StatefulWidget {
   final DiaryEntry? diaryEntry;
@@ -58,6 +60,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   int _todayCount = 0;
   bool _adGranted = false; // 광고 시청으로 1회 추가 허용
   RewardedAd? _rewardedAd;
+  final _purchaseService = PurchaseService();
 
   // 오늘 날짜 키
   String get _todayKey => 'positive_count_${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}';
@@ -191,6 +194,12 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       return;
     }
 
+    // 프리미엄 사용자는 한도 무시
+    if (_purchaseService.isPremium) {
+      mode == 'angel' ? await _convertToAngelVersion() : await _convertToDevilVersion();
+      return;
+    }
+
     // 일일 한도 체크
     if (_remainingFree <= 0) {
       _showLimitDialog(mode: mode);
@@ -201,42 +210,101 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
     mode == 'angel' ? await _convertToAngelVersion() : await _convertToDevilVersion();
   }
 
-  // 한도 초과 다이얼로그
+  // 한도 초과 다이얼로그 — 광고 OR 프리미엄 선택
   void _showLimitDialog({String mode = 'angel'}) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('🔒 오늘 무료 횟수 소진'),
-        content: const Text('하루 3회 무료 생성이 가능합니다.\n광고를 시청하면 1회 추가 생성할 수 있어요!'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('🔒 오늘 무료 횟수 소진', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('하루 3회 무료 생성 횟수를 모두 사용했습니다.', style: TextStyle(fontSize: 14)),
+            const SizedBox(height: 16),
+            // 광고 보기 버튼
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  final rewarded = await _showRewardedAd();
+                  if (rewarded) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('🎉 광고 시청 완료! 추가 생성이 가능합니다.'),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          backgroundColor: const Color(0xFF7C5CFC),
+                        ),
+                      );
+                    }
+                  } else {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('📢 광고 준비 중... 이번 한번은 무료로 생성해드릴게요!'),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          backgroundColor: const Color(0xFF7C5CFC),
+                        ),
+                      );
+                    }
+                  }
+                  setState(() { _adGranted = true; });
+                  await _tryGenerate(mode: mode);
+                },
+                icon: const Icon(Icons.play_circle_outline),
+                label: const Text('광고 보고 1회 생성하기'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF7C5CFC),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            // 프리미엄 구독 버튼
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PremiumScreen()),
+                  ).then((purchased) {
+                    if (purchased == true && mounted) {
+                      setState(() {});
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('🎉 프리미엄 활성화! 무제한으로 사용하세요!'),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          backgroundColor: const Color(0xFF7C5CFC),
+                        ),
+                      );
+                    }
+                  });
+                },
+                icon: const Icon(Icons.diamond_rounded, size: 18),
+                label: const Text('프리미엄 무제한 구독'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFFE8577E),
+                  side: const BorderSide(color: Color(0xFFE8577E), width: 1.5),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('닫기'),
-          ),
-          ElevatedButton.icon(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              final rewarded = await _showRewardedAd();
-              if (rewarded) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('🎉 광고 시청 완료! 추가 생성이 가능합니다.')),
-                  );
-                }
-              } else {
-                // 광고 로드 실패 시에도 1회 허용 (테스트 환경 대응)
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('📢 광고 준비 중... 이번 한번은 무료로 생성해드릴게요!')),
-                  );
-                }
-              }
-              // 광고 성공/실패 무관하게 1회 추가 허용
-              setState(() { _adGranted = true; });
-              await _tryGenerate(mode: mode);
-            },
-            icon: const Icon(Icons.play_circle_outline),
-            label: const Text('광고 보고 생성하기'),
+            child: const Text('닫기', style: TextStyle(color: Colors.grey)),
           ),
         ],
       ),
@@ -714,18 +782,34 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                           ),
                           const SizedBox(width: 8),
                           // 잔여 횟수
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: _remainingFree > 0 ? const Color(0xFFF3EEFF) : const Color(0xFFFFEEF0),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              '🎫 $_remainingFree/$_dailyFreeLimit',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: _remainingFree > 0 ? const Color(0xFF7C5CFC) : const Color(0xFFE8577E),
-                                fontWeight: FontWeight.w700,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => const PremiumScreen()),
+                              ).then((purchased) {
+                                if (purchased == true && mounted) setState(() {});
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: _purchaseService.isPremium
+                                    ? const Color(0xFFF3EEFF)
+                                    : _remainingFree > 0 ? const Color(0xFFF3EEFF) : const Color(0xFFFFEEF0),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                _purchaseService.isPremium
+                                    ? '💎 무제한'
+                                    : '🎫 $_remainingFree/$_dailyFreeLimit',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: _purchaseService.isPremium
+                                      ? const Color(0xFF7C5CFC)
+                                      : _remainingFree > 0 ? const Color(0xFF7C5CFC) : const Color(0xFFE8577E),
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ),

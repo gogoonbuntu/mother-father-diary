@@ -15,6 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart'; // 한글 글씨체 사용을 위한 패키지 추가
 import 'firebase_options.dart';
 import 'package:clarity_flutter/clarity_flutter.dart';
+import 'services/purchase_service.dart';
 // [중요] firebase_options.dart 파일은 flutterfire CLI로 생성된 실제 파일로 교체해야 합니다.
 // 현재 파일이 비어있거나 DefaultFirebaseOptions가 없다면 앱이 실행되지 않습니다.
 
@@ -48,6 +49,7 @@ Future<void> main() async {
   Future.wait([
     _preloadGoogleFonts(),
     DiaryService().init(),
+    PurchaseService().initialize(),
     MobileAds.instance.initialize().then((_) {
       debugPrint('[광고] MobileAds SDK 초기화 완료');
     }),
