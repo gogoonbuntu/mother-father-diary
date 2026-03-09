@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:diary_app/services/purchase_service.dart';
 import 'package:diary_app/premium_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class DiaryEntryScreen extends StatefulWidget {
   final DiaryEntry? diaryEntry;
@@ -54,6 +55,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   double _devilTextSize = 18.0;
   String _activeResultMode = ''; // 'angel' or 'devil' — 하단에 어떤 결과를 표시할지
   String _aiProvider = '';
+  int _angelRating = 0;  // 천사 버전 별점 (0=미평가, 1~5)
+  int _devilRating = 0;  // 악마 버전 별점
 
   // 생성 제한
   static const int _dailyFreeLimit = 3;
@@ -335,6 +338,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       _isLoadingPositive = true;
       _positiveVersion = null;
       _aiProvider = '';
+      _angelRating = 0;
     });
     final gemini = GeminiService(apiKey: geminiApiKey, grokApiKey: grokApiKey);
     final result = await gemini.getAngelVersion(_controller.text);
@@ -356,6 +360,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       _isLoadingDevil = true;
       _devilVersion = null;
       _aiProvider = '';
+      _devilRating = 0;
     });
     final gemini = GeminiService(apiKey: geminiApiKey, grokApiKey: grokApiKey);
     final result = await gemini.getDevilVersion(_controller.text);
@@ -369,6 +374,63 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       HapticFeedback.heavyImpact();
       _saveDiaryEntryWithVersions();
     }
+  }
+
+  /// ⭐ 별점 평가 위젯 (1~5, 한번 터치)
+  Widget _buildStarRating({
+    required int currentRating,
+    required Color accentColor,
+    required Function(int) onRate,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            currentRating > 0 ? '평가 완료!' : '이 결과 어때요?',
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
+          ),
+          const SizedBox(width: 6),
+          ...List.generate(5, (i) {
+            final star = i + 1;
+            return GestureDetector(
+              onTap: () => onRate(star),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 1),
+                child: Icon(
+                  star <= currentRating ? Icons.star_rounded : Icons.star_border_rounded,
+                  size: 22,
+                  color: star <= currentRating ? accentColor : Colors.grey.shade300,
+                ),
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  /// ⭐ 별점 Firebase 저장
+  void _submitRating(String mode, int stars) {
+    if (_aiProvider.isEmpty) return;
+    
+    setState(() {
+      if (mode == 'angel') _angelRating = stars;
+      else _devilRating = stars;
+    });
+    HapticFeedback.lightImpact();
+
+    // Firebase에 모델별 통계 저장
+    final modelKey = _aiProvider.replaceAll(' ', '_').replaceAll('.', '_');
+    final ref = FirebaseDatabase.instance.ref('model_ratings/$modelKey');
+    ref.child('total_stars').set(ServerValue.increment(stars));
+    ref.child('total_count').set(ServerValue.increment(1));
+    ref.child('star_$stars').set(ServerValue.increment(1));
+    ref.child('${mode}_count').set(ServerValue.increment(1));
+    ref.child('last_rated').set(DateTime.now().toIso8601String());
+
+    debugPrint('[Rating] ⭐ $mode $_aiProvider: $stars/5');
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -1020,8 +1082,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                       ),
                                     ),
                               ),
-                              if (_aiProvider.isNotEmpty && !_isLoadingPositive)
-                                Padding(
+                              if (_aiProvider.isNotEmpty && !_isLoadingPositive) ...[                                Padding(
                                   padding: const EdgeInsets.only(top: 8),
                                   child: Text(
                                     'Powered by $_aiProvider · E2E 암호화 저장 🔑',
@@ -1029,6 +1090,12 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
+                                _buildStarRating(
+                                  currentRating: _angelRating,
+                                  accentColor: const Color(0xFF7C5CFC),
+                                  onRate: (stars) => _submitRating('angel', stars),
+                                ),
+                              ],
                             ],
                           ),
                         ),
@@ -1119,8 +1186,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                       ),
                                     ),
                               ),
-                              if (_aiProvider.isNotEmpty && !_isLoadingDevil)
-                                Padding(
+                              if (_aiProvider.isNotEmpty && !_isLoadingDevil) ...[                                Padding(
                                   padding: const EdgeInsets.only(top: 8),
                                   child: Text(
                                     'Powered by $_aiProvider · E2E 암호화 저장 🔑',
@@ -1128,6 +1194,12 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
+                                _buildStarRating(
+                                  currentRating: _devilRating,
+                                  accentColor: const Color(0xFFE8577E),
+                                  onRate: (stars) => _submitRating('devil', stars),
+                                ),
+                              ],
                             ],
                           ),
                         ),
