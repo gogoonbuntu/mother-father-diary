@@ -77,7 +77,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        '프리미엄 무제한',
+                        '프리미엄 월 50회',
                         style: TextStyle(
                           fontSize: 26, fontWeight: FontWeight.w800,
                           color: Color(0xFF2D2D3A),
@@ -85,7 +85,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'AI 일기 변환을 제한 없이 사용하세요',
+                        'AI 일기 변환을 더 넓넹하게 사용하세요',
                         style: TextStyle(fontSize: 15, color: Colors.grey.shade600),
                       ),
                       const SizedBox(height: 28),
@@ -98,7 +98,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       // ── 가격 카드 ──
                       _buildPlanCard(
                         title: '월간 구독',
-                        price: '₩2,900',
+                        price: '₩1,100',
                         period: '/ 월',
                         description: '언제든 해지 가능',
                         productId: PurchaseService.monthlyId,
@@ -108,9 +108,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       const SizedBox(height: 12),
                       _buildPlanCard(
                         title: '연간 구독',
-                        price: '₩14,900',
+                        price: '₩5,900',
                         period: '/ 년',
-                        description: '월 ₩1,242 · 57% 절약',
+                        description: '월 ₩492 · 55% 절약',
                         productId: PurchaseService.yearlyId,
                         isPopular: true,
                         gradient: const [Color(0xFF7C5CFC), Color(0xFF9B7DFF)],
@@ -118,7 +118,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                       const SizedBox(height: 12),
                       _buildPlanCard(
                         title: '평생 이용권',
-                        price: '₩29,900',
+                        price: '₩12,900',
                         period: '',
                         description: '한 번 결제로 영원히',
                         productId: PurchaseService.lifetimeId,
@@ -165,11 +165,11 @@ class _PremiumScreenState extends State<PremiumScreen> {
       ),
       child: Column(
         children: [
-          _benefitRow(Icons.all_inclusive, '무제한 AI 일기 변환'),
+          _benefitRow(Icons.bolt_rounded, '월 50회 AI 일기 변환'),
           const SizedBox(height: 12),
           _benefitRow(Icons.flash_on_rounded, '광고 없이 바로 사용'),
           const SizedBox(height: 12),
-          _benefitRow(Icons.auto_awesome, '천사 & 악마 버전 무제한'),
+          _benefitRow(Icons.auto_awesome, '천사 & 악마 버전 모두 사용'),
           const SizedBox(height: 12),
           _benefitRow(Icons.speed, '빠른 AI 응답 우선 처리'),
         ],

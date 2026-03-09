@@ -55,32 +55,44 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   String _activeResultMode = ''; // 'angel' or 'devil' — 하단에 어떤 결과를 표시할지
   String _aiProvider = '';
 
-  // 일일 생성 제한
+  // 생성 제한
   static const int _dailyFreeLimit = 3;
+  static const int _monthlyPremiumLimit = 50;
   int _todayCount = 0;
+  int _monthCount = 0;
   bool _adGranted = false; // 광고 시청으로 1회 추가 허용
   RewardedAd? _rewardedAd;
   final _purchaseService = PurchaseService();
 
-  // 오늘 날짜 키
+  // 날짜 키
   String get _todayKey => 'positive_count_${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}';
+  String get _monthKey => 'premium_month_count_${DateTime.now().year}-${DateTime.now().month}';
 
-  // 남은 무료 횟수
+  // 남은 횟수
   int get _remainingFree => math.max(0, _dailyFreeLimit - _todayCount);
+  int get _remainingPremium => math.max(0, _monthlyPremiumLimit - _monthCount);
+  int get _remainingCredits => _purchaseService.isPremium ? _remainingPremium : _remainingFree;
+  bool get _hasCredits => _remainingCredits > 0;
 
-  // 일일 생성 횟수 로드
+  // 생성 횟수 로드
   Future<void> _loadDailyCount() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _todayCount = prefs.getInt(_todayKey) ?? 0;
+      _monthCount = prefs.getInt(_monthKey) ?? 0;
     });
   }
 
-  // 일일 생성 횟수 증가
+  // 생성 횟수 증가
   Future<void> _incrementDailyCount() async {
     final prefs = await SharedPreferences.getInstance();
-    _todayCount++;
-    await prefs.setInt(_todayKey, _todayCount);
+    if (_purchaseService.isPremium) {
+      _monthCount++;
+      await prefs.setInt(_monthKey, _monthCount);
+    } else {
+      _todayCount++;
+      await prefs.setInt(_todayKey, _todayCount);
+    }
   }
 
   // 리워드 광고 로드
@@ -163,7 +175,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('🔄 $label 버전 재생성'),
-        content: Text('새로운 $label 버전을 생성하시겠습니까?\n\n⚠️ 일일 무료 횟수 1회가 소모됩니다.\n(남은 횟수: $_remainingFree/$_dailyFreeLimit)'),
+        content: Text('새로운 $label 버전을 생성하시겠습니까?\n\n⚠️ 1회가 소모됩니다.\n(남은 횟수: ${_purchaseService.isPremium ? '$_remainingPremium/$_monthlyPremiumLimit 월' : '$_remainingFree/$_dailyFreeLimit 일'})'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -194,14 +206,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       return;
     }
 
-    // 프리미엄 사용자는 한도 무시
-    if (_purchaseService.isPremium) {
-      mode == 'angel' ? await _convertToAngelVersion() : await _convertToDevilVersion();
-      return;
-    }
-
-    // 일일 한도 체크
-    if (_remainingFree <= 0) {
+    // 한도 체크 (프리미엄: 50/월, 무료: 3/일)
+    if (!_hasCredits) {
       _showLimitDialog(mode: mode);
       return;
     }
@@ -212,15 +218,24 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
 
   // 한도 초과 다이얼로그 — 광고 OR 프리미엄 선택
   void _showLimitDialog({String mode = 'angel'}) {
+    final isPremium = _purchaseService.isPremium;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('🔒 오늘 무료 횟수 소진', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+        title: Text(
+          isPremium ? '🔒 이번 달 횟수 소진' : '🔒 오늘 무료 횟수 소진',
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('하루 3회 무료 생성 횟수를 모두 사용했습니다.', style: TextStyle(fontSize: 14)),
+            Text(
+              isPremium
+                  ? '월 $_monthlyPremiumLimit회 프리미엄 횟수를 모두 사용했습니다.\n광고를 보면 추가 생성할 수 있어요!'
+                  : '하루 $_dailyFreeLimit회 무료 생성 횟수를 모두 사용했습니다.',
+              style: const TextStyle(fontSize: 14),
+            ),
             const SizedBox(height: 16),
             // 광고 보기 버튼
             SizedBox(
@@ -265,40 +280,42 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            // 프리미엄 구독 버튼
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PremiumScreen()),
-                  ).then((purchased) {
-                    if (purchased == true && mounted) {
-                      setState(() {});
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text('🎉 프리미엄 활성화! 무제한으로 사용하세요!'),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          backgroundColor: const Color(0xFF7C5CFC),
-                        ),
-                      );
-                    }
-                  });
-                },
-                icon: const Icon(Icons.diamond_rounded, size: 18),
-                label: const Text('프리미엄 무제한 구독'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: const Color(0xFFE8577E),
-                  side: const BorderSide(color: Color(0xFFE8577E), width: 1.5),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+            // 무료 사용자만 프리미엄 구독 버튼 표시
+            if (!isPremium) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const PremiumScreen()),
+                    ).then((purchased) {
+                      if (purchased == true && mounted) {
+                        setState(() {});
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('🎉 프리미엄 활성화! 월 50회까지 사용하세요!'),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: const Color(0xFF7C5CFC),
+                          ),
+                        );
+                      }
+                    });
+                  },
+                  icon: const Icon(Icons.diamond_rounded, size: 18),
+                  label: const Text('프리미엄 구독 (월 50회)'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFE8577E),
+                    side: const BorderSide(color: Color(0xFFE8577E), width: 1.5),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
         actions: [
@@ -784,30 +801,28 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                           // 잔여 횟수
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const PremiumScreen()),
-                              ).then((purchased) {
-                                if (purchased == true && mounted) setState(() {});
-                              });
+                              if (!_purchaseService.isPremium) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const PremiumScreen()),
+                                ).then((purchased) {
+                                  if (purchased == true && mounted) setState(() {});
+                                });
+                              }
                             },
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                               decoration: BoxDecoration(
-                                color: _purchaseService.isPremium
-                                    ? const Color(0xFFF3EEFF)
-                                    : _remainingFree > 0 ? const Color(0xFFF3EEFF) : const Color(0xFFFFEEF0),
+                                color: _hasCredits ? const Color(0xFFF3EEFF) : const Color(0xFFFFEEF0),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 _purchaseService.isPremium
-                                    ? '💎 무제한'
-                                    : '🎫 $_remainingFree/$_dailyFreeLimit',
+                                    ? '💎 $_remainingPremium/$_monthlyPremiumLimit월'
+                                    : '🎫 $_remainingFree/$_dailyFreeLimit일',
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: _purchaseService.isPremium
-                                      ? const Color(0xFF7C5CFC)
-                                      : _remainingFree > 0 ? const Color(0xFF7C5CFC) : const Color(0xFFE8577E),
+                                  color: _hasCredits ? const Color(0xFF7C5CFC) : const Color(0xFFE8577E),
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
