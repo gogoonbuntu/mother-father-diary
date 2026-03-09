@@ -257,21 +257,21 @@ class _MainScreenState extends State<MainScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
         child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF2193b0), Color(0xFF6dd5ed)],
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF7C5CFC), Color(0xFF9B7DFF)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
-            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0, 4))],
+            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+            boxShadow: [BoxShadow(color: const Color(0xFF7C5CFC).withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))],
           ),
           child: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              'Diary App',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              '✨ Mother Father Diary',
+              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, letterSpacing: 0.5),
             ),
             centerTitle: true,
             actions: [
