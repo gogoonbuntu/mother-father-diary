@@ -16,6 +16,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:diary_app/services/purchase_service.dart';
 import 'package:diary_app/premium_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class DiaryEntryScreen extends StatefulWidget {
   final DiaryEntry? diaryEntry;
@@ -66,6 +67,11 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   bool _adGranted = false; // 광고 시청으로 1회 추가 허용
   RewardedAd? _rewardedAd;
   final _purchaseService = PurchaseService();
+
+  // 음성 인식
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
+  bool _speechAvailable = false;
 
   // 날짜 키
   String get _todayKey => 'positive_count_${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}';
@@ -536,11 +542,80 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
     // 일일 생성 횟수 로드 & 리워드 광고 미리 로드
     _loadDailyCount();
     _loadRewardedAd();
+
+    // 음성 인식 초기화
+    _initSpeech();
     
     // 지연된 초기화를 위해 다음 프레임에서 데이터 로드
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadExistingEntry();
     });
+  }
+
+  Future<void> _initSpeech() async {
+    _speechAvailable = await _speech.initialize(
+      onError: (error) {
+        debugPrint('[음성인식] 오류: ${error.errorMsg}');
+        if (mounted) setState(() { _isListening = false; });
+      },
+      onStatus: (status) {
+        debugPrint('[음성인식] 상태: $status');
+        if (status == 'done' || status == 'notListening') {
+          if (mounted) setState(() { _isListening = false; });
+        }
+      },
+    );
+    debugPrint('[음성인식] 초기화: $_speechAvailable');
+  }
+
+  void _toggleListening() async {
+    if (!_speechAvailable) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('🎙️ 음성 인식을 사용할 수 없습니다. 마이크 권한을 확인해주세요.'),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          backgroundColor: const Color(0xFFE8577E),
+        ),
+      );
+      return;
+    }
+
+    if (_isListening) {
+      await _speech.stop();
+      setState(() { _isListening = false; });
+    } else {
+      // 녹음 시작 전 텍스트 저장 (partial result가 전체 인식 텍스트를 반환하므로)
+      final textBeforeListening = _controller.text;
+      final needsSpace = textBeforeListening.isNotEmpty &&
+          !textBeforeListening.endsWith(' ') &&
+          !textBeforeListening.endsWith('\n');
+
+      setState(() { _isListening = true; });
+      HapticFeedback.mediumImpact();
+
+      // 기기 로케일 사용 (한국어 고정 대신)
+      final locale = Localizations.localeOf(context);
+      final localeId = '${locale.languageCode}_${locale.countryCode ?? locale.languageCode.toUpperCase()}';
+      debugPrint('[음성인식] 로케일: $localeId');
+
+      await _speech.listen(
+        onResult: (result) {
+          setState(() {
+            // 기존 텍스트 + 공백 + 인식된 전체 텍스트 (매번 교체)
+            final separator = needsSpace ? ' ' : '';
+            _controller.text = '$textBeforeListening$separator${result.recognizedWords}';
+            _controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: _controller.text.length),
+            );
+          });
+        },
+        localeId: localeId,
+        listenMode: stt.ListenMode.dictation,
+        cancelOnError: true,
+        partialResults: true,
+      );
+    }
   }
 
   Future<void> _loadExistingEntry() async {
@@ -921,7 +996,9 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                       ),
                     ),
                     const SizedBox(height: 12),
-                    // 일기 작성 영역
+                    // 일기 작성 영역 + 마이크 버튼
+                    Stack(
+                      children: [
                     Container(
                       height: MediaQuery.of(context).viewInsets.bottom > 0
                           ? MediaQuery.of(context).size.height * 0.25
@@ -929,9 +1006,12 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(20),
+                        border: _isListening ? Border.all(color: const Color(0xFFE8577E), width: 2) : null,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF7C5CFC).withValues(alpha: 0.08),
+                            color: _isListening
+                                ? const Color(0xFFE8577E).withValues(alpha: 0.15)
+                                : const Color(0xFF7C5CFC).withValues(alpha: 0.08),
                             blurRadius: 16,
                             offset: const Offset(0, 6),
                           ),
@@ -949,8 +1029,11 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                               expands: true,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: AppLocalizations.of(context)!.diaryHint,
-                                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+                                hintText: _isListening ? '🎙️ 말해보세요...' : AppLocalizations.of(context)!.diaryHint,
+                                hintStyle: TextStyle(
+                                  color: _isListening ? const Color(0xFFE8577E) : Colors.grey.shade400,
+                                  fontSize: 15,
+                                ),
                                 contentPadding: const EdgeInsets.all(16.0),
                                 filled: false,
                               ),
@@ -965,6 +1048,41 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                           ),
                         ),
                       ),
+                    ),
+                    // 🎙️ 마이크 버튼 (FAB)
+                    Positioned(
+                      right: 12,
+                      bottom: 12,
+                      child: GestureDetector(
+                        onTap: _toggleListening,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: _isListening
+                                  ? [const Color(0xFFE8577E), const Color(0xFFFF7E9D)]
+                                  : [const Color(0xFF7C5CFC), const Color(0xFF9B7DFF)],
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: (_isListening ? const Color(0xFFE8577E) : const Color(0xFF7C5CFC)).withValues(alpha: 0.4),
+                                blurRadius: _isListening ? 16 : 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            _isListening ? Icons.stop_rounded : Icons.mic_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ),
+                      ],
                     ),
                     // 첫 사용자를 위한 안내 가이드
                     if (_controller.text.isEmpty && _positiveVersion == null && _devilVersion == null && widget.diaryEntry == null)

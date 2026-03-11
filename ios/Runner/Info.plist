@@ -74,6 +74,11 @@
 	<!-- Privacy - Camera Usage Description -->
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to your camera to take photos for your diary entries. 일기에 사진을 촬영하기 위해 카메라 접근 권한이 필요합니다.</string>
+	<!-- Privacy - Microphone Usage Description (음성 인식) -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone access for voice-to-text diary entry. 음성으로 일기를 작성하기 위해 마이크 접근 권한이 필요합니다.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app uses speech recognition to convert your voice to text for diary entries. 음성을 텍스트로 변환하여 일기를 작성하기 위해 음성 인식 권한이 필요합니다.</string>
 	<!-- Google 로그인(google_sign_in) 권한 및 설정 -->
 	<key>CFBundleURLTypes</key>
 	<array>
