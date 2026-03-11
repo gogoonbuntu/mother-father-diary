@@ -671,16 +671,6 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.transparent,
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          title: Text(
-            widget.diaryEntry == null ? AppLocalizations.of(context)!.diaryEntry : AppLocalizations.of(context)!.editDiary,
-            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-        ),
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -699,11 +689,19 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
               SingleChildScrollView(
                 child: Padding(
                   padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + kToolbarHeight + 8,
+                    top: MediaQuery.of(context).padding.top + 12,
                     left: 16, right: 16, bottom: 24,
                   ),
                   child: Column(
                     children: [
+                    // 📝 타이틀 (스크롤과 함께 이동)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        widget.diaryEntry == null ? AppLocalizations.of(context)!.diaryEntry : AppLocalizations.of(context)!.editDiary,
+                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF2D2D3A)),
+                      ),
+                    ),
                     // 📅 날짜 & 기분 선택 카드
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1006,12 +1004,12 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                           ),
                         ),
                       ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     // 😇 천사 버전 결과 카드 (activeResultMode == 'angel'일 때만)
                     if ((_positiveVersion != null || _isLoadingPositive) && _activeResultMode == 'angel')
                       SafeArea(
                         child: Container(
-                          margin: const EdgeInsets.only(top: 4),
+
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.85),
@@ -1115,7 +1113,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                     if ((_devilVersion != null || _isLoadingDevil) && _activeResultMode == 'devil')
                       SafeArea(
                         child: Container(
-                          margin: const EdgeInsets.only(top: 4),
+
+
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.85),
