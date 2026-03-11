@@ -159,10 +159,17 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   void _onModeButtonPressed(String mode) {
     FocusScope.of(context).unfocus();
 
-    // 이미 해당 버전이 있으면 → 재생성 확인 팝업
     final hasVersion = (mode == 'angel' && _positiveVersion != null) ||
                        (mode == 'devil' && _devilVersion != null);
-    if (hasVersion) {
+
+    // 해당 버전이 이미 있는데, 현재 다른 모드를 보고 있으면 → 보기 전환만
+    if (hasVersion && _activeResultMode != mode) {
+      setState(() { _activeResultMode = mode; });
+      return;
+    }
+
+    // 해당 버전이 이미 있고, 현재 그 모드를 보고 있으면 → 재생성 확인
+    if (hasVersion && _activeResultMode == mode) {
       _showRegenerateConfirm(mode);
       return;
     }
@@ -810,7 +817,9 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                                     : const Text('😇', style: TextStyle(fontSize: 16)),
                                 label: Text(
-                                  _positiveVersion != null ? '천사 재생성' : '천사 버전',
+                                  _positiveVersion != null
+                                      ? (_activeResultMode == 'angel' ? '천사 재생성' : '천사버전 보기')
+                                      : '천사 버전',
                                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                                 ),
                                 style: ElevatedButton.styleFrom(
@@ -846,7 +855,9 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                                     : const Text('😈', style: TextStyle(fontSize: 16)),
                                 label: Text(
-                                  _devilVersion != null ? '악마 재생성' : '악마 버전',
+                                  _devilVersion != null
+                                      ? (_activeResultMode == 'devil' ? '악마 재생성' : '악마버전 보기')
+                                      : '악마 버전',
                                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                                 ),
                                 style: ElevatedButton.styleFrom(
