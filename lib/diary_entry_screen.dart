@@ -22,8 +22,9 @@ class DiaryEntryScreen extends StatefulWidget {
   final DiaryEntry? diaryEntry;
   final Color? bgColor;
   final String? fontFamily;
+  final ScrollController? scrollController;
 
-  const DiaryEntryScreen({super.key, this.diaryEntry, this.bgColor, this.fontFamily});
+  const DiaryEntryScreen({super.key, this.diaryEntry, this.bgColor, this.fontFamily, this.scrollController});
 
   @override
   State<DiaryEntryScreen> createState() => _DiaryEntryScreenState();
@@ -736,47 +737,71 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       ];
     }
     
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        await _saveDiaryEntry();
-        if (context.mounted) Navigator.pop(context);
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        backgroundColor: Colors.transparent,
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFF3EEFF), // 연보라
-                Color(0xFFFFF0F5), // 연핑크
-                Color(0xFFEEF7FF), // 연하늘
-              ],
-            ),
-          ),
-          child: Stack(
-            children: [
-              // 키보드 팝업시 스크롤 가능하게 하는 구조
-              SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).padding.top + 12,
-                    left: 16, right: 16, bottom: 24,
-                  ),
-                  child: Column(
-                    children: [
-                    // 📝 타이틀 (스크롤과 함께 이동)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        widget.diaryEntry == null ? AppLocalizations.of(context)!.diaryEntry : AppLocalizations.of(context)!.editDiary,
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF2D2D3A)),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFF3EEFF),
+            Color(0xFFFFF0F5),
+            Color(0xFFEEF7FF),
+          ],
+        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            controller: widget.scrollController,
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 16,
+                left: 16, right: 16, bottom: 24,
+              ),
+              child: Column(
+                children: [
+                  // 드래그 핸들
+                  Center(
+                    child: Container(
+                      width: 40, height: 4,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
+                  ),
+                  // 📝 타이틀
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.diaryEntry == null ? AppLocalizations.of(context)!.diaryEntry : AppLocalizations.of(context)!.editDiary,
+                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF2D2D3A)),
+                        ),
+                        // 저장 버튼
+                        GestureDetector(
+                          onTap: () async {
+                            await _saveDiaryEntry();
+                            if (context.mounted) Navigator.pop(context);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF7C5CFC), Color(0xFF9B7DFF)],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text('💾 저장', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                     // 📅 날짜 & 기분 선택 카드
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -891,10 +916,11 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     : const Text('😇', style: TextStyle(fontSize: 16)),
                                 label: Text(
                                   _positiveVersion != null
-                                      ? (_activeResultMode == 'angel' ? '천사 재생성' : '천사버전 보기')
-                                      : '천사 버전',
+                                      ? (_activeResultMode == 'angel' ? '위로 재생성' : '위로 보기')
+                                      : '천사의 위로',
                                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                                 ),
+
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.transparent,
                                   foregroundColor: Colors.white,
@@ -929,8 +955,9 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     : const Text('😈', style: TextStyle(fontSize: 16)),
                                 label: Text(
                                   _devilVersion != null
-                                      ? (_activeResultMode == 'devil' ? '악마 재생성' : '악마버전 보기')
-                                      : '악마 버전',
+                                      ? (_activeResultMode == 'devil' ? '공감 재생성' : '공감 보기')
+                                      : '악마의 공감',
+
                                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                                 ),
                                 style: ElevatedButton.styleFrom(
@@ -1374,11 +1401,9 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-  
+        );
+      }
+
   // 안전하게 폰트 스타일을 가져오는 헬퍼 메서드
   TextStyle _getFontStyle(String fontFamily, double fontSize, {FontWeight? fontWeight, Color? color}) {
     // 지원되는 폰트 목록 - main.dart와 일치시킴

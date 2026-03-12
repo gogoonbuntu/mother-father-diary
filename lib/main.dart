@@ -182,8 +182,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
-  late PageController _pageController;
+
 
 
   // 테마/색상 상태를 MainScreen에서 관리
@@ -216,17 +215,7 @@ class _MainScreenState extends State<MainScreen> {
     'OpenSans',
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: _currentIndex);
-  }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -307,28 +296,7 @@ class _MainScreenState extends State<MainScreen> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: PageView(
-          controller: _pageController,
-          onPageChanged: (index) => setState(() => _currentIndex = index),
-          children: [
-            DiaryEntryScreen(bgColor: _bgColor, fontFamily: _fontFamily),
-            DiaryListScreen(bgColor: _bgColor, fontFamily: _fontFamily),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          _pageController.animateToPage(
-            index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-        },
-        items: [
-          BottomNavigationBarItem(icon: const Icon(Icons.edit), label: AppLocalizations.of(context)!.diaryEntry),
-          BottomNavigationBarItem(icon: const Icon(Icons.list), label: AppLocalizations.of(context)!.diaryList),
-        ],
+        child: DiaryListScreen(bgColor: _bgColor, fontFamily: _fontFamily),
       ),
     ),
     );
