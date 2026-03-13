@@ -66,6 +66,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   int _todayCount = 0;
   int _monthCount = 0;
   bool _adGranted = false; // 광고 시청으로 1회 추가 허용
+  bool _ratingGranted = false; // 별점 평가로 1회 추가 허용
+  bool _hasRatedForCreditToday = false; // 오늘 이미 별점 크레딧 사용 여부
   RewardedAd? _rewardedAd;
   final _purchaseService = PurchaseService();
 
@@ -77,6 +79,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   // 날짜 키
   String get _todayKey => 'positive_count_${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}';
   String get _monthKey => 'premium_month_count_${DateTime.now().year}-${DateTime.now().month}';
+  String get _ratingCreditKey => 'rating_credit_${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}';
 
   // 남은 횟수
   int get _remainingFree => math.max(0, _dailyFreeLimit - _todayCount);
@@ -90,6 +93,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
     setState(() {
       _todayCount = prefs.getInt(_todayKey) ?? 0;
       _monthCount = prefs.getInt(_monthKey) ?? 0;
+      _hasRatedForCreditToday = prefs.getBool(_ratingCreditKey) ?? false;
     });
   }
 
@@ -223,6 +227,13 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       return;
     }
 
+    // 별점 평가 보너스가 있으면 사용
+    if (_ratingGranted) {
+      _ratingGranted = false;
+      mode == 'angel' ? await _convertToAngelVersion() : await _convertToDevilVersion();
+      return;
+    }
+
     // 한도 체크 (프리미엄: 50/월, 무료: 3/일)
     if (!_hasCredits) {
       _showLimitDialog(mode: mode);
@@ -254,6 +265,27 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
               style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 16),
+            // ⭐ 별점 평가로 1회 추가 (하루 1회, 기존 AI 결과가 있을 때만)
+            if (!_hasRatedForCreditToday && (_positiveVersion != null || _devilVersion != null)) ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _showRatingForCreditDialog(mode: mode);
+                  },
+                  icon: const Icon(Icons.star_rounded),
+                  label: const Text('⭐ AI 결과 평가하고 1회 추가'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF9800),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
             // 광고 보기 버튼
             SizedBox(
               width: double.infinity,
@@ -341,6 +373,118 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
             child: const Text('닫기', style: TextStyle(color: Colors.grey)),
           ),
         ],
+      ),
+    );
+  }
+
+  // ⭐ 별점 평가로 크레딧 받기 다이얼로그
+  void _showRatingForCreditDialog({String mode = 'angel'}) {
+    int tempRating = 0;
+    final hasAngel = _positiveVersion != null;
+    final hasDevil = _devilVersion != null;
+    // 가장 최근 결과를 평가 대상으로
+    final targetMode = _activeResultMode.isNotEmpty 
+        ? _activeResultMode 
+        : (hasDevil ? 'devil' : 'angel');
+    final targetText = targetMode == 'angel' ? _positiveVersion : _devilVersion;
+    
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(
+            targetMode == 'angel' ? '😇 천사 버전 평가' : '😈 악마 버전 평가',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 결과 미리보기
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                constraints: const BoxConstraints(maxHeight: 120),
+                child: SingleChildScrollView(
+                  child: Text(
+                    targetText ?? '',
+                    style: const TextStyle(fontSize: 13, height: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('이 결과가 얼마나 만족스러웠나요?', 
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 12),
+              // 별점 선택
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (i) {
+                  final star = i + 1;
+                  return GestureDetector(
+                    onTap: () => setDialogState(() => tempRating = star),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Icon(
+                        star <= tempRating ? Icons.star_rounded : Icons.star_border_rounded,
+                        size: 36,
+                        color: star <= tempRating ? const Color(0xFFFF9800) : Colors.grey.shade300,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              if (tempRating > 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    ['', '별로예요', '아쉬워요', '괜찮아요', '좋아요!', '최고예요!'][tempRating],
+                    style: const TextStyle(fontSize: 13, color: Color(0xFFFF9800), fontWeight: FontWeight.w600),
+                  ),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('취소', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              onPressed: tempRating > 0 ? () async {
+                Navigator.pop(ctx);
+                // 별점 저장 (Firebase)
+                _submitRating(targetMode, tempRating);
+                // 오늘 별점 크레딧 사용 완료 표시
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool(_ratingCreditKey, true);
+                setState(() {
+                  _hasRatedForCreditToday = true;
+                  _ratingGranted = true;
+                });
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('⭐ 평가 감사합니다! 1회 추가 생성이 가능합니다.'),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: const Color(0xFFFF9800),
+                    ),
+                  );
+                }
+                await _tryGenerate(mode: mode);
+              } : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFF9800),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              child: const Text('평가하고 1회 받기'),
+            ),
+          ],
+        ),
       ),
     );
   }
