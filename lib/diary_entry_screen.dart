@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:diary_app/main.dart' show kSupportedFonts;
 import 'package:flutter/services.dart';
 import 'package:diary_app/models/diary_entry.dart';
 import 'package:diary_app/generated/app_localizations.dart';
@@ -1527,21 +1528,9 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
 
   // 안전하게 폰트 스타일을 가져오는 헬퍼 메서드
   TextStyle _getFontStyle(String fontFamily, double fontSize, {FontWeight? fontWeight, Color? color}) {
-    // 지원되는 폰트 목록 - main.dart와 일치시킴
-    final supportedFonts = [
-      'Roboto',      // 기본 영문 폰트
-      'NotoSansKR',  // 한글 기본 폰트
-      'NanumGothic', // 한글 기본 폰트
-      'NanumMyeongjo', // 한글 글씨체
-      'Jua',         // 한글 글씨체
-      'GamjaFlower', // 한글 글씨체
-      'DoHyeon',     // 한글 글씨체
-      'PoorStory',   // 한글 글씨체
-    ];
-    
     try {
-      // 지원되는 폰트인지 확인
-      if (supportedFonts.contains(fontFamily)) {
+      // 통합 지원 폰트 목록 사용
+      if (kSupportedFonts.contains(fontFamily)) {
         return GoogleFonts.getFont(
           fontFamily,
           fontSize: fontSize,

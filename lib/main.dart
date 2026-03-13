@@ -13,6 +13,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart'; // 한글 글씨체 사용을 위한 패키지 추가
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'firebase_options.dart';
 import 'package:clarity_flutter/clarity_flutter.dart';
 import 'services/purchase_service.dart';
@@ -56,21 +58,26 @@ Future<void> main() async {
   ]);
 }
 
+// 지원되는 Google Fonts 통합 목록 (앞으로 이 하나만 사용)
+const List<String> kSupportedFonts = [
+  'Jua',
+  'Do Hyeon',
+  'Gamja Flower',
+  'Hi Melody',
+  'East Sea Dokdo',
+  'Poor Story',
+  'Nanum Pen Script',
+  'Nanum Gothic',
+  'Nanum Myeongjo',
+  'Noto Sans KR',
+  'Roboto',
+  'Lato',
+  'Open Sans',
+];
+
 // Google Fonts 미리 로딩 함수
 Future<void> _preloadGoogleFonts() async {
-  // 지원되는 폰트 목록
-  final fontList = [
-    'Roboto',      // 기본 영문 폰트
-    'NotoSansKR',  // 한글 기본 폰트
-    'NanumGothic', // 한글 기본 폰트
-    'NanumMyeongjo', // 한글 글씨체
-    'Jua',         // 한글 글씨체
-    'GamjaFlower', // 한글 글씨체
-    'DoHyeon',     // 한글 글씨체
-    'PoorStory',   // 한글 글씨체
-  ];
-  
-  await Future.wait(fontList.map((fontFamily) async {
+  await Future.wait(kSupportedFonts.map((fontFamily) async {
     try {
       GoogleFonts.getFont(fontFamily);
       debugPrint('폰트 로딩 성공: $fontFamily');
@@ -187,7 +194,8 @@ class _MainScreenState extends State<MainScreen> {
 
   // 테마/색상 상태를 MainScreen에서 관리
   Color _bgColor = const Color(0xFFFFE0E6);
-  String _fontFamily = 'NanumPenScript';
+  String _fontFamily = 'Nanum Pen Script';
+  bool _settingsLoaded = false;
 
   static const List<Color> _colorOptions = [
     Color(0xFFFFE0E6), // soft pink
@@ -200,20 +208,76 @@ class _MainScreenState extends State<MainScreen> {
     Color(0xFFF9E7E7), // light rose
   ];
 
-  // Google Fonts를 통해 사용할 글씨체 목록 - 지원되는 폰트만 포함
-  static const List<String> _fontOptions = [
-    // 한글 글씨체
-    'Jua',
-    'DoHyeon',
-    'GamjaFlower',
-    'HiMelody',
-    'EastSeaDokdo',
-    'PoorStory',
-    // 영어 글씨체
-    'Roboto',
-    'Lato',
-    'OpenSans',
-  ];
+  // Google Fonts를 통해 사용할 글씨체 목록 - 통합 목록 사용
+  static final List<String> _fontOptions = kSupportedFonts.toList();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserSettings();
+  }
+
+  /// Firebase + SharedPreferences에서 사용자 설정 로드
+  Future<void> _loadUserSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedFont = prefs.getString('user_font');
+    final savedColor = prefs.getInt('user_bg_color');
+    
+    // 로컬 캐시에서 먼저 불러오기
+    if (savedFont != null || savedColor != null) {
+      setState(() {
+        if (savedFont != null) _fontFamily = savedFont;
+        if (savedColor != null) _bgColor = Color(savedColor);
+        _settingsLoaded = true;
+      });
+    }
+    
+    // Firebase에서 동기화
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final snapshot = await FirebaseDatabase.instance
+            .ref('users/${user.uid}/settings')
+            .get();
+        if (snapshot.exists) {
+          final data = snapshot.value as Map<dynamic, dynamic>;
+          setState(() {
+            if (data['fontFamily'] != null) _fontFamily = data['fontFamily'] as String;
+            if (data['bgColor'] != null) _bgColor = Color(data['bgColor'] as int);
+            _settingsLoaded = true;
+          });
+          // 로컬 캐시 업데이트
+          await prefs.setString('user_font', _fontFamily);
+          await prefs.setInt('user_bg_color', _bgColor.toARGB32());
+        }
+      }
+    } catch (e) {
+      debugPrint('[설정] Firebase 로드 실패: $e');
+    }
+    if (!_settingsLoaded) setState(() => _settingsLoaded = true);
+  }
+
+  /// 설정 저장 (SharedPreferences + Firebase)
+  Future<void> _saveUserSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_font', _fontFamily);
+    await prefs.setInt('user_bg_color', _bgColor.toARGB32());
+    
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseDatabase.instance
+            .ref('users/${user.uid}/settings')
+            .set({
+          'fontFamily': _fontFamily,
+          'bgColor': _bgColor.toARGB32(),
+          'updatedAt': DateTime.now().toIso8601String(),
+        });
+      }
+    } catch (e) {
+      debugPrint('[설정] Firebase 저장 실패: $e');
+    }
+  }
 
 
 
@@ -277,8 +341,14 @@ class _MainScreenState extends State<MainScreen> {
             colorOptions: _colorOptions,
             currentFont: _fontFamily,
             fontOptions: _fontOptions,
-            onColorSelected: (color) => setState(() => _bgColor = color),
-            onFontSelected: (font) => setState(() => _fontFamily = font),
+            onColorSelected: (color) {
+              setState(() => _bgColor = color);
+              _saveUserSettings();
+            },
+            onFontSelected: (font) {
+              setState(() => _fontFamily = font);
+              _saveUserSettings();
+            },
           ),
         ),
       );
@@ -289,12 +359,8 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFe0eafc), Color(0xFFcfdef3)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
+        decoration: BoxDecoration(
+          color: _bgColor,
         ),
         child: DiaryListScreen(bgColor: _bgColor, fontFamily: _fontFamily),
       ),
