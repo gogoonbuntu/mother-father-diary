@@ -772,34 +772,11 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                       ),
                     ),
                   ),
-                  // 📝 타이틀
                   Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          widget.diaryEntry == null ? AppLocalizations.of(context)!.diaryEntry : AppLocalizations.of(context)!.editDiary,
-                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF2D2D3A)),
-                        ),
-                        // 저장 버튼
-                        GestureDetector(
-                          onTap: () async {
-                            await _saveDiaryEntry();
-                            if (context.mounted) Navigator.pop(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF7C5CFC), Color(0xFF9B7DFF)],
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Text('💾 저장', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      widget.diaryEntry == null ? AppLocalizations.of(context)!.diaryEntry : AppLocalizations.of(context)!.editDiary,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Color(0xFF2D2D3A)),
                     ),
                   ),
                     // 📅 날짜 & 기분 선택 카드
