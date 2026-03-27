@@ -3,6 +3,9 @@ import 'package:diary_app/generated/app_localizations.dart';
 import 'package:diary_app/theme_selector.dart';
 import 'package:diary_app/google_sign_in_service.dart';
 import 'package:diary_app/privacy_info_screen.dart';
+import 'package:diary_app/services/notification_service.dart';
+import 'package:diary_app/main.dart' show globalLocaleNotifier;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io' show Platform;
 
@@ -32,22 +35,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _loggingOut = false;
   late Color _currentColor;
   late String _currentFont;
+  bool _notificationEnabled = true;
 
   @override
   void initState() {
     super.initState();
     _currentColor = widget.currentColor;
     _currentFont = widget.currentFont;
+    _loadNotificationSetting();
+  }
+
+  Future<void> _loadNotificationSetting() async {
+    final enabled = await NotificationService().isEnabled();
+    if (mounted) {
+      setState(() => _notificationEnabled = enabled);
+    }
   }
 
   /// 이메일 보내기 (버그리포트 / 개선제안)
   Future<void> _sendEmail({required bool isBugReport}) async {
+    final l10n = AppLocalizations.of(context)!;
     final subject = isBugReport
-        ? '[부모일기] 버그 리포트'
-        : '[부모일기] 개선 제안';
+        ? '[${l10n.shareCardAppName}] ${l10n.bugReport}'
+        : '[${l10n.shareCardAppName}] ${l10n.improvementSuggestion}';
     final body = isBugReport
-        ? '안녕하세요,\n\n[버그 설명]\n\n\n[재현 방법]\n1. \n2. \n3. \n\n[기기 정보]\n- OS: ${Platform.operatingSystem} ${Platform.operatingSystemVersion}\n- 앱 버전: 1.0.0\n'
-        : '안녕하세요,\n\n[개선 제안 내용]\n\n\n[기대 효과]\n\n\n감사합니다!\n';
+        ? l10n.bugReportTemplate('${Platform.operatingSystem} ${Platform.operatingSystemVersion}')
+        : l10n.improvementTemplate;
 
     final uri = Uri(
       scheme: 'mailto',
@@ -63,7 +76,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('이메일 앱을 열 수 없습니다. tmddud333@naver.com 으로 직접 보내주세요.')),
+          SnackBar(content: Text(l10n.emailFallback)),
         );
       }
     }
@@ -73,7 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.settings)),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,6 +125,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 24),
 
+            // 🌐 언어 선택
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF0F4FF),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF7C5CFC).withOpacity(0.15)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.language, size: 20, color: Color(0xFF7C5CFC)),
+                      const SizedBox(width: 8),
+                      Text(
+                        AppLocalizations.of(context)!.selectTheme.replaceAll(AppLocalizations.of(context)!.theme, '🌐'),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      _buildLanguageChip(context, '🇰🇷', '한국어', 'ko'),
+                      const SizedBox(width: 8),
+                      _buildLanguageChip(context, '🇺🇸', 'English', 'en'),
+                      const SizedBox(width: 8),
+                      _buildLanguageChip(context, '🇯🇵', '日本語', 'ja'),
+                      const SizedBox(width: 8),
+                      _buildLanguageChip(context, '🇫🇷', 'Français', 'fr'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // 📬 버그리포트 & 개선제안
             Container(
               width: double.infinity,
@@ -124,19 +176,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.mail_outline, size: 20, color: Colors.black87),
-                      SizedBox(width: 8),
+                      const Icon(Icons.mail_outline, size: 20, color: Colors.black87),
+                      const SizedBox(width: 8),
                       Text(
-                        '의견 보내기',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        AppLocalizations.of(context)!.sendFeedback,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '버그나 개선 아이디어를 알려주세요!',
+                    AppLocalizations.of(context)!.feedbackSubtitle,
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                   ),
                   const SizedBox(height: 12),
@@ -146,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: OutlinedButton.icon(
                           onPressed: () => _sendEmail(isBugReport: true),
                           icon: const Icon(Icons.bug_report, size: 18),
-                          label: const Text('버그 리포트', style: TextStyle(fontSize: 13)),
+                          label: Text(AppLocalizations.of(context)!.bugReport, style: const TextStyle(fontSize: 13)),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.red.shade600,
                             side: BorderSide(color: Colors.red.shade300),
@@ -160,7 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: OutlinedButton.icon(
                           onPressed: () => _sendEmail(isBugReport: false),
                           icon: const Icon(Icons.lightbulb_outline, size: 18),
-                          label: const Text('개선 제안', style: TextStyle(fontSize: 13)),
+                          label: Text(AppLocalizations.of(context)!.improvementSuggestion, style: const TextStyle(fontSize: 13)),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: Colors.blue.shade600,
                             side: BorderSide(color: Colors.blue.shade300),
@@ -174,6 +226,77 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            // 🔔 알림 설정
+            Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3EEFF),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF7C5CFC).withOpacity(0.2)),
+              ),
+              child: SwitchListTile(
+                value: _notificationEnabled,
+                onChanged: (value) async {
+                  setState(() => _notificationEnabled = value);
+                  await NotificationService().setEnabled(value);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(value ? '🔔 매일 저녁 9시에 알려드릴게요!' : '🔕 일기 알림을 껐어요.'),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        backgroundColor: const Color(0xFF7C5CFC),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                secondary: Icon(
+                  _notificationEnabled ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                  color: const Color(0xFF7C5CFC),
+                ),
+                title: Text(AppLocalizations.of(context)!.diaryNotification, style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text(
+                  AppLocalizations.of(context)!.notificationSubtitle,
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+                activeColor: const Color(0xFF7C5CFC),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            if (_notificationEnabled)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      await NotificationService().showTestNotification();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('🧪 테스트 알림을 보냈어요! 알림 센터를 확인하세요.'),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: const Color(0xFF7C5CFC),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.science_rounded, size: 18),
+                    label: Text(AppLocalizations.of(context)!.testNotification, style: const TextStyle(fontSize: 13)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFF7C5CFC),
+                      side: const BorderSide(color: Color(0xFF7C5CFC)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+              ),
+
             const SizedBox(height: 16),
 
             // 🔒 데이터 보호
@@ -185,8 +308,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               child: ListTile(
                 leading: Icon(Icons.shield_rounded, color: Colors.green.shade600),
-                title: const Text('데이터 보호', style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: Text('종단간 암호화(E2EE) 적용', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                title: Text(AppLocalizations.of(context)!.dataProtection, style: const TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: Text(AppLocalizations.of(context)!.e2eEncryption, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                 trailing: Icon(Icons.chevron_right, color: Colors.grey.shade400),
                 onTap: () {
                   Navigator.push(
@@ -243,5 +366,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-}
 
+  Widget _buildLanguageChip(BuildContext context, String flag, String label, String langCode) {
+    final currentCode = globalLocaleNotifier.value?.languageCode ??
+        Localizations.localeOf(context).languageCode;
+    final isSelected = currentCode == langCode;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () async {
+          final newLocale = Locale(langCode);
+          globalLocaleNotifier.value = newLocale;
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('app_locale', langCode);
+          if (mounted) {
+            setState(() {});
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFF7C5CFC) : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? const Color(0xFF7C5CFC) : Colors.grey.shade300,
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: isSelected
+                ? [BoxShadow(color: const Color(0xFF7C5CFC).withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))]
+                : [],
+          ),
+          child: Column(
+            children: [
+              Text(flag, style: const TextStyle(fontSize: 22)),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? Colors.white : Colors.grey.shade700,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

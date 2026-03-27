@@ -1,0 +1,171 @@
+{
+  "@@locale": "fr",
+
+  "appTitle": "Journal Intime",
+  "settings": "Paramètres",
+  "logout": "Déconnexion",
+  "theme": "Thème",
+  "font": "Police",
+  "selectTheme": "Choisir un thème",
+  "selectFont": "Choisir une police",
+  "diaryEntry": "Écrire",
+  "diaryList": "Liste des entrées",
+  "login": "Connexion",
+  "googleSignIn": "Se connecter avec Google",
+  "logoutConfirm": "Voulez-vous vraiment vous déconnecter ?",
+  "colorSelected": "Couleur de fond modifiée.",
+  "fontSelected": "Police modifiée.",
+  "editDiary": "Modifier",
+  "positiveVersion": "Version positive :",
+  "convertToPositive": "Convertir en version positive",
+  "diaryHint": "Écrivez votre journal ici",
+  "moodHappy": "Heureux",
+  "moodSad": "Triste",
+  "moodNeutral": "Neutre",
+  "loginSubtitle": "Enregistrez chaleureusement votre précieuse journée",
+  "noDiaries": "Aucune entrée pour le moment. Créez votre première entrée !",
+  "hidePositive": "Masquer la version positive",
+  "showPositive": "Afficher la version positive",
+  "positiveButton": "Générer la version positive",
+
+  "cancel": "Annuler",
+  "close": "Fermer",
+  "delete": "Supprimer",
+  "confirm": "OK",
+  "share": "Partager",
+
+  "exitAppTitle": "Quitter l'app",
+  "exitAppContent": "Voulez-vous vraiment quitter ?",
+  "exitAppConfirm": "Quitter",
+
+  "settingsTooltip": "Paramètres",
+
+  "emptyDiaryTitle": "Aucune entrée pour le moment",
+  "emptyDiarySubtitle": "Appuyez sur le bouton ci-dessous pour écrire votre premier journal !",
+  "newDiaryButton": "✏️ Nouveau journal",
+  "deleteConfirmTitle": "Confirmer la suppression",
+  "deleteConfirmContent": "Voulez-vous supprimer cette entrée ?",
+
+  "angel": "Ange",
+  "devil": "Diable",
+  "angelComfort": "Réconfort de l'Ange",
+  "devilEmpathy": "Empathie du Diable",
+  "regenerateAngel": "Régénérer le réconfort",
+  "viewAngel": "Voir le réconfort",
+  "regenerateDevil": "Régénérer l'empathie",
+  "viewDevil": "Voir l'empathie",
+  "originalDiary": "Journal original",
+  "shareAsImageCard": "Partager en carte image",
+
+  "regenerateConfirm": "Générer une nouvelle version {label} ?\n\n⚠️ 1 crédit sera utilisé.\n(Restant : {remaining})",
+  "@regenerateConfirm": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"}
+    }
+  },
+  "regenerateButton": "Régénérer",
+
+  "premiumLimitReached": "Vous avez utilisé vos {limit} crédits premium ce mois-ci.\nRegardez une pub pour une génération supplémentaire !",
+  "@premiumLimitReached": {
+    "placeholders": { "limit": {"type": "int"} }
+  },
+  "freeLimitReached": "Vous avez utilisé vos {limit} crédits gratuits aujourd'hui.",
+  "@freeLimitReached": {
+    "placeholders": { "limit": {"type": "int"} }
+  },
+  "watchAdToGenerate": "Regarder une pub pour 1 génération",
+  "premiumSubscription": "Abonnement Premium (300/mois)",
+
+  "ratingQuestion": "Êtes-vous satisfait de ce résultat ?",
+  "ratingBad": "Mauvais",
+  "ratingPoor": "Décevant",
+  "ratingOk": "Correct",
+  "ratingGood": "Bien !",
+  "ratingExcellent": "Excellent !",
+  "rateAndGet": "Évaluer et obtenir 1 crédit",
+  "ratingComplete": "Évaluation terminée !",
+  "ratingPrompt": "Comment trouvez-vous ce résultat ?",
+
+  "remainingCountFree": "{remaining}/{limit} jour",
+  "@remainingCountFree": {
+    "placeholders": {
+      "remaining": {"type": "int"},
+      "limit": {"type": "int"}
+    }
+  },
+  "remainingCountPremium": "{remaining}/{limit} mois",
+  "@remainingCountPremium": {
+    "placeholders": {
+      "remaining": {"type": "int"},
+      "limit": {"type": "int"}
+    }
+  },
+
+  "sendFeedback": "Envoyer un avis",
+  "feedbackSubtitle": "Signalez un bug ou partagez vos idées !",
+  "bugReport": "Rapport de bug",
+  "improvementSuggestion": "Suggestion",
+  "emailFallback": "Impossible d'ouvrir l'app mail. Envoyez un email à tmddud333@naver.com.",
+  "bugReportTemplate": "Bonjour,\n\n[Description du bug]\n\n\n[Étapes de reproduction]\n1. \n2. \n3. \n\n[Infos appareil]\n- OS : {os}\n- Version : 1.0.0\n",
+  "@bugReportTemplate": {
+    "placeholders": { "os": {"type": "String"} }
+  },
+  "improvementTemplate": "Bonjour,\n\n[Suggestion d'amélioration]\n\n\n[Bénéfices attendus]\n\n\nMerci !\n",
+
+  "diaryNotification": "Rappel journal",
+  "notificationSubtitle": "Un rappel chaque soir à 21h",
+  "testNotification": "Envoyer une notification test",
+  "dataProtection": "Protection des données",
+  "e2eEncryption": "Chiffrement de bout en bout (E2EE)",
+
+  "notificationChannelName": "Rappel journal",
+  "notificationChannelDesc": "Rappel quotidien à 21h pour écrire votre journal",
+  "notificationDismiss": "Ignorer",
+  "notificationBody": "Comment était votre journée ? Écrivez-le ! 📝",
+  "notificationMsg1": "Comment s'est passée votre journée ? ✨",
+  "notificationMsg2": "Bravo pour aujourd'hui ! Prêt à écrire ? 📝",
+  "notificationMsg3": "Terminez la journée en notant vos moments 🌙",
+  "notificationMsg4": "Racontez-nous votre journée ! 💜",
+  "notificationMsg5": "Avant de dormir, revoyons la journée 🌟",
+
+  "networkError": "Vérifiez votre connexion réseau.",
+  "loginError": "Une erreur est survenue lors de la connexion. Réessayez.",
+
+  "privacyTitle": "Votre journal est\nen sécurité",
+  "privacySubtitle": "Chiffrement de bout en bout (E2EE)",
+  "privacyHowTitle": "Comment est-il chiffré ?",
+  "privacyHowBullet1": "Votre journal est chiffré sur l'appareil avec AES-256 de niveau militaire",
+  "privacyHowBullet2": "Les données sont stockées chiffrées — seul du texte illisible est visible sur le serveur",
+  "privacyHowBullet3": "Personne, y compris le développeur, ne peut lire vos entrées",
+  "privacyKeyTitle": "Comment la clé de chiffrement est-elle protégée ?",
+  "privacyKeyBullet1": "La clé est automatiquement générée à partir de votre compte Google",
+  "privacyKeyBullet2": "La clé n'existe que dans la mémoire de l'appareil et n'est jamais stockée",
+  "privacyKeyBullet3": "Se connecter avec le même compte Google génère toujours la même clé",
+  "privacyReassureTitle": "Soyez tranquille",
+  "privacyRememberTitle": "N'oubliez pas",
+  "privacyRememberContent": "Le contenu du journal ne peut pas être récupéré. Gardez votre compte Google en sécurité.",
+  "privacyTechSpecTitle": "Spécifications techniques",
+  "privacySpecEncryption": "Algorithme de chiffrement",
+  "privacySpecKeyDerivation": "Dérivation de clé",
+  "privacySpecDataId": "Identifiant de données",
+
+  "premiumRestore": "Restaurer l'achat",
+  "premiumTitle": "Premium 300/mois",
+  "premiumMonthly": "Mensuel",
+  "premiumMonthlyDesc": "Résiliable à tout moment",
+  "premiumYearly": "Annuel",
+  "premiumYearlyDesc": "492₩/mois · Économisez 55%",
+  "premiumLifetime": "À vie",
+  "premiumLifetimeDesc": "Un seul paiement, pour toujours",
+  "premiumDisclaimer": "Les abonnements sont facturés via votre compte iTunes/Google Play.\nSi le renouvellement automatique n'est pas annulé, il sera renouvelé\n24 heures avant la fin de la période en cours.",
+  "premiumBenefit1": "300 conversions IA/mois",
+  "premiumBenefit2": "Sans publicité",
+  "premiumBenefit3": "Versions Ange et Diable",
+  "premiumBenefit4": "Réponse IA prioritaire",
+  "premiumComingSoon": "Bientôt disponible ! 🚀",
+  "premiumNoRestore": "Aucun achat à restaurer.",
+
+  "shareCardBranding": "Essayez le journal IA ✍️",
+  "shareCardAppName": "Journal Papa Maman"
+}

@@ -6,6 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_fr.dart';
+import 'app_localizations_ja.dart';
 import 'app_localizations_ko.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +97,8 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('fr'),
+    Locale('ja'),
     Locale('ko'),
   ];
 
@@ -203,7 +207,7 @@ abstract class AppLocalizations {
   /// No description provided for @diaryHint.
   ///
   /// In en, this message translates to:
-  /// **'Enter your diary entry'**
+  /// **'Write your diary here'**
   String get diaryHint;
 
   /// No description provided for @moodHappy.
@@ -253,6 +257,594 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Generate Positive Version'**
   String get positiveButton;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get confirm;
+
+  /// No description provided for @share.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get share;
+
+  /// No description provided for @exitAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit App'**
+  String get exitAppTitle;
+
+  /// No description provided for @exitAppContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to exit?'**
+  String get exitAppContent;
+
+  /// No description provided for @exitAppConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get exitAppConfirm;
+
+  /// No description provided for @settingsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTooltip;
+
+  /// No description provided for @emptyDiaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No diary entries yet'**
+  String get emptyDiaryTitle;
+
+  /// No description provided for @emptyDiarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the button below to write your first diary!'**
+  String get emptyDiarySubtitle;
+
+  /// No description provided for @newDiaryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'✏️ New Diary'**
+  String get newDiaryButton;
+
+  /// No description provided for @deleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get deleteConfirmTitle;
+
+  /// No description provided for @deleteConfirmContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this diary?'**
+  String get deleteConfirmContent;
+
+  /// No description provided for @angel.
+  ///
+  /// In en, this message translates to:
+  /// **'Angel'**
+  String get angel;
+
+  /// No description provided for @devil.
+  ///
+  /// In en, this message translates to:
+  /// **'Devil'**
+  String get devil;
+
+  /// No description provided for @angelComfort.
+  ///
+  /// In en, this message translates to:
+  /// **'Angel\'s Comfort'**
+  String get angelComfort;
+
+  /// No description provided for @devilEmpathy.
+  ///
+  /// In en, this message translates to:
+  /// **'Devil\'s Empathy'**
+  String get devilEmpathy;
+
+  /// No description provided for @regenerateAngel.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate Comfort'**
+  String get regenerateAngel;
+
+  /// No description provided for @viewAngel.
+  ///
+  /// In en, this message translates to:
+  /// **'View Comfort'**
+  String get viewAngel;
+
+  /// No description provided for @regenerateDevil.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate Empathy'**
+  String get regenerateDevil;
+
+  /// No description provided for @viewDevil.
+  ///
+  /// In en, this message translates to:
+  /// **'View Empathy'**
+  String get viewDevil;
+
+  /// No description provided for @originalDiary.
+  ///
+  /// In en, this message translates to:
+  /// **'Original Diary'**
+  String get originalDiary;
+
+  /// No description provided for @shareAsImageCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Share as Image Card'**
+  String get shareAsImageCard;
+
+  /// No description provided for @regenerateConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate a new {label} version?\n\n⚠️ This will use 1 credit.\n(Remaining: {remaining})'**
+  String regenerateConfirm(String label, String remaining);
+
+  /// No description provided for @regenerateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get regenerateButton;
+
+  /// No description provided for @premiumLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used all {limit} premium credits this month.\nWatch an ad for an extra generation!'**
+  String premiumLimitReached(int limit);
+
+  /// No description provided for @freeLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used all {limit} free credits today.'**
+  String freeLimitReached(int limit);
+
+  /// No description provided for @watchAdToGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch ad for 1 free generation'**
+  String get watchAdToGenerate;
+
+  /// No description provided for @premiumSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium Subscription (300/mo)'**
+  String get premiumSubscription;
+
+  /// No description provided for @ratingQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How satisfied were you with this result?'**
+  String get ratingQuestion;
+
+  /// No description provided for @ratingBad.
+  ///
+  /// In en, this message translates to:
+  /// **'Bad'**
+  String get ratingBad;
+
+  /// No description provided for @ratingPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get ratingPoor;
+
+  /// No description provided for @ratingOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Okay'**
+  String get ratingOk;
+
+  /// No description provided for @ratingGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good!'**
+  String get ratingGood;
+
+  /// No description provided for @ratingExcellent.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent!'**
+  String get ratingExcellent;
+
+  /// No description provided for @rateAndGet.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate & get 1 credit'**
+  String get rateAndGet;
+
+  /// No description provided for @ratingComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating complete!'**
+  String get ratingComplete;
+
+  /// No description provided for @ratingPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'How was this result?'**
+  String get ratingPrompt;
+
+  /// No description provided for @remainingCountFree.
+  ///
+  /// In en, this message translates to:
+  /// **'{remaining}/{limit} daily'**
+  String remainingCountFree(int remaining, int limit);
+
+  /// No description provided for @remainingCountPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'{remaining}/{limit} monthly'**
+  String remainingCountPremium(int remaining, int limit);
+
+  /// No description provided for @sendFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Feedback'**
+  String get sendFeedback;
+
+  /// No description provided for @feedbackSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a bug or share your ideas!'**
+  String get feedbackSubtitle;
+
+  /// No description provided for @bugReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Bug Report'**
+  String get bugReport;
+
+  /// No description provided for @improvementSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestion'**
+  String get improvementSuggestion;
+
+  /// No description provided for @emailFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot open email app. Please email tmddud333@naver.com directly.'**
+  String get emailFallback;
+
+  /// No description provided for @bugReportTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello,\n\n[Bug Description]\n\n\n[Steps to Reproduce]\n1. \n2. \n3. \n\n[Device Info]\n- OS: {os}\n- App Version: 1.0.0\n'**
+  String bugReportTemplate(String os);
+
+  /// No description provided for @improvementTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello,\n\n[Improvement Suggestion]\n\n\n[Expected Benefits]\n\n\nThank you!\n'**
+  String get improvementTemplate;
+
+  /// No description provided for @diaryNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Diary Reminder'**
+  String get diaryNotification;
+
+  /// No description provided for @notificationSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a reminder every evening at 9 PM'**
+  String get notificationSubtitle;
+
+  /// No description provided for @testNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Test Notification'**
+  String get testNotification;
+
+  /// No description provided for @dataProtection.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Protection'**
+  String get dataProtection;
+
+  /// No description provided for @e2eEncryption.
+  ///
+  /// In en, this message translates to:
+  /// **'End-to-end Encryption (E2EE)'**
+  String get e2eEncryption;
+
+  /// No description provided for @notificationChannelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Diary Reminder'**
+  String get notificationChannelName;
+
+  /// No description provided for @notificationChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily reminder to write your diary at 9 PM'**
+  String get notificationChannelDesc;
+
+  /// No description provided for @notificationDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get notificationDismiss;
+
+  /// No description provided for @notificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'How was your day? Write it down! 📝'**
+  String get notificationBody;
+
+  /// No description provided for @notificationMsg1.
+  ///
+  /// In en, this message translates to:
+  /// **'How was your day? ✨'**
+  String get notificationMsg1;
+
+  /// No description provided for @notificationMsg2.
+  ///
+  /// In en, this message translates to:
+  /// **'Great job today! Ready to write your diary? 📝'**
+  String get notificationMsg2;
+
+  /// No description provided for @notificationMsg3.
+  ///
+  /// In en, this message translates to:
+  /// **'End your day by recording today\'s moments 🌙'**
+  String get notificationMsg3;
+
+  /// No description provided for @notificationMsg4.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us about your day! 💜'**
+  String get notificationMsg4;
+
+  /// No description provided for @notificationMsg5.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you sleep, let\'s look back on today 🌟'**
+  String get notificationMsg5;
+
+  /// No description provided for @networkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please check your network connection.'**
+  String get networkError;
+
+  /// No description provided for @loginError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred during login. Please try again.'**
+  String get loginError;
+
+  /// No description provided for @privacyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your diary is\nsafely protected'**
+  String get privacyTitle;
+
+  /// No description provided for @privacySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'End-to-end Encryption (E2EE) Applied'**
+  String get privacySubtitle;
+
+  /// No description provided for @privacyHowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How is it encrypted?'**
+  String get privacyHowTitle;
+
+  /// No description provided for @privacyHowBullet1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your diary is encrypted on device with AES-256 military-grade encryption'**
+  String get privacyHowBullet1;
+
+  /// No description provided for @privacyHowBullet2.
+  ///
+  /// In en, this message translates to:
+  /// **'Data is stored encrypted on the server — only scrambled text is visible'**
+  String get privacyHowBullet2;
+
+  /// No description provided for @privacyHowBullet3.
+  ///
+  /// In en, this message translates to:
+  /// **'No one, including the developer, can read your entries'**
+  String get privacyHowBullet3;
+
+  /// No description provided for @privacyKeyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How is the encryption key protected?'**
+  String get privacyKeyTitle;
+
+  /// No description provided for @privacyKeyBullet1.
+  ///
+  /// In en, this message translates to:
+  /// **'The encryption key is automatically generated from your Google account'**
+  String get privacyKeyBullet1;
+
+  /// No description provided for @privacyKeyBullet2.
+  ///
+  /// In en, this message translates to:
+  /// **'The key exists only in device memory and is never stored anywhere'**
+  String get privacyKeyBullet2;
+
+  /// No description provided for @privacyKeyBullet3.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging in with the same Google account always generates the same key'**
+  String get privacyKeyBullet3;
+
+  /// No description provided for @privacyReassureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest assured'**
+  String get privacyReassureTitle;
+
+  /// No description provided for @privacyRememberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Please remember'**
+  String get privacyRememberTitle;
+
+  /// No description provided for @privacyRememberContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Diary contents cannot be recovered. Please keep your Google account safe.'**
+  String get privacyRememberContent;
+
+  /// No description provided for @privacyTechSpecTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical Specifications'**
+  String get privacyTechSpecTitle;
+
+  /// No description provided for @privacySpecEncryption.
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption Algorithm'**
+  String get privacySpecEncryption;
+
+  /// No description provided for @privacySpecKeyDerivation.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Derivation'**
+  String get privacySpecKeyDerivation;
+
+  /// No description provided for @privacySpecDataId.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Identifier'**
+  String get privacySpecDataId;
+
+  /// No description provided for @premiumRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchase'**
+  String get premiumRestore;
+
+  /// No description provided for @premiumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium 300/month'**
+  String get premiumTitle;
+
+  /// No description provided for @premiumMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get premiumMonthly;
+
+  /// No description provided for @premiumMonthlyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel anytime'**
+  String get premiumMonthlyDesc;
+
+  /// No description provided for @premiumYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get premiumYearly;
+
+  /// No description provided for @premiumYearlyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'₩492/mo · Save 55%'**
+  String get premiumYearlyDesc;
+
+  /// No description provided for @premiumLifetime.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime'**
+  String get premiumLifetime;
+
+  /// No description provided for @premiumLifetimeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time payment, forever'**
+  String get premiumLifetimeDesc;
+
+  /// No description provided for @premiumDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions are charged through your iTunes/Google Play account.\nIf auto-renewal is not cancelled, it will automatically renew\n24 hours before the end of the current period.'**
+  String get premiumDisclaimer;
+
+  /// No description provided for @premiumBenefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'300 AI diary conversions/month'**
+  String get premiumBenefit1;
+
+  /// No description provided for @premiumBenefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'No ads, instant access'**
+  String get premiumBenefit2;
+
+  /// No description provided for @premiumBenefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'Both Angel & Devil versions'**
+  String get premiumBenefit3;
+
+  /// No description provided for @premiumBenefit4.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority AI response speed'**
+  String get premiumBenefit4;
+
+  /// No description provided for @premiumComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon! Stay tuned! 🚀'**
+  String get premiumComingSoon;
+
+  /// No description provided for @premiumNoRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No purchases to restore.'**
+  String get premiumNoRestore;
+
+  /// No description provided for @shareCardBranding.
+  ///
+  /// In en, this message translates to:
+  /// **'Try AI Diary too ✍️'**
+  String get shareCardBranding;
+
+  /// No description provided for @shareCardAppName.
+  ///
+  /// In en, this message translates to:
+  /// **'Mom Dad Diary'**
+  String get shareCardAppName;
 }
 
 class _AppLocalizationsDelegate
@@ -266,7 +858,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'ko'].contains(locale.languageCode);
+      <String>['en', 'fr', 'ja', 'ko'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -277,6 +869,10 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'fr':
+      return AppLocalizationsFr();
+    case 'ja':
+      return AppLocalizationsJa();
     case 'ko':
       return AppLocalizationsKo();
   }

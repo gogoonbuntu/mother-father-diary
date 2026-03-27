@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:diary_app/generated/app_localizations.dart';
+import 'package:diary_app/main.dart' show kSupportedFonts;
 import 'animated_warm_background.dart';
 import 'theme_selector.dart';
 import 'package:diary_app/google_sign_in_service.dart';
@@ -16,29 +17,18 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
 
   Color _bgColor = const Color(0xFFFFE0E6);
-  String _fontFamily = 'NanumPenScript';
+  String _fontFamily = 'Nanum Gothic';
 
   static const List<Color> _colorOptions = [
-    Color(0xFFFFE0E6), // soft pink
-    Color(0xFFFFF2E0), // warm cream
-    Color(0xFFFFB6A6), // peach
-    Color(0xFFFFD6C0), // light apricot
-    Color(0xFFFFB6B9), // pink
-    Color(0xFFFFE6C0), // yellow-peach
-    Color(0xFFFAF4E6), // ivory
-    Color(0xFFF9E7E7), // light rose
+    Color(0xFFFFE0E6), // 핑크
+    Color(0xFFFFF2E0), // 크림
+    Color(0xFFE0F5E8), // 민트
+    Color(0xFFE8E0F5), // 라벤더
+    Color(0xFFE0ECF5), // 스카이 블루
+    Color(0xFFFAF4E6), // 아이보리
   ];
 
-  static const List<String> _fontOptions = [
-    'NanumPenScript',
-    'NanumBrushScript',
-    'DancingScript',
-    'Jua',
-    'GowunDodum',
-    'Sunflower',
-    'Roboto',
-    'NotoSerifKR',
-  ];
+  static const List<String> _fontOptions = kSupportedFonts;
 
   @override
   Widget build(BuildContext context) {
@@ -125,9 +115,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                         if (!isAlreadySignedIn && mounted) {
                                           String msg;
                                           if (e.toString().contains('network_offline')) {
-                                            msg = '네트워크 연결을 확인해주세요.';
+                                            msg = AppLocalizations.of(context)!.networkError;
                                           } else {
-                                            msg = '로그인 중 오류가 발생했습니다. 다시 시도해주세요.';
+                                            msg = AppLocalizations.of(context)!.loginError;
                                           }
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(content: Text(msg)),

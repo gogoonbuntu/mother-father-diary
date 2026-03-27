@@ -7,6 +7,7 @@ import 'package:diary_app/generated/app_localizations.dart';
 import 'package:diary_app/services/diary_service.dart';
 import 'package:diary_app/services/gemini_service.dart';
 import 'package:diary_app/services/gemini_api_key.dart';
+import 'package:diary_app/services/share_service.dart';
 import 'package:confetti/confetti.dart';
 import 'dart:math' as math; 
 import 'confetti_themes.dart';
@@ -38,6 +39,11 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
   // 화면 플래시 애니메이션
   late AnimationController _flashController;
   late Animation<double> _flashAnimation;
+  // 악마 이펙트: 빨간 플래시 + 흔들림
+  late AnimationController _devilFlashController;
+  late Animation<double> _devilFlashAnimation;
+  late AnimationController _shakeController;
+  late Animation<double> _shakeAnimation;
   final TextEditingController _controller = TextEditingController();
   Timer? _saveDebounceTimer;
   late DateTime _selectedDate;
@@ -192,16 +198,20 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
 
   // 재생성 확인 팝업
   void _showRegenerateConfirm(String mode) {
-    final label = mode == 'angel' ? '천사' : '악마';
+    final l10n = AppLocalizations.of(context)!;
+    final label = mode == 'angel' ? l10n.angel : l10n.devil;
+    final remaining = _purchaseService.isPremium
+        ? l10n.remainingCountPremium(_remainingPremium, _monthlyPremiumLimit)
+        : l10n.remainingCountFree(_remainingFree, _dailyFreeLimit);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('🔄 $label 버전 재생성'),
-        content: Text('새로운 $label 버전을 생성하시겠습니까?\n\n⚠️ 1회가 소모됩니다.\n(남은 횟수: ${_purchaseService.isPremium ? '$_remainingPremium/$_monthlyPremiumLimit 월' : '$_remainingFree/$_dailyFreeLimit 일'})'),
+        title: Text('🔄 $label'),
+        content: Text(l10n.regenerateConfirm(label, remaining)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('취소'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -212,7 +222,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
               backgroundColor: mode == 'angel' ? Colors.teal : Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('재생성'),
+            child: Text(l10n.regenerateButton),
           ),
         ],
       ),
@@ -261,8 +271,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
           children: [
             Text(
               isPremium
-                  ? '월 $_monthlyPremiumLimit회 프리미엄 횟수를 모두 사용했습니다.\n광고를 보면 추가 생성할 수 있어요!'
-                  : '하루 $_dailyFreeLimit회 무료 생성 횟수를 모두 사용했습니다.',
+                  ? AppLocalizations.of(context)!.premiumLimitReached(_monthlyPremiumLimit)
+                  : AppLocalizations.of(context)!.freeLimitReached(_dailyFreeLimit),
               style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 16),
@@ -321,7 +331,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                   await _tryGenerate(mode: mode);
                 },
                 icon: const Icon(Icons.play_circle_outline),
-                label: const Text('광고 보고 1회 생성하기'),
+                label: Text(AppLocalizations.of(context)!.watchAdToGenerate),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF7C5CFC),
                   foregroundColor: Colors.white,
@@ -356,7 +366,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                     });
                   },
                   icon: const Icon(Icons.diamond_rounded, size: 18),
-                  label: const Text('프리미엄 구독 (월 300회)'),
+                  label: Text(AppLocalizations.of(context)!.premiumSubscription),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFE8577E),
                     side: const BorderSide(color: Color(0xFFE8577E), width: 1.5),
@@ -371,7 +381,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('닫기', style: TextStyle(color: Colors.grey)),
+            child: Text(AppLocalizations.of(context)!.close, style: const TextStyle(color: Colors.grey)),
           ),
         ],
       ),
@@ -417,7 +427,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('이 결과가 얼마나 만족스러웠나요?', 
+              Text(AppLocalizations.of(context)!.ratingQuestion, 
                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               const SizedBox(height: 12),
               // 별점 선택
@@ -442,7 +452,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    ['', '별로예요', '아쉬워요', '괜찮아요', '좋아요!', '최고예요!'][tempRating],
+                    ['' , AppLocalizations.of(context)!.ratingBad, AppLocalizations.of(context)!.ratingPoor, AppLocalizations.of(context)!.ratingOk, AppLocalizations.of(context)!.ratingGood, AppLocalizations.of(context)!.ratingExcellent][tempRating],
                     style: const TextStyle(fontSize: 13, color: Color(0xFFFF9800), fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -451,7 +461,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('취소', style: TextStyle(color: Colors.grey)),
+              child: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(color: Colors.grey)),
             ),
             ElevatedButton(
               onPressed: tempRating > 0 ? () async {
@@ -482,7 +492,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              child: const Text('평가하고 1회 받기'),
+              child: Text(AppLocalizations.of(context)!.rateAndGet),
             ),
           ],
         ),
@@ -531,8 +541,36 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
     });
     if (result != null) {
       HapticFeedback.heavyImpact();
+      _playDevilCelebration();
       _saveDiaryEntryWithVersions();
     }
+  }
+
+  // 😈 악마 축하 이펙트: 빨간 플래시 + 화면 흔들림 + 연속 햅틱
+  void _playDevilCelebration() {
+    // 빨간 플래시
+    _devilFlashController.forward(from: 0.0);
+
+    // 화면 흔들림
+    _shakeController.forward(from: 0.0);
+
+    // 1차 햅틱
+    HapticFeedback.heavyImpact();
+
+    // 2차 햅틱 (200ms 후)
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) HapticFeedback.heavyImpact();
+    });
+
+    // 3차 햅틱 (400ms 후)
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) HapticFeedback.mediumImpact();
+    });
+
+    // 4차 햅틱 (600ms 후)
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) HapticFeedback.lightImpact();
+    });
   }
 
   /// ⭐ 별점 평가 위젯 (1~5, 한번 터치)
@@ -547,7 +585,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            currentRating > 0 ? '평가 완료!' : '이 결과 어때요?',
+            currentRating > 0 ? AppLocalizations.of(context)!.ratingComplete : AppLocalizations.of(context)!.ratingPrompt,
             style: TextStyle(fontSize: 11, color: Colors.grey.shade400),
           ),
           const SizedBox(width: 6),
@@ -590,6 +628,152 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
     ref.child('last_rated').set(DateTime.now().toIso8601String());
 
     debugPrint('[Rating] ⭐ $mode $_aiProvider: $stars/5');
+  }
+
+  /// 📤 공유 바텀 시트
+  void _showShareBottomSheet() {
+    bool includeOriginal = true;
+    bool includeAngel = _positiveVersion != null;
+    bool includeDevil = _devilVersion != null;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 드래그 핸들
+                Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Text('📤 일기 공유하기',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF2D2D3A)),
+                ),
+                const SizedBox(height: 16),
+
+                // 체크박스 옵션
+                _shareCheckTile(
+                  icon: '📝',
+                  title: AppLocalizations.of(context)!.originalDiary,
+                  subtitle: _controller.text.length > 30
+                      ? '${_controller.text.substring(0, 30)}...'
+                      : _controller.text,
+                  value: includeOriginal,
+                  enabled: _controller.text.trim().isNotEmpty,
+                  onChanged: (v) => setSheetState(() => includeOriginal = v ?? false),
+                ),
+                if (_positiveVersion != null)
+                  _shareCheckTile(
+                    icon: '😇',
+                    title: AppLocalizations.of(context)!.angelComfort,
+                    subtitle: _positiveVersion!.length > 30
+                        ? '${_positiveVersion!.substring(0, 30)}...'
+                        : _positiveVersion!,
+                    value: includeAngel,
+                    onChanged: (v) => setSheetState(() => includeAngel = v ?? false),
+                  ),
+                if (_devilVersion != null)
+                  _shareCheckTile(
+                    icon: '😈',
+                    title: AppLocalizations.of(context)!.devilEmpathy,
+                    subtitle: _devilVersion!.length > 30
+                        ? '${_devilVersion!.substring(0, 30)}...'
+                        : _devilVersion!,
+                    value: includeDevil,
+                    onChanged: (v) => setSheetState(() => includeDevil = v ?? false),
+                  ),
+
+                const SizedBox(height: 16),
+
+                // 공유 버튼
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: (includeOriginal || includeAngel || includeDevil)
+                        ? () {
+                            Navigator.pop(ctx);
+                            ShareService.shareAsImage(
+                              context,
+                              date: _selectedDate,
+                              mood: _selectedMood,
+                              originalContent: includeOriginal ? _controller.text : null,
+                              angelVersion: includeAngel ? _positiveVersion : null,
+                              devilVersion: includeDevil ? _devilVersion : null,
+                            );
+                          }
+                        : null,
+                    icon: const Icon(Icons.image_rounded, size: 20),
+                    label: Text(AppLocalizations.of(context)!.shareAsImageCard, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF7C5CFC),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// 공유 체크 타일 위젯
+  Widget _shareCheckTile({
+    required String icon,
+    required String title,
+    required String subtitle,
+    required bool value,
+    bool enabled = true,
+    required ValueChanged<bool?> onChanged,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: value ? const Color(0xFFF3EEFF) : Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: value ? const Color(0xFF7C5CFC).withValues(alpha: 0.3) : Colors.grey.shade200,
+        ),
+      ),
+      child: CheckboxListTile(
+        value: value,
+        onChanged: enabled ? onChanged : null,
+        title: Row(
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 18)),
+            const SizedBox(width: 8),
+            Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+          ],
+        ),
+        subtitle: Text(subtitle,
+          style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        controlAffinity: ListTileControlAffinity.trailing,
+        activeColor: const Color(0xFF7C5CFC),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        dense: true,
+      ),
+    );
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -672,6 +856,31 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.7), weight: 30),
       TweenSequenceItem(tween: Tween(begin: 0.7, end: 0.0), weight: 70),
     ]).animate(CurvedAnimation(parent: _flashController, curve: Curves.easeOut));
+
+    // 악마 빨간 플래시 (0 → 0.5 → 0, 500ms)
+    _devilFlashController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _devilFlashAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.5), weight: 25),
+      TweenSequenceItem(tween: Tween(begin: 0.5, end: 0.0), weight: 75),
+    ]).animate(CurvedAnimation(parent: _devilFlashController, curve: Curves.easeOut));
+
+    // 화면 흔들림 (좌우 진동, 500ms)
+    _shakeController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _shakeAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 8.0), weight: 10),
+      TweenSequenceItem(tween: Tween(begin: 8.0, end: -8.0), weight: 15),
+      TweenSequenceItem(tween: Tween(begin: -8.0, end: 6.0), weight: 15),
+      TweenSequenceItem(tween: Tween(begin: 6.0, end: -6.0), weight: 15),
+      TweenSequenceItem(tween: Tween(begin: -6.0, end: 4.0), weight: 15),
+      TweenSequenceItem(tween: Tween(begin: 4.0, end: -2.0), weight: 15),
+      TweenSequenceItem(tween: Tween(begin: -2.0, end: 0.0), weight: 15),
+    ]).animate(CurvedAnimation(parent: _shakeController, curve: Curves.easeOut));
     _selectedDate = widget.diaryEntry?.date ?? DateTime.now();
     
     // 기본 기분 설정 - 영어 상수 사용
@@ -865,6 +1074,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
     _saveDebounceTimer?.cancel();
     _confettiController.dispose();
     _flashController.dispose();
+    _devilFlashController.dispose();
+    _shakeController.dispose();
     _controller.dispose();
     _rewardedAd?.dispose();
     super.dispose();
@@ -897,7 +1108,15 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       ),
       child: Stack(
         children: [
-          SingleChildScrollView(
+          AnimatedBuilder(
+            animation: _shakeAnimation,
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(_shakeAnimation.value, 0),
+                child: child,
+              );
+            },
+            child: SingleChildScrollView(
             controller: widget.scrollController,
             child: Padding(
               padding: const EdgeInsets.only(
@@ -1038,8 +1257,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     : const Text('😇', style: TextStyle(fontSize: 16)),
                                 label: Text(
                                   _positiveVersion != null
-                                      ? (_activeResultMode == 'angel' ? '위로 재생성' : '위로 보기')
-                                      : '천사의 위로',
+                                      ? (_activeResultMode == 'angel' ? AppLocalizations.of(context)!.regenerateAngel : AppLocalizations.of(context)!.viewAngel)
+                                      : AppLocalizations.of(context)!.angelComfort,
                                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                                 ),
 
@@ -1077,8 +1296,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                     : const Text('😈', style: TextStyle(fontSize: 16)),
                                 label: Text(
                                   _devilVersion != null
-                                      ? (_activeResultMode == 'devil' ? '공감 재생성' : '공감 보기')
-                                      : '악마의 공감',
+                                      ? (_activeResultMode == 'devil' ? AppLocalizations.of(context)!.regenerateDevil : AppLocalizations.of(context)!.viewDevil)
+                                      : AppLocalizations.of(context)!.devilEmpathy,
 
                                   style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                                 ),
@@ -1317,6 +1536,13 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                                         onPressed: () => _adjustPositiveTextSize(1),
                                       ),
+                                      IconButton(
+                                        icon: const Icon(Icons.share_rounded, size: 18, color: Color(0xFF7C5CFC)),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                        tooltip: '공유하기',
+                                        onPressed: _showShareBottomSheet,
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -1422,6 +1648,13 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                                         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                                         onPressed: () => _adjustDevilTextSize(1),
                                       ),
+                                      IconButton(
+                                        icon: const Icon(Icons.share_rounded, size: 18, color: Color(0xFFE8577E)),
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                        tooltip: '공유하기',
+                                        onPressed: _showShareBottomSheet,
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -1485,6 +1718,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                   ),
                 ),
               ),
+              ), // AnimatedBuilder (shake)
               // 흰색 플래시 오버레이
               AnimatedBuilder(
                 animation: _flashAnimation,
@@ -1494,6 +1728,20 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                     child: IgnorePointer(
                       child: Container(
                         color: Colors.white.withValues(alpha: _flashAnimation.value),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              // 빨간 플래시 오버레이 (악마 이펙트)
+              AnimatedBuilder(
+                animation: _devilFlashAnimation,
+                builder: (context, child) {
+                  if (_devilFlashAnimation.value == 0) return const SizedBox.shrink();
+                  return Positioned.fill(
+                    child: IgnorePointer(
+                      child: Container(
+                        color: const Color(0xFFE8577E).withValues(alpha: _devilFlashAnimation.value),
                       ),
                     ),
                   );
@@ -1528,28 +1776,17 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
 
   // 안전하게 폰트 스타일을 가져오는 헬퍼 메서드
   TextStyle _getFontStyle(String fontFamily, double fontSize, {FontWeight? fontWeight, Color? color}) {
-    try {
-      // 통합 지원 폰트 목록 사용
-      if (kSupportedFonts.contains(fontFamily)) {
-        return GoogleFonts.getFont(
-          fontFamily,
-          fontSize: fontSize,
-          height: 1.5,
-          fontWeight: fontWeight ?? FontWeight.normal,
-          color: color ?? Colors.black,
-        );
-      } else {
-        debugPrint('지원되지 않는 폰트: $fontFamily, 기본 폰트 사용');
-        return TextStyle(
-          fontSize: fontSize,
-          height: 1.5,
-          fontWeight: fontWeight ?? FontWeight.normal,
-          color: color ?? Colors.black,
-        );
-      }
-    } catch (e) {
-      debugPrint('폰트 로딩 오류: $e');
-      // 폰트 로딩 실패 시 기본 폰트 사용
+    // 번들 폰트 직접 사용 (GoogleFonts 런타임 다운로드 대신)
+    if (kSupportedFonts.contains(fontFamily)) {
+      return TextStyle(
+        fontFamily: fontFamily,
+        fontSize: fontSize,
+        height: 1.5,
+        fontWeight: fontWeight ?? FontWeight.normal,
+        color: color ?? Colors.black,
+      );
+    } else {
+      debugPrint('지원되지 않는 폰트: $fontFamily, 기본 폰트 사용');
       return TextStyle(
         fontSize: fontSize,
         height: 1.5,
@@ -1558,6 +1795,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
       );
     }
   }
+
 
   // 기분을 영어로 변환
   String _moodToEnglish(String mood) {

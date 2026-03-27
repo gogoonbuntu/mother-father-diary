@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:diary_app/generated/app_localizations.dart';
 import 'services/purchase_service.dart';
 
 /// 프리미엄 구독 화면 — 3가지 플랜 (월간/연간/평생)
@@ -40,7 +41,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
                     TextButton(
                       onPressed: _restoring ? null : _handleRestore,
                       child: Text(
-                        '구매 복원',
+                        AppLocalizations.of(context)!.premiumRestore,
                         style: TextStyle(
                           color: _restoring ? Colors.grey : const Color(0xFF7C5CFC),
                           fontWeight: FontWeight.w600,
@@ -76,9 +77,9 @@ class _PremiumScreenState extends State<PremiumScreen> {
                         child: const Icon(Icons.diamond_rounded, size: 40, color: Colors.white),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
-                        '프리미엄 월 300회',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context)!.premiumTitle,
+                        style: const TextStyle(
                           fontSize: 26, fontWeight: FontWeight.w800,
                           color: Color(0xFF2D2D3A),
                         ),
@@ -97,30 +98,30 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
                       // ── 가격 카드 ──
                       _buildPlanCard(
-                        title: '월간 구독',
+                        title: AppLocalizations.of(context)!.premiumMonthly,
                         price: '₩1,100',
-                        period: '/ 월',
-                        description: '언제든 해지 가능',
+                        period: '/ mo',
+                        description: AppLocalizations.of(context)!.premiumMonthlyDesc,
                         productId: PurchaseService.monthlyId,
                         isPopular: false,
                         gradient: const [Color(0xFFF0EBFF), Color(0xFFE8E0FF)],
                       ),
                       const SizedBox(height: 12),
                       _buildPlanCard(
-                        title: '연간 구독',
+                        title: AppLocalizations.of(context)!.premiumYearly,
                         price: '₩5,900',
-                        period: '/ 년',
-                        description: '월 ₩492 · 55% 절약',
+                        period: '/ yr',
+                        description: AppLocalizations.of(context)!.premiumYearlyDesc,
                         productId: PurchaseService.yearlyId,
                         isPopular: true,
                         gradient: const [Color(0xFF7C5CFC), Color(0xFF9B7DFF)],
                       ),
                       const SizedBox(height: 12),
                       _buildPlanCard(
-                        title: '평생 이용권',
+                        title: AppLocalizations.of(context)!.premiumLifetime,
                         price: '₩12,900',
                         period: '',
-                        description: '한 번 결제로 영원히',
+                        description: AppLocalizations.of(context)!.premiumLifetimeDesc,
                         productId: PurchaseService.lifetimeId,
                         isPopular: false,
                         gradient: const [Color(0xFFFFF0F3), Color(0xFFFFE8ED)],
@@ -130,9 +131,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
 
                       // ── 안내문 ──
                       Text(
-                        '구독은 iTunes/Google Play 계정을 통해 결제되며,\n'
-                        '자동 갱신을 히지 않으면 구독 기간 종료 24시간 전에\n'
-                        '자동으로 갱신됩니다.',
+                        AppLocalizations.of(context)!.premiumDisclaimer,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 11, color: Colors.grey.shade400, height: 1.5),
                       ),
@@ -165,13 +164,13 @@ class _PremiumScreenState extends State<PremiumScreen> {
       ),
       child: Column(
         children: [
-          _benefitRow(Icons.bolt_rounded, '월 300회 AI 일기 변환'),
+          _benefitRow(Icons.bolt_rounded, AppLocalizations.of(context)!.premiumBenefit1),
           const SizedBox(height: 12),
-          _benefitRow(Icons.flash_on_rounded, '광고 없이 바로 사용'),
+          _benefitRow(Icons.flash_on_rounded, AppLocalizations.of(context)!.premiumBenefit2),
           const SizedBox(height: 12),
-          _benefitRow(Icons.auto_awesome, '천사 & 악마 버전 모두 사용'),
+          _benefitRow(Icons.auto_awesome, AppLocalizations.of(context)!.premiumBenefit3),
           const SizedBox(height: 12),
-          _benefitRow(Icons.speed, '빠른 AI 응답 우선 처리'),
+          _benefitRow(Icons.speed, AppLocalizations.of(context)!.premiumBenefit4),
         ],
       ),
     );
@@ -315,7 +314,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('현재 준비 중입니다. 곧 이용 가능합니다! 🚀'),
+            content: Text(AppLocalizations.of(context)!.premiumComingSoon),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             backgroundColor: const Color(0xFF7C5CFC),
@@ -336,7 +335,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
           content: Text(
             _purchaseService.isPremium
                 ? '✅ 프리미엄이 복원되었습니다!'
-                : '복원할 구매 내역이 없습니다.',
+                : AppLocalizations.of(context)!.premiumNoRestore,
           ),
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

@@ -1,4 +1,6 @@
 {
+  "@@locale": "en",
+
   "appTitle": "Diary App",
   "settings": "Settings",
   "logout": "Logout",
@@ -10,14 +12,13 @@
   "diaryList": "Diary List",
   "login": "Login",
   "googleSignIn": "Sign in with Google",
-  "logoutConfirm": "Are you sure you want to logout?"
-,
+  "logoutConfirm": "Are you sure you want to logout?",
   "colorSelected": "Background color changed.",
   "fontSelected": "Font changed.",
   "editDiary": "Edit Diary",
   "positiveVersion": "Positive Version:",
   "convertToPositive": "Convert to Positive Version",
-  "diaryHint": "Enter your diary entry",
+  "diaryHint": "Write your diary here",
   "moodHappy": "Happy",
   "moodSad": "Sad",
   "moodNeutral": "Neutral",
@@ -25,5 +26,146 @@
   "noDiaries": "No diary entries yet. Create your first entry!",
   "hidePositive": "Hide Positive Version",
   "showPositive": "Show Positive Version",
-  "positiveButton": "Generate Positive Version"
+  "positiveButton": "Generate Positive Version",
+
+  "cancel": "Cancel",
+  "close": "Close",
+  "delete": "Delete",
+  "confirm": "OK",
+  "share": "Share",
+
+  "exitAppTitle": "Exit App",
+  "exitAppContent": "Are you sure you want to exit?",
+  "exitAppConfirm": "Exit",
+
+  "settingsTooltip": "Settings",
+
+  "emptyDiaryTitle": "No diary entries yet",
+  "emptyDiarySubtitle": "Tap the button below to write your first diary!",
+  "newDiaryButton": "✏️ New Diary",
+  "deleteConfirmTitle": "Confirm Delete",
+  "deleteConfirmContent": "Are you sure you want to delete this diary?",
+
+  "angel": "Angel",
+  "devil": "Devil",
+  "angelComfort": "Angel's Comfort",
+  "devilEmpathy": "Devil's Empathy",
+  "regenerateAngel": "Regenerate Comfort",
+  "viewAngel": "View Comfort",
+  "regenerateDevil": "Regenerate Empathy",
+  "viewDevil": "View Empathy",
+  "originalDiary": "Original Diary",
+  "shareAsImageCard": "Share as Image Card",
+
+  "regenerateConfirm": "Generate a new {label} version?\n\n⚠️ This will use 1 credit.\n(Remaining: {remaining})",
+  "@regenerateConfirm": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"}
+    }
+  },
+  "regenerateButton": "Regenerate",
+
+  "premiumLimitReached": "You've used all {limit} premium credits this month.\nWatch an ad for an extra generation!",
+  "@premiumLimitReached": {
+    "placeholders": { "limit": {"type": "int"} }
+  },
+  "freeLimitReached": "You've used all {limit} free credits today.",
+  "@freeLimitReached": {
+    "placeholders": { "limit": {"type": "int"} }
+  },
+  "watchAdToGenerate": "Watch ad for 1 free generation",
+  "premiumSubscription": "Premium Subscription (300/mo)",
+
+  "ratingQuestion": "How satisfied were you with this result?",
+  "ratingBad": "Bad",
+  "ratingPoor": "Poor",
+  "ratingOk": "Okay",
+  "ratingGood": "Good!",
+  "ratingExcellent": "Excellent!",
+  "rateAndGet": "Rate & get 1 credit",
+  "ratingComplete": "Rating complete!",
+  "ratingPrompt": "How was this result?",
+
+  "remainingCountFree": "{remaining}/{limit} daily",
+  "@remainingCountFree": {
+    "placeholders": {
+      "remaining": {"type": "int"},
+      "limit": {"type": "int"}
+    }
+  },
+  "remainingCountPremium": "{remaining}/{limit} monthly",
+  "@remainingCountPremium": {
+    "placeholders": {
+      "remaining": {"type": "int"},
+      "limit": {"type": "int"}
+    }
+  },
+
+  "sendFeedback": "Send Feedback",
+  "feedbackSubtitle": "Report a bug or share your ideas!",
+  "bugReport": "Bug Report",
+  "improvementSuggestion": "Suggestion",
+  "emailFallback": "Cannot open email app. Please email tmddud333@naver.com directly.",
+  "bugReportTemplate": "Hello,\n\n[Bug Description]\n\n\n[Steps to Reproduce]\n1. \n2. \n3. \n\n[Device Info]\n- OS: {os}\n- App Version: 1.0.0\n",
+  "@bugReportTemplate": {
+    "placeholders": { "os": {"type": "String"} }
+  },
+  "improvementTemplate": "Hello,\n\n[Improvement Suggestion]\n\n\n[Expected Benefits]\n\n\nThank you!\n",
+
+  "diaryNotification": "Diary Reminder",
+  "notificationSubtitle": "Get a reminder every evening at 9 PM",
+  "testNotification": "Send Test Notification",
+  "dataProtection": "Data Protection",
+  "e2eEncryption": "End-to-end Encryption (E2EE)",
+
+  "notificationChannelName": "Diary Reminder",
+  "notificationChannelDesc": "Daily reminder to write your diary at 9 PM",
+  "notificationDismiss": "Dismiss",
+  "notificationBody": "How was your day? Write it down! 📝",
+  "notificationMsg1": "How was your day? ✨",
+  "notificationMsg2": "Great job today! Ready to write your diary? 📝",
+  "notificationMsg3": "End your day by recording today's moments 🌙",
+  "notificationMsg4": "Tell us about your day! 💜",
+  "notificationMsg5": "Before you sleep, let's look back on today 🌟",
+
+  "networkError": "Please check your network connection.",
+  "loginError": "An error occurred during login. Please try again.",
+
+  "privacyTitle": "Your diary is\nsafely protected",
+  "privacySubtitle": "End-to-end Encryption (E2EE) Applied",
+  "privacyHowTitle": "How is it encrypted?",
+  "privacyHowBullet1": "Your diary is encrypted on device with AES-256 military-grade encryption",
+  "privacyHowBullet2": "Data is stored encrypted on the server — only scrambled text is visible",
+  "privacyHowBullet3": "No one, including the developer, can read your entries",
+  "privacyKeyTitle": "How is the encryption key protected?",
+  "privacyKeyBullet1": "The encryption key is automatically generated from your Google account",
+  "privacyKeyBullet2": "The key exists only in device memory and is never stored anywhere",
+  "privacyKeyBullet3": "Logging in with the same Google account always generates the same key",
+  "privacyReassureTitle": "Rest assured",
+  "privacyRememberTitle": "Please remember",
+  "privacyRememberContent": "Diary contents cannot be recovered. Please keep your Google account safe.",
+  "privacyTechSpecTitle": "Technical Specifications",
+  "privacySpecEncryption": "Encryption Algorithm",
+  "privacySpecKeyDerivation": "Key Derivation",
+  "privacySpecDataId": "Data Identifier",
+
+  "premiumRestore": "Restore Purchase",
+  "premiumTitle": "Premium 300/month",
+  "premiumMonthly": "Monthly",
+  "premiumMonthlyDesc": "Cancel anytime",
+  "premiumYearly": "Yearly",
+  "premiumYearlyDesc": "₩492/mo · Save 55%",
+  "premiumLifetime": "Lifetime",
+  "premiumLifetimeDesc": "One-time payment, forever",
+  "premiumDisclaimer": "Subscriptions are charged through your iTunes/Google Play account.\nIf auto-renewal is not cancelled, it will automatically renew\n24 hours before the end of the current period.",
+  "premiumBenefit1": "300 AI diary conversions/month",
+  "premiumBenefit2": "No ads, instant access",
+  "premiumBenefit3": "Both Angel & Devil versions",
+  "premiumBenefit4": "Priority AI response speed",
+  "premiumComingSoon": "Coming soon! Stay tuned! 🚀",
+  "premiumNoRestore": "No purchases to restore.",
+
+  "shareCardBranding": "Try AI Diary too ✍️",
+  "shareCardAppName": "Mom Dad Diary"
 }

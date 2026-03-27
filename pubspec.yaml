@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.14+16
+version: 1.0.15+17
 
 environment:
   sdk: ^3.7.2
@@ -49,6 +49,9 @@ dependencies:
   crypto: ^3.0.7
   in_app_purchase: ^3.2.3
   speech_to_text: ^7.3.0
+  share_plus: ^10.1.4
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -88,22 +91,23 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
 
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+  fonts:
+    - family: Jua
+      fonts:
+        - asset: assets/fonts/Jua-Regular.ttf
+    - family: Gamja Flower
+      fonts:
+        - asset: assets/fonts/GamjaFlower-Regular.ttf
+    - family: Poor Story
+      fonts:
+        - asset: assets/fonts/PoorStory-Regular.ttf
+    - family: Nanum Gothic
+      fonts:
+        - asset: assets/fonts/NanumGothic-Regular.ttf
+        - asset: assets/fonts/NanumGothic-Bold.ttf
+          weight: 700
+    - family: Nanum Myeongjo
+      fonts:
+        - asset: assets/fonts/NanumMyeongjo-Regular.ttf
+        - asset: assets/fonts/NanumMyeongjo-Bold.ttf
+          weight: 700

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:diary_app/generated/app_localizations.dart';
 
 class PrivacyInfoScreen extends StatelessWidget {
   const PrivacyInfoScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🔒 데이터 보호'),
+        title: Text('🔒 ${l10n.dataProtection}'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -27,24 +29,24 @@ class PrivacyInfoScreen extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Column(
+              child: Column(
                 children: [
-                  Icon(Icons.shield_rounded, size: 48, color: Colors.white),
-                  SizedBox(height: 12),
+                  const Icon(Icons.shield_rounded, size: 48, color: Colors.white),
+                  const SizedBox(height: 12),
                   Text(
-                    '당신의 일기는\n안전하게 보호됩니다',
+                    l10n.privacyTitle,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       height: 1.3,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    '종단간 암호화(E2EE) 적용',
-                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                    l10n.privacySubtitle,
+                    style: const TextStyle(fontSize: 14, color: Colors.white70),
                   ),
                 ],
               ),
@@ -56,11 +58,11 @@ class PrivacyInfoScreen extends StatelessWidget {
             _buildInfoCard(
               icon: Icons.lock_rounded,
               iconColor: Colors.blue.shade600,
-              title: '어떻게 암호화되나요?',
-              children: const [
-                _BulletPoint('일기 내용은 기기에서 AES-256 군사급 암호화로 변환됩니다'),
-                _BulletPoint('암호화된 상태로 서버에 저장되므로, 서버에서는 깨진 문자만 보입니다'),
-                _BulletPoint('개발자를 포함한 그 누구도 내용을 확인할 수 없습니다'),
+              title: l10n.privacyHowTitle,
+              children: [
+                _BulletPoint(l10n.privacyHowBullet1),
+                _BulletPoint(l10n.privacyHowBullet2),
+                _BulletPoint(l10n.privacyHowBullet3),
               ],
             ),
 
@@ -70,25 +72,25 @@ class PrivacyInfoScreen extends StatelessWidget {
             _buildInfoCard(
               icon: Icons.vpn_key_rounded,
               iconColor: Colors.orange.shade600,
-              title: '암호화 키는 어떻게 보호되나요?',
-              children: const [
-                _BulletPoint('암호화 키는 Google 계정 정보로부터 자동 생성됩니다'),
-                _BulletPoint('키는 기기 메모리에만 존재하며, 어디에도 저장되지 않습니다'),
-                _BulletPoint('같은 Google 계정으로 로그인하면 항상 같은 키가 생성됩니다'),
+              title: l10n.privacyKeyTitle,
+              children: [
+                _BulletPoint(l10n.privacyKeyBullet1),
+                _BulletPoint(l10n.privacyKeyBullet2),
+                _BulletPoint(l10n.privacyKeyBullet3),
               ],
             ),
 
             const SizedBox(height: 16),
 
-            // 걱정하지 않아도 되는 것
+            // 안심하세요
             _buildInfoCard(
               icon: Icons.check_circle_rounded,
               iconColor: Colors.green.shade600,
-              title: '안심하세요',
+              title: l10n.privacyReassureTitle,
               children: const [
-                _BulletPoint('📱 기기를 바꿔도 → 같은 Google 계정이면 복원 가능'),
-                _BulletPoint('🗑️ 앱을 삭제해도 → 재설치 후 로그인하면 복원 가능'),
-                _BulletPoint('🔄 여러 기기 사용해도 → 같은 계정이면 어디서든 열람 가능'),
+                _BulletPoint('📱 → ✅'),
+                _BulletPoint('🗑️ → ✅'),
+                _BulletPoint('🔄 → ✅'),
               ],
             ),
 
@@ -111,7 +113,7 @@ class PrivacyInfoScreen extends StatelessWidget {
                       Icon(Icons.warning_amber_rounded, color: Colors.amber.shade700, size: 20),
                       const SizedBox(width: 8),
                       Text(
-                        '꼭 기억해주세요',
+                        l10n.privacyRememberTitle,
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -122,8 +124,7 @@ class PrivacyInfoScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Google 계정을 삭제하면 암호화 키를 재생성할 수 없어 '
-                    '일기 내용을 복구할 수 없습니다. Google 계정을 안전하게 유지해주세요.',
+                    l10n.privacyRememberContent,
                     style: TextStyle(
                       fontSize: 13,
                       color: Colors.amber.shade900,
@@ -149,7 +150,7 @@ class PrivacyInfoScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '기술 사양',
+                    l10n.privacyTechSpecTitle,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -157,10 +158,10 @@ class PrivacyInfoScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  _buildSpecRow('암호화 알고리즘', 'AES-256-CBC'),
-                  _buildSpecRow('키 파생', 'SHA-256 (2회 해싱)'),
-                  _buildSpecRow('IV 생성', 'MD5 (일기별 고유값)'),
-                  _buildSpecRow('데이터 식별', 'E2E: 접두사'),
+                  _buildSpecRow(l10n.privacySpecEncryption, 'AES-256-CBC'),
+                  _buildSpecRow(l10n.privacySpecKeyDerivation, 'SHA-256 (2x)'),
+                  _buildSpecRow('IV', 'MD5'),
+                  _buildSpecRow(l10n.privacySpecDataId, 'E2E:'),
                 ],
               ),
             ),

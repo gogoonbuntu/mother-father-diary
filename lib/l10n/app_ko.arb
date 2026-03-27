@@ -1,4 +1,6 @@
 {
+  "@@locale": "ko",
+
   "appTitle": "다이어리 앱",
   "settings": "설정",
   "logout": "로그아웃",
@@ -10,8 +12,7 @@
   "diaryList": "일기 목록",
   "login": "로그인",
   "googleSignIn": "구글로 로그인",
-  "logoutConfirm": "정말 로그아웃 하시겠습니까?"
-,
+  "logoutConfirm": "정말 로그아웃 하시겠습니까?",
   "colorSelected": "배경색이 변경되었습니다.",
   "fontSelected": "폰트가 변경되었습니다.",
   "editDiary": "일기 수정",
@@ -25,5 +26,146 @@
   "noDiaries": "아직 일기가 없습니다. 첫 번째 일기를 작성해보세요!",
   "hidePositive": "긍정 버전 숨기기",
   "showPositive": "긍정 버전 보기",
-  "positiveButton": "긍정 버전 생성하기"
+  "positiveButton": "긍정 버전 생성하기",
+
+  "cancel": "취소",
+  "close": "닫기",
+  "delete": "삭제",
+  "confirm": "확인",
+  "share": "공유하기",
+
+  "exitAppTitle": "앱 종료",
+  "exitAppContent": "앱을 종료하시겠습니까?",
+  "exitAppConfirm": "종료",
+
+  "settingsTooltip": "설정",
+
+  "emptyDiaryTitle": "아직 일기가 없어요",
+  "emptyDiarySubtitle": "아래 버튼을 눌러 첫 일기를 작성해보세요!",
+  "newDiaryButton": "✏️ 새 일기 쓰기",
+  "deleteConfirmTitle": "삭제 확인",
+  "deleteConfirmContent": "이 일기를 삭제하시겠습니까?",
+
+  "angel": "천사",
+  "devil": "악마",
+  "angelComfort": "천사의 위로",
+  "devilEmpathy": "악마의 공감",
+  "regenerateAngel": "위로 재생성",
+  "viewAngel": "위로 보기",
+  "regenerateDevil": "공감 재생성",
+  "viewDevil": "공감 보기",
+  "originalDiary": "원본 일기",
+  "shareAsImageCard": "이미지 카드로 공유하기",
+
+  "regenerateConfirm": "새로운 {label} 버전을 생성하시겠습니까?\n\n⚠️ 1회가 소모됩니다.\n(남은 횟수: {remaining})",
+  "@regenerateConfirm": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"}
+    }
+  },
+  "regenerateButton": "재생성",
+
+  "premiumLimitReached": "월 {limit}회 프리미엄 횟수를 모두 사용했습니다.\n광고를 보면 추가 생성할 수 있어요!",
+  "@premiumLimitReached": {
+    "placeholders": { "limit": {"type": "int"} }
+  },
+  "freeLimitReached": "하루 {limit}회 무료 생성 횟수를 모두 사용했습니다.",
+  "@freeLimitReached": {
+    "placeholders": { "limit": {"type": "int"} }
+  },
+  "watchAdToGenerate": "광고 보고 1회 생성하기",
+  "premiumSubscription": "프리미엄 구독 (월 300회)",
+
+  "ratingQuestion": "이 결과가 얼마나 만족스러웠나요?",
+  "ratingBad": "별로예요",
+  "ratingPoor": "아쉬워요",
+  "ratingOk": "괜찮아요",
+  "ratingGood": "좋아요!",
+  "ratingExcellent": "최고예요!",
+  "rateAndGet": "평가하고 1회 받기",
+  "ratingComplete": "평가 완료!",
+  "ratingPrompt": "이 결과 어때요?",
+
+  "remainingCountFree": "{remaining}/{limit} 일",
+  "@remainingCountFree": {
+    "placeholders": {
+      "remaining": {"type": "int"},
+      "limit": {"type": "int"}
+    }
+  },
+  "remainingCountPremium": "{remaining}/{limit} 월",
+  "@remainingCountPremium": {
+    "placeholders": {
+      "remaining": {"type": "int"},
+      "limit": {"type": "int"}
+    }
+  },
+
+  "sendFeedback": "의견 보내기",
+  "feedbackSubtitle": "버그나 개선 아이디어를 알려주세요!",
+  "bugReport": "버그 리포트",
+  "improvementSuggestion": "개선 제안",
+  "emailFallback": "이메일 앱을 열 수 없습니다. tmddud333@naver.com 으로 직접 보내주세요.",
+  "bugReportTemplate": "안녕하세요,\n\n[버그 설명]\n\n\n[재현 방법]\n1. \n2. \n3. \n\n[기기 정보]\n- OS: {os}\n- 앱 버전: 1.0.0\n",
+  "@bugReportTemplate": {
+    "placeholders": { "os": {"type": "String"} }
+  },
+  "improvementTemplate": "안녕하세요,\n\n[개선 제안 내용]\n\n\n[기대 효과]\n\n\n감사합니다!\n",
+
+  "diaryNotification": "일기 알림",
+  "notificationSubtitle": "매일 저녁 9시에 오늘 하루를 물어봐요",
+  "testNotification": "테스트 알림 보내기",
+  "dataProtection": "데이터 보호",
+  "e2eEncryption": "종단간 암호화(E2EE) 적용",
+
+  "notificationChannelName": "일기 알림",
+  "notificationChannelDesc": "매일 저녁 9시에 일기 작성을 알려드려요",
+  "notificationDismiss": "알림 끄기",
+  "notificationBody": "오늘 하루는 어땠나요? 일기를 써보세요! 📝",
+  "notificationMsg1": "오늘 하루는 어땠나요? ✨",
+  "notificationMsg2": "오늘도 수고했어요! 일기 쓰러 가볼까요? 📝",
+  "notificationMsg3": "하루를 마무리하며 오늘을 기록해보세요 🌙",
+  "notificationMsg4": "오늘의 이야기를 들려주세요! 💜",
+  "notificationMsg5": "잠들기 전, 오늘 하루를 돌아볼까요? 🌟",
+
+  "networkError": "네트워크 연결을 확인해주세요.",
+  "loginError": "로그인 중 오류가 발생했습니다. 다시 시도해주세요.",
+
+  "privacyTitle": "당신의 일기는\n안전하게 보호됩니다",
+  "privacySubtitle": "종단간 암호화(E2EE) 적용",
+  "privacyHowTitle": "어떻게 암호화되나요?",
+  "privacyHowBullet1": "일기 내용은 기기에서 AES-256 군사급 암호화로 변환됩니다",
+  "privacyHowBullet2": "암호화된 상태로 서버에 저장되므로, 서버에서는 깨진 문자만 보입니다",
+  "privacyHowBullet3": "개발자를 포함한 그 누구도 내용을 확인할 수 없습니다",
+  "privacyKeyTitle": "암호화 키는 어떻게 보호되나요?",
+  "privacyKeyBullet1": "암호화 키는 Google 계정 정보로부터 자동 생성됩니다",
+  "privacyKeyBullet2": "키는 기기 메모리에만 존재하며, 어디에도 저장되지 않습니다",
+  "privacyKeyBullet3": "같은 Google 계정으로 로그인하면 항상 같은 키가 생성됩니다",
+  "privacyReassureTitle": "안심하세요",
+  "privacyRememberTitle": "꼭 기억해주세요",
+  "privacyRememberContent": "일기 내용을 복구할 수 없습니다. Google 계정을 안전하게 유지해주세요.",
+  "privacyTechSpecTitle": "기술 사양",
+  "privacySpecEncryption": "암호화 알고리즘",
+  "privacySpecKeyDerivation": "키 파생",
+  "privacySpecDataId": "데이터 식별",
+
+  "premiumRestore": "구매 복원",
+  "premiumTitle": "프리미엄 월 300회",
+  "premiumMonthly": "월간 구독",
+  "premiumMonthlyDesc": "언제든 해지 가능",
+  "premiumYearly": "연간 구독",
+  "premiumYearlyDesc": "월 ₩492 · 55% 절약",
+  "premiumLifetime": "평생 이용권",
+  "premiumLifetimeDesc": "한 번 결제로 영원히",
+  "premiumDisclaimer": "구독은 iTunes/Google Play 계정을 통해 결제되며,\n자동 갱신을 해지 않으면 구독 기간 종료 24시간 전에\n자동으로 갱신됩니다.",
+  "premiumBenefit1": "월 300회 AI 일기 변환",
+  "premiumBenefit2": "광고 없이 바로 사용",
+  "premiumBenefit3": "천사 & 악마 버전 모두 사용",
+  "premiumBenefit4": "빠른 AI 응답 우선 처리",
+  "premiumComingSoon": "현재 준비 중입니다. 곧 이용 가능합니다! 🚀",
+  "premiumNoRestore": "복원할 구매 내역이 없습니다.",
+
+  "shareCardBranding": "나도 AI 일기 써보기 ✍️",
+  "shareCardAppName": "엄마아빠 다이어리"
 }

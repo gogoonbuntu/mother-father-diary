@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'firebase_options.dart';
 import 'package:clarity_flutter/clarity_flutter.dart';
+import 'services/notification_service.dart';
 import 'services/purchase_service.dart';
 // [중요] firebase_options.dart 파일은 flutterfire CLI로 생성된 실제 파일로 교체해야 합니다.
 // 현재 파일이 비어있거나 DefaultFirebaseOptions가 없다면 앱이 실행되지 않습니다.
@@ -49,43 +50,30 @@ Future<void> main() async {
 
   // 앱이 뜬 후 백그라운드에서 병렬 초기화 (OpeningBanner 동안 완료됨)
   Future.wait([
-    _preloadGoogleFonts(),
     DiaryService().init(),
     PurchaseService().initialize(),
+    NotificationService().init(),
     MobileAds.instance.initialize().then((_) {
       debugPrint('[광고] MobileAds SDK 초기화 완료');
     }),
   ]);
 }
 
-// 지원되는 Google Fonts 통합 목록 (앞으로 이 하나만 사용)
+// 지원되는 Google Fonts 통합 목록 (한글 완벽 지원 폰트만)
 const List<String> kSupportedFonts = [
   'Jua',
-  'Do Hyeon',
   'Gamja Flower',
-  'Hi Melody',
-  'East Sea Dokdo',
   'Poor Story',
-  'Nanum Pen Script',
   'Nanum Gothic',
   'Nanum Myeongjo',
-  'Noto Sans KR',
-  'Roboto',
-  'Lato',
-  'Open Sans',
 ];
 
-// Google Fonts 미리 로딩 함수
-Future<void> _preloadGoogleFonts() async {
-  await Future.wait(kSupportedFonts.map((fontFamily) async {
-    try {
-      GoogleFonts.getFont(fontFamily);
-      debugPrint('폰트 로딩 성공: $fontFamily');
-    } catch (e) {
-      debugPrint('폰트 로딩 실패: $fontFamily - $e');
-    }
-  }));
-}
+
+// 글로벌 폰트 알림 — MyApp이 이를 감시하여 MaterialApp 테마 전체에 적용
+final globalFontNotifier = ValueNotifier<String>('Nanum Gothic');
+
+// 글로벌 로캘 알림 — null이면 시스템 기본 사용
+final globalLocaleNotifier = ValueNotifier<Locale?>(null);
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -97,6 +85,33 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _showOpening = true;
 
+  @override
+  void initState() {
+    super.initState();
+    globalFontNotifier.addListener(_onSettingChanged);
+    globalLocaleNotifier.addListener(_onSettingChanged);
+    _loadSavedLocale();
+  }
+
+  Future<void> _loadSavedLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    final code = prefs.getString('app_locale');
+    if (code != null) {
+      globalLocaleNotifier.value = Locale(code);
+    }
+  }
+
+  @override
+  void dispose() {
+    globalFontNotifier.removeListener(_onSettingChanged);
+    globalLocaleNotifier.removeListener(_onSettingChanged);
+    super.dispose();
+  }
+
+  void _onSettingChanged() {
+    setState(() {}); // MaterialApp 테마/로캘 재빌드
+  }
+
   void _finishOpening() {
     setState(() {
       _showOpening = false;
@@ -105,28 +120,33 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final fontFamily = globalFontNotifier.value;
+    debugPrint('[폰트] 선택된 폰트: $fontFamily');
+
     return MaterialApp(
       title: 'Diary App',
       theme: ThemeData(
         useMaterial3: true,
+        fontFamily: fontFamily,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF7C5CFC), // 부드러운 보라
+          seedColor: const Color(0xFF7C5CFC),
           brightness: Brightness.light,
           primary: const Color(0xFF7C5CFC),
-          secondary: const Color(0xFFFF8FAB), // 코랄 핑크
+          secondary: const Color(0xFFFF8FAB),
           surface: const Color(0xFFF8F5FF),
           onSurface: const Color(0xFF2D2D3A),
         ),
         scaffoldBackgroundColor: const Color(0xFFF8F5FF),
-        appBarTheme: const AppBarTheme(
+        appBarTheme: AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
-          foregroundColor: Color(0xFF2D2D3A),
+          foregroundColor: const Color(0xFF2D2D3A),
           titleTextStyle: TextStyle(
+            fontFamily: fontFamily,
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF2D2D3A),
+            color: const Color(0xFF2D2D3A),
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -157,9 +177,26 @@ class _MyAppState extends State<MyApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: WidgetsBinding.instance.window.locale.languageCode == 'ko'
-          ? const Locale('ko')
-          : null,
+      locale: globalLocaleNotifier.value,
+      localeResolutionCallback: (locale, supportedLocales) {
+        // 유저가 명시적으로 선택한 경우 그대로 사용
+        if (globalLocaleNotifier.value != null) {
+          return globalLocaleNotifier.value;
+        }
+        for (var supportedLocale in supportedLocales) {
+          if (locale?.languageCode == supportedLocale.languageCode) {
+            return supportedLocale;
+          }
+        }
+        return supportedLocales.first;
+      },
+      // 모든 페이지/라우트에 선택된 폰트 강제 적용 (번들 폰트)
+      builder: (context, child) {
+        return DefaultTextStyle.merge(
+          style: TextStyle(fontFamily: fontFamily),
+          child: child!,
+        );
+      },
 
       home: _showOpening
           ? OpeningBanner(onFinish: _finishOpening)
@@ -194,18 +231,16 @@ class _MainScreenState extends State<MainScreen> {
 
   // 테마/색상 상태를 MainScreen에서 관리
   Color _bgColor = const Color(0xFFFFE0E6);
-  String _fontFamily = 'Nanum Pen Script';
+  String _fontFamily = 'Nanum Gothic';
   bool _settingsLoaded = false;
 
   static const List<Color> _colorOptions = [
-    Color(0xFFFFE0E6), // soft pink
-    Color(0xFFFFF2E0), // warm cream
-    Color(0xFFFFB6A6), // peach
-    Color(0xFFFFD6C0), // light apricot
-    Color(0xFFFFB6B9), // pink
-    Color(0xFFFFE6C0), // yellow-peach
-    Color(0xFFFAF4E6), // ivory
-    Color(0xFFF9E7E7), // light rose
+    Color(0xFFFFE0E6), // 소프트 핑크
+    Color(0xFFFFF2E0), // 워므 크림
+    Color(0xFFE0F5E9), // 민트
+    Color(0xFFE8E0FF), // 라벤더
+    Color(0xFFE0EDFF), // 스카이 블루
+    Color(0xFFFAF4E6), // 아이보리
   ];
 
   // Google Fonts를 통해 사용할 글씨체 목록 - 통합 목록 사용
@@ -226,10 +261,13 @@ class _MainScreenState extends State<MainScreen> {
     // 로컬 캐시에서 먼저 불러오기
     if (savedFont != null || savedColor != null) {
       setState(() {
-        if (savedFont != null) _fontFamily = savedFont;
+        if (savedFont != null) {
+          _fontFamily = kSupportedFonts.contains(savedFont) ? savedFont : 'Nanum Gothic';
+        }
         if (savedColor != null) _bgColor = Color(savedColor);
         _settingsLoaded = true;
       });
+      globalFontNotifier.value = _fontFamily;
     }
     
     // Firebase에서 동기화
@@ -242,10 +280,14 @@ class _MainScreenState extends State<MainScreen> {
         if (snapshot.exists) {
           final data = snapshot.value as Map<dynamic, dynamic>;
           setState(() {
-            if (data['fontFamily'] != null) _fontFamily = data['fontFamily'] as String;
+            if (data['fontFamily'] != null) {
+              final fbFont = data['fontFamily'] as String;
+              _fontFamily = kSupportedFonts.contains(fbFont) ? fbFont : 'Nanum Gothic';
+            }
             if (data['bgColor'] != null) _bgColor = Color(data['bgColor'] as int);
             _settingsLoaded = true;
           });
+          globalFontNotifier.value = _fontFamily;
           // 로컬 캐시 업데이트
           await prefs.setString('user_font', _fontFamily);
           await prefs.setInt('user_bg_color', _bgColor.toARGB32());
@@ -290,16 +332,16 @@ class _MainScreenState extends State<MainScreen> {
         final shouldExit = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('앱 종료'),
-            content: const Text('앱을 종료하시겠습니까?'),
+            title: Text(AppLocalizations.of(context)!.exitAppTitle),
+            content: Text(AppLocalizations.of(context)!.exitAppContent),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
-                child: const Text('취소'),
+                child: Text(AppLocalizations.of(context)!.cancel),
               ),
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('종료'),
+                child: Text(AppLocalizations.of(context)!.exitAppConfirm),
               ),
             ],
           ),
@@ -332,7 +374,7 @@ class _MainScreenState extends State<MainScreen> {
             actions: [
   IconButton(
     icon: const Icon(Icons.settings),
-    tooltip: '설정',
+    tooltip: AppLocalizations.of(context)!.settingsTooltip,
     onPressed: () async {
       await Navigator.of(context).push(
         MaterialPageRoute(
@@ -347,6 +389,7 @@ class _MainScreenState extends State<MainScreen> {
             },
             onFontSelected: (font) {
               setState(() => _fontFamily = font);
+              globalFontNotifier.value = font;
               _saveUserSettings();
             },
           ),

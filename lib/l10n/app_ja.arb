@@ -1,0 +1,171 @@
+{
+  "@@locale": "ja",
+
+  "appTitle": "ダイアリーアプリ",
+  "settings": "設定",
+  "logout": "ログアウト",
+  "theme": "テーマ",
+  "font": "フォント",
+  "selectTheme": "テーマ選択",
+  "selectFont": "フォント選択",
+  "diaryEntry": "日記を書く",
+  "diaryList": "日記一覧",
+  "login": "ログイン",
+  "googleSignIn": "Googleでログイン",
+  "logoutConfirm": "本当にログアウトしますか？",
+  "colorSelected": "背景色が変更されました。",
+  "fontSelected": "フォントが変更されました。",
+  "editDiary": "日記を編集",
+  "positiveVersion": "ポジティブ版:",
+  "convertToPositive": "ポジティブ版に変換",
+  "diaryHint": "日記を入力してください",
+  "moodHappy": "幸せ",
+  "moodSad": "悲しい",
+  "moodNeutral": "普通",
+  "loginSubtitle": "大切な一日をあたたかく記録しましょう",
+  "noDiaries": "まだ日記がありません。最初の日記を書いてみましょう！",
+  "hidePositive": "ポジティブ版を隠す",
+  "showPositive": "ポジティブ版を表示",
+  "positiveButton": "ポジティブ版を生成",
+
+  "cancel": "キャンセル",
+  "close": "閉じる",
+  "delete": "削除",
+  "confirm": "OK",
+  "share": "共有",
+
+  "exitAppTitle": "アプリ終了",
+  "exitAppContent": "アプリを終了しますか？",
+  "exitAppConfirm": "終了",
+
+  "settingsTooltip": "設定",
+
+  "emptyDiaryTitle": "まだ日記がありません",
+  "emptyDiarySubtitle": "下のボタンをタップして最初の日記を書きましょう！",
+  "newDiaryButton": "✏️ 新しい日記",
+  "deleteConfirmTitle": "削除確認",
+  "deleteConfirmContent": "この日記を削除しますか？",
+
+  "angel": "天使",
+  "devil": "悪魔",
+  "angelComfort": "天使の慰め",
+  "devilEmpathy": "悪魔の共感",
+  "regenerateAngel": "慰めを再生成",
+  "viewAngel": "慰めを見る",
+  "regenerateDevil": "共感を再生成",
+  "viewDevil": "共感を見る",
+  "originalDiary": "元の日記",
+  "shareAsImageCard": "画像カードで共有",
+
+  "regenerateConfirm": "新しい{label}版を生成しますか？\n\n⚠️ 1回分を消費します。\n(残り: {remaining})",
+  "@regenerateConfirm": {
+    "placeholders": {
+      "label": {"type": "String"},
+      "remaining": {"type": "String"}
+    }
+  },
+  "regenerateButton": "再生成",
+
+  "premiumLimitReached": "月{limit}回のプレミアム回数をすべて使用しました。\n広告を見ると追加生成できます！",
+  "@premiumLimitReached": {
+    "placeholders": { "limit": {"type": "int"} }
+  },
+  "freeLimitReached": "1日{limit}回の無料生成回数をすべて使用しました。",
+  "@freeLimitReached": {
+    "placeholders": { "limit": {"type": "int"} }
+  },
+  "watchAdToGenerate": "広告を見て1回生成",
+  "premiumSubscription": "プレミアム (月300回)",
+
+  "ratingQuestion": "この結果にどのくらい満足しましたか？",
+  "ratingBad": "悪い",
+  "ratingPoor": "残念",
+  "ratingOk": "まあまあ",
+  "ratingGood": "良い！",
+  "ratingExcellent": "最高！",
+  "rateAndGet": "評価して1回もらう",
+  "ratingComplete": "評価完了！",
+  "ratingPrompt": "この結果どうですか？",
+
+  "remainingCountFree": "{remaining}/{limit} 日",
+  "@remainingCountFree": {
+    "placeholders": {
+      "remaining": {"type": "int"},
+      "limit": {"type": "int"}
+    }
+  },
+  "remainingCountPremium": "{remaining}/{limit} 月",
+  "@remainingCountPremium": {
+    "placeholders": {
+      "remaining": {"type": "int"},
+      "limit": {"type": "int"}
+    }
+  },
+
+  "sendFeedback": "フィードバック",
+  "feedbackSubtitle": "バグや改善アイデアを教えてください！",
+  "bugReport": "バグ報告",
+  "improvementSuggestion": "改善提案",
+  "emailFallback": "メールアプリを開けません。tmddud333@naver.comに直接ご連絡ください。",
+  "bugReportTemplate": "こんにちは、\n\n[バグの説明]\n\n\n[再現手順]\n1. \n2. \n3. \n\n[デバイス情報]\n- OS: {os}\n- アプリバージョン: 1.0.0\n",
+  "@bugReportTemplate": {
+    "placeholders": { "os": {"type": "String"} }
+  },
+  "improvementTemplate": "こんにちは、\n\n[改善提案の内容]\n\n\n[期待される効果]\n\n\nよろしくお願いします！\n",
+
+  "diaryNotification": "日記リマインダー",
+  "notificationSubtitle": "毎晩9時に今日を振り返りましょう",
+  "testNotification": "テスト通知を送る",
+  "dataProtection": "データ保護",
+  "e2eEncryption": "エンドツーエンド暗号化(E2EE)",
+
+  "notificationChannelName": "日記リマインダー",
+  "notificationChannelDesc": "毎晩9時に日記作成をお知らせします",
+  "notificationDismiss": "閉じる",
+  "notificationBody": "今日はどんな一日でしたか？書いてみましょう！📝",
+  "notificationMsg1": "今日はどんな一日でしたか？ ✨",
+  "notificationMsg2": "今日もお疲れさまです！日記を書きませんか？ 📝",
+  "notificationMsg3": "一日の終わりに今日を記録しましょう 🌙",
+  "notificationMsg4": "今日の話を聞かせてください！ 💜",
+  "notificationMsg5": "寝る前に今日を振り返りませんか？ 🌟",
+
+  "networkError": "ネットワーク接続を確認してください。",
+  "loginError": "ログイン中にエラーが発生しました。もう一度お試しください。",
+
+  "privacyTitle": "あなたの日記は\n安全に保護されています",
+  "privacySubtitle": "エンドツーエンド暗号化(E2EE)適用",
+  "privacyHowTitle": "どのように暗号化されますか？",
+  "privacyHowBullet1": "日記の内容はデバイスでAES-256軍事級暗号化で変換されます",
+  "privacyHowBullet2": "暗号化された状態でサーバーに保存されるため、サーバーでは文字化けのみが表示されます",
+  "privacyHowBullet3": "開発者を含む誰もその内容を確認できません",
+  "privacyKeyTitle": "暗号化キーはどのように保護されますか？",
+  "privacyKeyBullet1": "暗号化キーはGoogleアカウント情報から自動生成されます",
+  "privacyKeyBullet2": "キーはデバイスメモリにのみ存在し、どこにも保存されません",
+  "privacyKeyBullet3": "同じGoogleアカウントでログインすると常に同じキーが生成されます",
+  "privacyReassureTitle": "ご安心ください",
+  "privacyRememberTitle": "必ず覚えてください",
+  "privacyRememberContent": "日記の内容は復元できません。Googleアカウントを安全に保ってください。",
+  "privacyTechSpecTitle": "技術仕様",
+  "privacySpecEncryption": "暗号化アルゴリズム",
+  "privacySpecKeyDerivation": "鍵導出",
+  "privacySpecDataId": "データ識別",
+
+  "premiumRestore": "購入を復元",
+  "premiumTitle": "プレミアム 月300回",
+  "premiumMonthly": "月額プラン",
+  "premiumMonthlyDesc": "いつでも解約可能",
+  "premiumYearly": "年額プラン",
+  "premiumYearlyDesc": "月¥492 · 55%お得",
+  "premiumLifetime": "永久プラン",
+  "premiumLifetimeDesc": "一度の支払いで永遠に",
+  "premiumDisclaimer": "サブスクリプションはiTunes/Google Playアカウントを通じて課金され、\n自動更新を解除しない場合、現在の期間終了の24時間前に\n自動的に更新されます。",
+  "premiumBenefit1": "月300回AI日記変換",
+  "premiumBenefit2": "広告なしで即利用",
+  "premiumBenefit3": "天使＆悪魔バージョン両方使用",
+  "premiumBenefit4": "高速AI応答優先処理",
+  "premiumComingSoon": "現在準備中です。もうすぐご利用いただけます！ 🚀",
+  "premiumNoRestore": "復元できる購入はありません。",
+
+  "shareCardBranding": "AI日記を書いてみよう ✍️",
+  "shareCardAppName": "ママパパダイアリー"
+}

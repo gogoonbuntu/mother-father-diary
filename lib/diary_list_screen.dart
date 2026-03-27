@@ -113,14 +113,12 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                     ),
                   ],
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.edit_rounded, color: Colors.white, size: 22),
-                    SizedBox(width: 10),
                     Text(
-                      '✏️ 새 일기 쓰기',
-                      style: TextStyle(
+                      AppLocalizations.of(context)!.newDiaryButton,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
@@ -141,22 +139,22 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
     return ListView(
       children: [
         SizedBox(height: MediaQuery.of(context).size.height * 0.25),
-        const Center(
+        Center(
           child: Column(
             children: [
-              Text('📝', style: TextStyle(fontSize: 64)),
-              SizedBox(height: 16),
+              const Text('📝', style: TextStyle(fontSize: 64)),
+              const SizedBox(height: 16),
               Text(
-                '아직 일기가 없어요',
-                style: TextStyle(
+                AppLocalizations.of(context)!.emptyDiaryTitle,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF5A3ED9),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                '아래 버튼을 눌러 첫 일기를 작성해보세요!',
+                AppLocalizations.of(context)!.emptyDiarySubtitle,
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
             ],
@@ -222,11 +220,11 @@ class _DiaryListScreenState extends State<DiaryListScreen> {
                     bool confirm = await showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text('삭제 확인'),
-                        content: const Text('이 일기를 삭제하시겠습니까?'),
+                        title: Text(AppLocalizations.of(context)!.deleteConfirmTitle),
+                        content: Text(AppLocalizations.of(context)!.deleteConfirmContent),
                         actions: [
-                          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('취소')),
-                          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('삭제')),
+                          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppLocalizations.of(context)!.cancel)),
+                          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(AppLocalizations.of(context)!.delete)),
                         ],
                       ),
                     );
