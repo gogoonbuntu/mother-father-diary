@@ -58,3 +58,20 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Fastlane
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots
+*/fastlane/test_output
+fastlane/README.md
+Gemfile.lock
+vendor/bundle/
+
+# Store credentials (NEVER commit these)
+play-store-credentials.json
+appstore-api-key.json
+*.p8
+android/key.properties
+*.jks
+*.keystore

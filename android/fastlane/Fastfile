@@ -1,0 +1,69 @@
+default_platform(:android)
+
+platform :android do
+  desc "자동 버전 코드 증가"
+  private_lane :increment_version do
+    # pubspec.yaml에서 현재 버전 읽기
+    pubspec = File.read("../../pubspec.yaml")
+    current_version = pubspec.match(/version:\s*(\d+\.\d+\.\d+)\+(\d+)/i)
+
+    if current_version
+      version_name = current_version[1]
+      version_code = current_version[2].to_i + 1
+
+      # pubspec.yaml 업데이트
+      new_pubspec = pubspec.sub(
+        /version:\s*\d+\.\d+\.\d+\+\d+/,
+        "version: #{version_name}+#{version_code}"
+      )
+      File.write("../../pubspec.yaml", new_pubspec)
+      UI.success("✅ Version updated: #{version_name}+#{version_code}")
+    end
+  end
+
+  desc "🧪 내부 테스트 트랙에 업로드"
+  lane :beta do
+    increment_version
+
+    # Flutter AAB 빌드
+    sh("cd ../.. && flutter build appbundle --release")
+
+    # Play Store 내부 테스트 트랙 업로드
+    upload_to_play_store(
+      track: "internal",
+      aab: "../../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false,
+    )
+
+    UI.success("🎉 내부 테스트 트랙에 업로드 완료!")
+  end
+
+  desc "🚀 프로덕션 배포"
+  lane :deploy do
+    increment_version
+
+    sh("cd ../.. && flutter build appbundle --release")
+
+    upload_to_play_store(
+      track: "production",
+      aab: "../../build/app/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+
+    UI.success("🚀 프로덕션에 배포 완료!")
+  end
+
+  desc "📸 스크린샷 캡처 + 메타데이터 업로드"
+  lane :metadata do
+    upload_to_play_store(
+      track: "internal",
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+    )
+  end
+end
