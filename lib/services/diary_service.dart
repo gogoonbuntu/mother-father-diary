@@ -11,22 +11,24 @@ import 'package:flutter/foundation.dart';
 
 class DiaryService {
   static final DiaryService _instance = DiaryService._internal();
-  
+
   // 로컬 저장소 관련 변수
   List<DiaryEntry> _localDiaryEntries = [];
   late File _diaryFile;
-  
+
   // Firebase 관련 변수
-  bool _useFirestore = true;
+  bool _firebaseAvailable = false;
   bool _initialized = false;
-  
+  String? _lastUserId; // 유저 변경 감지용
+
   // 캐싱 및 최적화 관련 변수
   Map<String, DiaryEntry> _cachedEntries = {}; // 메모리 캐시 (복호화된 원문)
   Timer? _saveDebounceTimer; // 저장 디바운스 타이머
-  bool _hasPendingChanges = false; // 대기 중인 변경사항 여부
-  DateTime _lastSyncTime = DateTime.now(); // 마지막 동기화 시간
-  static const Duration _syncInterval = Duration(minutes: 5); // 동기화 간격
-  static const Duration _debounceTime = Duration(seconds: 3); // 디바운스 시간
+  Timer? _periodicSyncTimer; // 주기적 동기화 타이머
+  bool _hasPendingChanges = false;
+  DateTime _lastSyncTime = DateTime.now();
+  static const Duration _syncInterval = Duration(minutes: 5);
+  static const Duration _debounceTime = Duration(seconds: 3);
 
   // 암호화 서비스
   final EncryptionService _encryption = EncryptionService();
@@ -36,147 +38,185 @@ class DiaryService {
   DiaryService._internal();
 
   String get _userId => FirebaseAuth.instance.currentUser?.uid ?? 'local-user';
-  
-  // Firebase Realtime Database 참조 - 아시아 지역 URL 사용
+
+  // Firebase Realtime Database 참조
   DatabaseReference get _databaseRef => FirebaseDatabase.instanceFor(
     app: Firebase.app(),
     databaseURL: 'https://diary-becbb-default-rtdb.asia-southeast1.firebasedatabase.app'
   ).ref();
-  
+
   // 사용자별 일기 경로
   DatabaseReference get _userDiariesRef => _databaseRef.child('users/$_userId/diaries');
 
   Future<void> init() async {
-    if (_initialized) return;
-    
+    // 유저가 바뀌면 재초기화 필요
+    final currentUserId = _userId;
+    if (_initialized && _lastUserId == currentUserId) return;
+
+    if (_lastUserId != null && _lastUserId != currentUserId) {
+      debugPrint('[DiaryService] 유저 변경 감지: $_lastUserId → $currentUserId, 재초기화');
+      _cachedEntries.clear();
+      _hasPendingChanges = false;
+      _periodicSyncTimer?.cancel();
+      _saveDebounceTimer?.cancel();
+    }
+
+    _lastUserId = currentUserId;
+
     // 암호화 서비스 초기화
     _encryption.initialize();
-    
+
     // 로컬 저장소 초기화
     final directory = await getApplicationDocumentsDirectory();
-    _diaryFile = File('${directory.path}/diary_entries.json');
+    _diaryFile = File('${directory.path}/diary_entries_$currentUserId.json');
     await _loadLocalDiaryEntries();
-    
+
     // Firebase Realtime Database 사용 가능 여부 확인
-    try {
-      await _databaseRef.child('test').get();
-      _useFirestore = true;
-      debugPrint('Firebase Realtime Database is available and will be used');
-      
-      // 초기 로드 후 캐싱
-      await _loadAndCacheRemoteEntries();
-      
-      // 주기적 동기화 타이머 설정
-      _setupPeriodicSync();
-    } catch (e) {
-      _useFirestore = false;
-      debugPrint('Firebase error, falling back to local storage: $e');
+    _firebaseAvailable = false;
+    if (currentUserId != 'local-user') {
+      try {
+        // 자기 자신의 경로에서 읽기 테스트 (보안 규칙 통과)
+        await _userDiariesRef.limitToFirst(1).get();
+        _firebaseAvailable = true;
+        debugPrint('[DiaryService] ✅ Firebase Realtime Database 연결 성공');
+
+        // 원격 데이터를 로컬과 병합
+        await _mergeRemoteEntries();
+
+        // 주기적 동기화 타이머 설정
+        _setupPeriodicSync();
+      } catch (e) {
+        _firebaseAvailable = false;
+        debugPrint('[DiaryService] ❌ Firebase 연결 실패, 로컬 모드: $e');
+      }
     }
-    
+
     // 기존 비암호화 데이터 마이그레이션
     await _migrateUnencryptedEntries();
-    
+
     _initialized = true;
   }
-  
+
   // 주기적 동기화 타이머 설정
   void _setupPeriodicSync() {
-    Timer.periodic(_syncInterval, (_) {
+    _periodicSyncTimer?.cancel();
+    _periodicSyncTimer = Timer.periodic(_syncInterval, (_) {
       if (_hasPendingChanges) {
-        _syncToDatabase();
+        _syncToFirebase();
       }
     });
   }
-  
-  // 원격 데이터를 가져와서 캐싱 (복호화 후 캐시에 저장)
-  Future<void> _loadAndCacheRemoteEntries() async {
+
+  // 원격 데이터를 가져와서 로컬과 병합 (핵심: 앱 재설치 후 복원)
+  Future<void> _mergeRemoteEntries() async {
     try {
       final snapshot = await _userDiariesRef.get();
       if (snapshot.exists) {
         final data = snapshot.value as Map<dynamic, dynamic>?;
         if (data != null) {
+          int newCount = 0;
           data.forEach((key, value) {
             if (value is Map) {
               final Map<String, dynamic> entryMap = {};
               value.forEach((k, v) => entryMap[k.toString()] = v);
-              final entry = DiaryEntry.fromJson(entryMap);
-              // 복호화 후 캐시에 저장
-              _cachedEntries[entry.id] = _decryptEntry(entry);
+              try {
+                final entry = DiaryEntry.fromJson(entryMap);
+                final decrypted = _decryptEntry(entry);
+                // 로컬에 없는 항목이면 추가 (ID 기반)
+                if (!_cachedEntries.containsKey(entry.id)) {
+                  _cachedEntries[entry.id] = decrypted;
+                  newCount++;
+                } else {
+                  // 이미 있으면, updatedAt 비교하여 최신 데이터로 교체
+                  final localUpdatedAt = entryMap['updatedAt'];
+                  final cachedJson = _cachedEntries[entry.id]!.toJson();
+                  final cachedUpdatedAt = cachedJson['updatedAt'];
+                  if (localUpdatedAt != null && cachedUpdatedAt != null) {
+                    if (localUpdatedAt.toString().compareTo(cachedUpdatedAt.toString()) > 0) {
+                      _cachedEntries[entry.id] = decrypted;
+                    }
+                  }
+                }
+              } catch (e) {
+                debugPrint('[DiaryService] 항목 파싱 실패: $e');
+              }
             }
           });
-          debugPrint('Cached ${_cachedEntries.length} entries from remote database');
+          debugPrint('[DiaryService] 원격에서 $newCount개 새 항목 병합, 총 ${_cachedEntries.length}개');
+          // 병합 후 로컬 저장
+          if (newCount > 0) {
+            await _saveLocalDiaryEntries();
+          }
         }
       }
     } catch (e) {
-      debugPrint('Error loading remote entries: $e');
+      debugPrint('[DiaryService] 원격 데이터 로드 실패: $e');
     }
   }
 
-  // 로컬 저장소 관련 메서드 (복호화 후 캐시에 저장)
+  // 로컬 저장소 관련 메서드
   Future<void> _loadLocalDiaryEntries() async {
     try {
       if (await _diaryFile.exists()) {
         final contents = await _diaryFile.readAsString();
         final jsonList = jsonDecode(contents);
         _localDiaryEntries = jsonList.map<DiaryEntry>((json) => DiaryEntry.fromJson(json)).toList();
-        
-        // 로컬 데이터 복호화 후 캐싱
+
         for (var entry in _localDiaryEntries) {
           _cachedEntries[entry.id] = _decryptEntry(entry);
         }
+        debugPrint('[DiaryService] 로컬에서 ${_localDiaryEntries.length}개 항목 로드');
       }
     } catch (e) {
-      debugPrint('Error loading local diary entries: $e');
+      debugPrint('[DiaryService] 로컬 로드 실패: $e');
       _localDiaryEntries = [];
     }
   }
 
   Future<void> _saveLocalDiaryEntries() async {
     try {
-      // 캐시(복호화 상태)에서 암호화하여 저장
       _localDiaryEntries = _cachedEntries.values
           .map((entry) => _encryptEntry(entry))
           .toList();
-      
+
       final jsonList = _localDiaryEntries.map((entry) => entry.toJson()).toList();
       await _diaryFile.writeAsString(jsonEncode(jsonList));
     } catch (e) {
-      debugPrint('Error saving local diary entries: $e');
+      debugPrint('[DiaryService] 로컬 저장 실패: $e');
     }
   }
-  
+
   // 디바운스를 적용한 데이터베이스 동기화
   void _scheduleDatabaseSync() {
     _hasPendingChanges = true;
-    
-    // 기존 타이머 취소 후 새로 설정
+
     _saveDebounceTimer?.cancel();
     _saveDebounceTimer = Timer(_debounceTime, () {
-      _syncToDatabase();
+      _syncToFirebase();
     });
   }
-  
-  // 데이터베이스와 동기화 (암호화 후 업로드)
-  Future<void> _syncToDatabase() async {
-    if (!_useFirestore || !_hasPendingChanges) return;
-    
+
+  // Firebase에 동기화 (암호화 후 업로드) — 즉시 실행 가능
+  Future<void> _syncToFirebase() async {
+    if (!_firebaseAvailable || !_hasPendingChanges) return;
+
     try {
-      // 배치 업데이트 사용 (암호화 후)
       final updates = <String, dynamic>{};
       _cachedEntries.forEach((id, entry) {
         updates[id] = _encryptEntry(entry).toJson();
       });
-      
+
       await _userDiariesRef.update(updates);
       _lastSyncTime = DateTime.now();
       _hasPendingChanges = false;
-      debugPrint('Synced ${updates.length} encrypted entries to database');
+      debugPrint('[DiaryService] ✅ Firebase에 ${updates.length}개 항목 동기화 완료');
     } catch (e) {
-      debugPrint('Error syncing to database: $e');
+      debugPrint('[DiaryService] ❌ Firebase 동기화 실패: $e');
     }
   }
 
-  // 하이브리드 CRUD 메서드
+  // === CRUD 메서드 ===
+
   Future<void> addDiaryEntry(DiaryEntry entry) async {
     await init();
     final now = DateTime.now();
@@ -186,54 +226,55 @@ class DiaryService {
       'createdAt': now.toIso8601String(),
       'updatedAt': now.toIso8601String(),
     };
-    
-    // 캐시에 저장
+
     final diaryEntry = DiaryEntry.fromJson(entryWithMetadata);
     _cachedEntries[entry.id] = diaryEntry;
-    
-    // 로컬 저장소 업데이트
+
+    // 로컬 저장
     await _saveLocalDiaryEntries();
-    
-    if (_useFirestore) {
-      // 디바운스를 적용하여 데이터베이스 업데이트 일정 잠시 지연
-      _scheduleDatabaseSync();
+
+    if (_firebaseAvailable) {
+      // 새 항목은 즉시 Firebase에 업로드 (유실 방지)
+      try {
+        await _userDiariesRef.child(entry.id).set(_encryptEntry(diaryEntry).toJson());
+        debugPrint('[DiaryService] ✅ 새 일기 Firebase에 즉시 저장: ${entry.id}');
+      } catch (e) {
+        debugPrint('[DiaryService] ❌ Firebase 즉시 저장 실패, 디바운스로 재시도: $e');
+        _scheduleDatabaseSync();
+      }
     }
   }
 
   Future<List<DiaryEntry>> getDiaryEntries() async {
     await init();
-    
-    // 캐시에서 데이터 가져오기 (원격 데이터는 이미 초기화 시 캐싱됨)
+
     final entries = _cachedEntries.values.toList();
-    
-    // 마지막 동기화 이후 시간이 오래 지났다면 새로 로드
+
+    // 15분마다 원격 새로고침
     final timeSinceLastSync = DateTime.now().difference(_lastSyncTime);
-    if (_useFirestore && timeSinceLastSync > const Duration(minutes: 15)) {
+    if (_firebaseAvailable && timeSinceLastSync > const Duration(minutes: 15)) {
       try {
-        await _loadAndCacheRemoteEntries();
+        await _mergeRemoteEntries();
         _lastSyncTime = DateTime.now();
         return _cachedEntries.values.toList()
           ..sort((a, b) => b.date.compareTo(a.date));
       } catch (e) {
-        debugPrint('Firebase get error, using cached data: $e');
+        debugPrint('[DiaryService] 새로고침 실패, 캐시 사용: $e');
       }
     }
-    
-    // 날짜별로 정렬 (최신순)
+
     entries.sort((a, b) => b.date.compareTo(a.date));
     return entries;
   }
 
   Future<DiaryEntry?> getDiaryEntryForDate(DateTime date) async {
     await init();
-    
-    // 캐시에서 찾기
+
     try {
       return _cachedEntries.values.firstWhere(
         (entry) => isSameDate(entry.date, date),
       );
     } catch (e) {
-      // 캐시에 없을 경우 null 반환
       return null;
     }
   }
@@ -244,53 +285,71 @@ class DiaryService {
       ...entry.toJson(),
       'updatedAt': DateTime.now().toIso8601String(),
     };
-    
-    // 캐시 업데이트
+
     _cachedEntries[id] = DiaryEntry.fromJson(updatedData);
-    
-    // 로컬 저장소 업데이트
+
+    // 로컬 저장
     await _saveLocalDiaryEntries();
-    
-    if (_useFirestore) {
-      // 디바운스를 적용하여 데이터베이스 업데이트 일정 지연
-      _scheduleDatabaseSync();
+
+    if (_firebaseAvailable) {
+      // 업데이트도 즉시 Firebase에 저장
+      try {
+        await _userDiariesRef.child(id).set(
+          _encryptEntry(DiaryEntry.fromJson(updatedData)).toJson()
+        );
+        debugPrint('[DiaryService] ✅ 일기 업데이트 Firebase에 즉시 저장: $id');
+      } catch (e) {
+        debugPrint('[DiaryService] ❌ Firebase 업데이트 실패, 디바운스로 재시도: $e');
+        _scheduleDatabaseSync();
+      }
     }
   }
 
   Future<void> deleteDiaryEntry(String id) async {
     await init();
-    
-    // 캐시에서 삭제
+
     _cachedEntries.remove(id);
-    
-    // 로컬 저장소 업데이트
+
+    // 로컬 저장
     await _saveLocalDiaryEntries();
-    
-    if (_useFirestore) {
+
+    if (_firebaseAvailable) {
       try {
-        // 삭제는 즉시 적용 (디바운스 없이)
         await _userDiariesRef.child(id).remove();
+        debugPrint('[DiaryService] ✅ Firebase에서 삭제: $id');
       } catch (e) {
-        debugPrint('Firebase delete error: $e');
+        debugPrint('[DiaryService] ❌ Firebase 삭제 실패: $e');
       }
     }
   }
-  
-  // 앱 종료 시 동기화 작업 수행
+
+  // 앱 종료 시 동기화
   Future<void> syncOnAppClose() async {
-    if (_useFirestore && _hasPendingChanges) {
-      await _syncToDatabase();
+    if (_firebaseAvailable && _hasPendingChanges) {
+      await _syncToFirebase();
     }
   }
 
-  // For compatibility: fetch all entries and find by date
+  // 수동 전체 동기화 (설정에서 호출 가능)
+  Future<void> forceSync() async {
+    if (!_firebaseAvailable) return;
+
+    // 로컬 → Firebase 업로드
+    _hasPendingChanges = true;
+    await _syncToFirebase();
+
+    // Firebase → 로컬 병합
+    await _mergeRemoteEntries();
+
+    debugPrint('[DiaryService] ✅ 강제 동기화 완료');
+  }
+
   bool isSameDate(DateTime date1, DateTime date2) {
     return date1.year == date2.year && date1.month == date2.month && date1.day == date2.day;
   }
 
   // === 암호화 헬퍼 ===
 
-  /// 일기 엔트리 암호화 (content, positiveVersion, devilVersion)
   DiaryEntry _encryptEntry(DiaryEntry entry) {
     return DiaryEntry(
       id: entry.id,
@@ -306,7 +365,6 @@ class DiaryService {
     );
   }
 
-  /// 일기 엔트리 복호화 (content, positiveVersion, devilVersion)
   DiaryEntry _decryptEntry(DiaryEntry entry) {
     return DiaryEntry(
       id: entry.id,
@@ -322,27 +380,25 @@ class DiaryService {
     );
   }
 
-  /// 기존 비암호화 데이터 자동 마이그레이션
   Future<void> _migrateUnencryptedEntries() async {
     if (!_encryption.isEnabled) return;
-    
+
     bool needsSave = false;
     for (final entry in _cachedEntries.values) {
-      // content가 암호화되지 않은 평문이면 마이그레이션 필요
       if (entry.content.isNotEmpty && !_encryption.isEncrypted(entry.content)) {
         needsSave = true;
         break;
       }
     }
-    
+
     if (needsSave) {
-      debugPrint('[암호화] 기존 비암호화 데이터 마이그레이션 시작...');
-      await _saveLocalDiaryEntries(); // 캐시(평문) → 암호화 후 저장
-      if (_useFirestore) {
+      debugPrint('[DiaryService] 비암호화 데이터 마이그레이션 시작...');
+      await _saveLocalDiaryEntries();
+      if (_firebaseAvailable) {
         _hasPendingChanges = true;
-        await _syncToDatabase();
+        await _syncToFirebase();
       }
-      debugPrint('[암호화] 마이그레이션 완료');
+      debugPrint('[DiaryService] 마이그레이션 완료');
     }
   }
 }
