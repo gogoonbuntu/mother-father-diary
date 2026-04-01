@@ -1,22 +1,25 @@
 default_platform(:android)
 
+# 프로젝트 루트 경로
+PROJECT_ROOT = File.expand_path("../..", __dir__)
+AAB_PATH = File.join(PROJECT_ROOT, "build/app/outputs/bundle/release/app-release.aab")
+
 platform :android do
   desc "자동 버전 코드 증가"
   private_lane :increment_version do
-    # pubspec.yaml에서 현재 버전 읽기
-    pubspec = File.read("../../pubspec.yaml")
+    pubspec_path = File.join(PROJECT_ROOT, "pubspec.yaml")
+    pubspec = File.read(pubspec_path)
     current_version = pubspec.match(/version:\s*(\d+\.\d+\.\d+)\+(\d+)/i)
 
     if current_version
       version_name = current_version[1]
       version_code = current_version[2].to_i + 1
 
-      # pubspec.yaml 업데이트
       new_pubspec = pubspec.sub(
         /version:\s*\d+\.\d+\.\d+\+\d+/,
         "version: #{version_name}+#{version_code}"
       )
-      File.write("../../pubspec.yaml", new_pubspec)
+      File.write(pubspec_path, new_pubspec)
       UI.success("✅ Version updated: #{version_name}+#{version_code}")
     end
   end
@@ -25,17 +28,22 @@ platform :android do
   lane :beta do
     increment_version
 
-    # Flutter AAB 빌드
-    sh("cd ../.. && flutter build appbundle --release")
+    # Flutter AAB 빌드 (프로젝트 루트에서 실행)
+    Dir.chdir(PROJECT_ROOT) do
+      sh("flutter", "build", "appbundle", "--release")
+    end
+
+    UI.message("📦 AAB path: #{AAB_PATH}")
+    UI.user_error!("AAB 파일을 찾을 수 없습니다: #{AAB_PATH}") unless File.exist?(AAB_PATH)
 
     # Play Store 내부 테스트 트랙 업로드
     upload_to_play_store(
       track: "internal",
-      aab: "../../build/app/outputs/bundle/release/app-release.aab",
+      aab: AAB_PATH,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
-      skip_upload_changelogs: false,
+      skip_upload_changelogs: true,
     )
 
     UI.success("🎉 내부 테스트 트랙에 업로드 완료!")
@@ -45,25 +53,18 @@ platform :android do
   lane :deploy do
     increment_version
 
-    sh("cd ../.. && flutter build appbundle --release")
+    Dir.chdir(PROJECT_ROOT) do
+      sh("flutter", "build", "appbundle", "--release")
+    end
 
     upload_to_play_store(
       track: "production",
-      aab: "../../build/app/outputs/bundle/release/app-release.aab",
+      aab: AAB_PATH,
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
     )
 
     UI.success("🚀 프로덕션에 배포 완료!")
-  end
-
-  desc "📸 스크린샷 캡처 + 메타데이터 업로드"
-  lane :metadata do
-    upload_to_play_store(
-      track: "internal",
-      skip_upload_aab: true,
-      skip_upload_apk: true,
-    )
   end
 end
