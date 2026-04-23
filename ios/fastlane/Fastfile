@@ -32,7 +32,7 @@ platform :ios do
   private_lane :setup_provisioning do
     sigh(
       app_identifier: "com.motherfatherdiary.app",
-      readonly: true,
+      readonly: false,
       output_path: "./profiles",
     )
   end
@@ -46,8 +46,7 @@ platform :ios do
     setup_provisioning
     profile_name = lane_context[SharedValues::SIGH_NAME]
 
-    # Flutter 빌드
-    sh("export PATH=\"/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH\" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign")
+    # Flutter 빌드는 deploy.sh 에서 사전 실행됨
 
     # 아카이브 + IPA 생성
     build_app(
@@ -97,7 +96,7 @@ platform :ios do
     setup_provisioning
     profile_name = lane_context[SharedValues::SIGH_NAME]
 
-    sh("export PATH=\"/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH\" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign")
+    # Flutter 빌드는 deploy.sh 에서 사전 실행됨
 
     build_app(
       workspace: "Runner.xcworkspace",
@@ -171,5 +170,30 @@ platform :ios do
     )
 
     UI.success("📝 메타데이터 업로드 완료!")
+  end
+
+  desc "🚀 심사 제출 (빌드가 이미 업로드된 상태)"
+  lane :submit_review do
+    setup_api_key
+
+    deliver(
+      skip_binary_upload: true,
+      skip_metadata: false,
+      skip_screenshots: false,
+      overwrite_screenshots: true,
+      force: true,
+      submit_for_review: true,
+      automatic_release: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: true,
+        add_id_info_serves_ads: true,
+        add_id_info_tracks_install: false,
+        add_id_info_tracks_action: false,
+        add_id_info_limits_tracking: true,
+      },
+    )
+
+    UI.success("🚀 App Store 심사 제출 완료!")
   end
 end

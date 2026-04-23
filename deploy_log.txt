@@ -1,0 +1,626 @@
+═══════════════════════════════════════════
+🚀 Mother Father Diary Deploy
+  Platform: ios
+  Lane:     deploy
+═══════════════════════════════════════════
+📦 Cleaning and getting dependencies...
+Cleaning Xcode workspace...                                         3.3s
+Cleaning Xcode workspace...                                      1,907ms
+Deleting build...                                                    7ms
+Deleting .dart_tool...                                               3ms
+Deleting ephemeral...                                                0ms
+Deleting Generated.xcconfig...                                       0ms
+Deleting flutter_export_environment.sh...                            0ms
+Deleting Flutter.podspec...                                          0ms
+Deleting ephemeral...                                                0ms
+Deleting ephemeral...                                                0ms
+Deleting ephemeral...                                                0ms
+Deleting .flutter-plugins-dependencies...                            0ms
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.59 (1.3.69 available)
+  archive 4.0.7 (4.0.9 available)
+  async 2.12.0 (2.13.1 available)
+  characters 1.4.0 (1.4.1 available)
+  checked_yaml 2.0.3 (2.0.4 available)
+  clarity_flutter 1.7.1 (1.8.0 available)
+  cli_util 0.4.2 (0.5.0 available)
+  cloud_firestore 5.6.12 (6.3.0 available)
+  cloud_firestore_platform_interface 6.6.12 (7.2.0 available)
+  cloud_firestore_web 4.4.12 (5.3.0 available)
+  connectivity_plus 6.1.4 (7.1.1 available)
+  connectivity_plus_platform_interface 2.0.1 (2.1.0 available)
+  cupertino_icons 1.0.8 (1.0.9 available)
+  dbus 0.7.11 (0.7.12 available)
+  device_info_plus 12.3.0 (13.1.0 available)
+  device_info_plus_platform_interface 7.0.3 (8.1.0 available)
+  ffi 2.1.4 (2.2.0 available)
+  firebase_auth 5.7.0 (6.4.0 available)
+  firebase_auth_platform_interface 7.7.3 (8.1.9 available)
+  firebase_auth_web 5.15.3 (6.1.5 available)
+  firebase_core 3.15.2 (4.7.0 available)
+  firebase_core_platform_interface 6.0.2 (6.0.3 available)
+  firebase_core_web 2.24.1 (3.6.0 available)
+  firebase_database 11.3.10 (12.3.0 available)
+  firebase_database_platform_interface 0.2.6+10 (0.3.1+1 available)
+  firebase_database_web 0.2.6+16 (0.2.7+6 available)
+  flutter_lints 5.0.0 (6.0.0 available)
+  flutter_local_notifications 18.0.1 (21.0.0 available)
+  flutter_local_notifications_linux 5.0.0 (8.0.0 available)
+  flutter_local_notifications_platform_interface 8.0.0 (11.0.0 available)
+  google_fonts 6.2.1 (8.0.2 available)
+  google_mobile_ads 6.0.0 (8.0.0 available)
+  google_sign_in 6.3.0 (7.2.0 available)
+  google_sign_in_android 6.2.1 (7.2.10 available)
+  google_sign_in_ios 5.9.0 (6.3.0 available)
+  google_sign_in_platform_interface 2.5.0 (3.1.0 available)
+  google_sign_in_web 0.12.4+4 (1.1.3 available)
+  http 1.3.0 (1.6.0 available)
+  image 4.5.4 (4.8.0 available)
+  in_app_purchase_android 0.4.0+8 (0.4.0+10 available)
+  json_annotation 4.9.0 (4.11.0 available)
+  lints 5.1.1 (6.1.0 available)
+  matcher 0.12.17 (0.12.19 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.2 available)
+  package_info_plus 9.0.0 (10.1.0 available)
+  package_info_plus_platform_interface 3.2.1 (4.1.0 available)
+  path_provider_android 2.2.17 (2.3.1 available)
+  path_provider_foundation 2.4.1 (2.6.0 available)
+  petitparser 6.1.0 (7.0.2 available)
+  pointycastle 3.9.1 (4.0.0 available)
+  posix 6.0.2 (6.5.0 available)
+  share_plus 10.1.4 (13.1.0 available)
+  share_plus_platform_interface 5.0.2 (7.1.0 available)
+  shared_preferences 2.5.4 (2.5.5 available)
+  shared_preferences_android 2.4.20 (2.4.23 available)
+  shared_preferences_platform_interface 2.4.1 (2.4.2 available)
+  sign_in_with_apple 6.1.4 (7.0.1 available)
+  sign_in_with_apple_platform_interface 1.1.0 (2.0.0 available)
+  sign_in_with_apple_web 2.1.1 (3.0.0 available)
+  source_span 1.10.1 (1.10.2 available)
+  test_api 0.7.7 (0.7.11 available)
+  timezone 0.10.1 (0.11.0 available)
+  url_launcher_android 6.3.28 (6.3.29 available)
+  url_launcher_ios 6.4.0 (6.4.1 available)
+  uuid 4.5.1 (4.5.3 available)
+  vector_math 2.2.0 (2.3.0 available)
+  vm_service 14.3.1 (15.1.0 available)
+  webview_flutter 4.11.0 (4.13.1 available)
+  webview_flutter_android 4.4.2 (4.11.0 available)
+  webview_flutter_platform_interface 2.11.0 (2.15.1 available)
+  webview_flutter_wkwebview 3.20.0 (3.24.5 available)
+  win32 5.15.0 (6.1.0 available)
+  win32_registry 2.1.0 (3.0.3 available)
+  xml 6.5.0 (6.6.1 available)
+Got dependencies!
+75 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+
+🍎 iOS: Running fastlane deploy...
+Updating local specs repositories
+Analyzing dependencies
+cloud_firestore: Using Firebase SDK version '11.15.0' defined in 'firebase_core'
+firebase_auth: Using Firebase SDK version '11.15.0' defined in 'firebase_core'
+firebase_core: Using Firebase SDK version '11.15.0' defined in 'firebase_core'
+firebase_database: Using Firebase SDK version '11.15.0' defined in 'firebase_core'
+Downloading dependencies
+Installing AppAuth (1.7.6)
+Installing AppCheckCore (11.2.0)
+Installing BoringSSL-GRPC (0.0.37)
+Installing CwlCatchException (2.2.1)
+Installing CwlCatchExceptionSupport (2.2.1)
+Installing Firebase (11.15.0)
+Installing FirebaseAppCheckInterop (11.15.0)
+Installing FirebaseAuth (11.15.0)
+Installing FirebaseAuthInterop (11.15.0)
+Installing FirebaseCore (11.15.0)
+Installing FirebaseCoreExtension (11.15.0)
+Installing FirebaseCoreInternal (11.15.0)
+Installing FirebaseDatabase (11.15.0)
+Installing FirebaseFirestore (11.15.0)
+Installing FirebaseFirestoreInternal (11.15.0)
+Installing FirebaseSharedSwift (11.15.0)
+Installing Flutter (1.0.0)
+Installing GTMAppAuth (4.1.1)
+Installing GTMSessionFetcher (3.5.0)
+Installing Google-Mobile-Ads-SDK (12.2.0)
+Installing GoogleSignIn (8.0.0)
+Installing GoogleUserMessagingPlatform (3.1.0)
+Installing GoogleUtilities (8.1.0)
+Installing PromisesObjC (2.4.0)
+Installing RecaptchaInterop (101.0.0)
+Installing abseil (1.20240722.0)
+Installing cloud_firestore (5.6.12)
+Installing connectivity_plus (0.0.1)
+Installing device_info_plus (0.0.1)
+Installing firebase_auth (5.7.0)
+Installing firebase_core (3.15.2)
+Installing firebase_database (11.3.10)
+Installing flutter_local_notifications (0.0.1)
+Installing gRPC-C++ (1.69.0)
+Installing gRPC-Core (1.69.0)
+Installing google_mobile_ads (6.0.0)
+Installing google_sign_in_ios (0.0.1)
+Installing in_app_purchase_storekit (0.0.1)
+Installing leveldb-library (1.22.6)
+Installing memory_info (0.0.1)
+Installing nanopb (3.30910.0)
+Installing package_info_plus (0.4.5)
+Installing path_provider_foundation (0.0.1)
+Installing share_plus (0.0.1)
+Installing shared_preferences_foundation (0.0.1)
+Installing sign_in_with_apple (0.0.1)
+Installing speech_to_text (7.2.0)
+Installing url_launcher_ios (0.0.1)
+Installing webview_flutter_wkwebview (0.0.1)
+Generating Pods project
+Integrating client project
+Pod installation complete! There are 20 dependencies from the Podfile and 49 total pods installed.
+
+[!] CocoaPods did not set the base configuration of your project because your project already has a custom config set. In order for CocoaPods integration to work at all, please either set the base configurations of the target `Runner` to `Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig` or include the `Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig` in your build configuration (`Flutter/Release.xcconfig`).
+[16:42:44]: [32m------------------------------[0m
+[16:42:44]: [32m--- Step: default_platform ---[0m
+[16:42:44]: [32m------------------------------[0m
+[16:42:44]: [32mDriving the lane 'ios deploy' 🚀[0m
+[16:42:44]: [32m----------------------------------------------[0m
+[16:42:44]: [32m--- Step: Switch to ios setup_api_key lane ---[0m
+[16:42:44]: [32m----------------------------------------------[0m
+[16:42:44]: Cruising over to lane 'ios setup_api_key' 🚖
+[16:42:44]: [32m---------------------------------------[0m
+[16:42:44]: [32m--- Step: app_store_connect_api_key ---[0m
+[16:42:44]: [32m---------------------------------------[0m
+[16:42:44]: Cruising back to lane 'ios deploy' 🚘
+[16:42:44]: [32m--------------------------------------------------[0m
+[16:42:44]: [32m--- Step: Switch to ios increment_version lane ---[0m
+[16:42:44]: [32m--------------------------------------------------[0m
+[16:42:44]: Cruising over to lane 'ios increment_version' 🚖
+[16:42:44]: [32m✅ Version updated: 1.1.0+54[0m
+[16:42:44]: Cruising back to lane 'ios deploy' 🚘
+[16:42:44]: [32m---------------------------------------------------[0m
+[16:42:44]: [32m--- Step: Switch to ios setup_provisioning lane ---[0m
+[16:42:44]: [32m---------------------------------------------------[0m
+[16:42:44]: Cruising over to lane 'ios setup_provisioning' 🚖
+[16:42:44]: [32m------------------[0m
+[16:42:44]: [32m--- Step: sigh ---[0m
+[16:42:44]: [32m------------------[0m
+
++-----------------------------------------------------------------+
+|                    [32mSummary for sigh 2.232.2[0m                     |
++-------------------------------------+---------------------------+
+| app_identifier                      | com.motherfatherdiary.app |
+| readonly                            | false                     |
+| api_key                             | ********                  |
+| adhoc                               | false                     |
+| developer_id                        | false                     |
+| development                         | false                     |
+| skip_install                        | false                     |
+| force                               | false                     |
+| include_mac_in_profiles             | false                     |
+| team_id                             | 29H2TP8N49                |
+| ignore_profiles_with_different_name | false                     |
+| skip_fetch_profiles                 | false                     |
+| include_all_certificates            | false                     |
+| skip_certificate_verification       | false                     |
+| platform                            | ios                       |
+| fail_on_name_taken                  | false                     |
++-------------------------------------+---------------------------+
+
+[16:42:44]: Creating authorization token for App Store Connect API
+[16:42:44]: Fetching profiles...
+[16:42:45]: Provisioning Profile 'com.motherfatherdiary.app AppStore' is not valid, skipping this one...
+[16:42:45]: Verifying certificates...
+[16:42:45]: [32mFound 1 matching profile(s)[0m
+[16:42:45]: [33mDownloading provisioning profile...[0m
+[16:42:45]: [32mSuccessfully downloaded provisioning profile...[0m
+[16:42:45]: Installing provisioning profile...
+[32m/Users/user/dev/mother-father-diary/ios/profiles/AppStore_com.motherfatherdiary.app.mobileprovision[0m
+[16:42:45]: Setting Provisioning Profile type to 'app-store'
+[16:42:45]: Cruising back to lane 'ios deploy' 🚘
+[16:42:45]: [32m--------------------------------------------------------------------[0m
+[16:42:45]: [32mStep: export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/4.0.0/bin:/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign[0m
+[16:42:45]: [32m--------------------------------------------------------------------[0m
+[16:42:45]: [36m$ export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/4.0.0/bin:/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign[0m
+[16:42:46]: ▸ [35mResolving dependencies...[0m
+[16:42:46]: ▸ [35mDownloading packages...[0m
+[16:42:46]: ▸ [35m_flutterfire_internals 1.3.59 (1.3.69 available)[0m
+[16:42:46]: ▸ [35marchive 4.0.7 (4.0.9 available)[0m
+[16:42:46]: ▸ [35masync 2.12.0 (2.13.1 available)[0m
+[16:42:46]: ▸ [35mcharacters 1.4.0 (1.4.1 available)[0m
+[16:42:46]: ▸ [35mchecked_yaml 2.0.3 (2.0.4 available)[0m
+[16:42:46]: ▸ [35mclarity_flutter 1.7.1 (1.8.0 available)[0m
+[16:42:46]: ▸ [35mcli_util 0.4.2 (0.5.0 available)[0m
+[16:42:46]: ▸ [35mcloud_firestore 5.6.12 (6.3.0 available)[0m
+[16:42:46]: ▸ [35mcloud_firestore_platform_interface 6.6.12 (7.2.0 available)[0m
+[16:42:46]: ▸ [35mcloud_firestore_web 4.4.12 (5.3.0 available)[0m
+[16:42:46]: ▸ [35mconnectivity_plus 6.1.4 (7.1.1 available)[0m
+[16:42:46]: ▸ [35mconnectivity_plus_platform_interface 2.0.1 (2.1.0 available)[0m
+[16:42:46]: ▸ [35mcupertino_icons 1.0.8 (1.0.9 available)[0m
+[16:42:46]: ▸ [35mdbus 0.7.11 (0.7.12 available)[0m
+[16:42:46]: ▸ [35mdevice_info_plus 12.3.0 (13.1.0 available)[0m
+[16:42:46]: ▸ [35mdevice_info_plus_platform_interface 7.0.3 (8.1.0 available)[0m
+[16:42:46]: ▸ [35mffi 2.1.4 (2.2.0 available)[0m
+[16:42:46]: ▸ [35mfirebase_auth 5.7.0 (6.4.0 available)[0m
+[16:42:46]: ▸ [35mfirebase_auth_platform_interface 7.7.3 (8.1.9 available)[0m
+[16:42:46]: ▸ [35mfirebase_auth_web 5.15.3 (6.1.5 available)[0m
+[16:42:46]: ▸ [35mfirebase_core 3.15.2 (4.7.0 available)[0m
+[16:42:46]: ▸ [35mfirebase_core_platform_interface 6.0.2 (6.0.3 available)[0m
+[16:42:46]: ▸ [35mfirebase_core_web 2.24.1 (3.6.0 available)[0m
+[16:42:46]: ▸ [35mfirebase_database 11.3.10 (12.3.0 available)[0m
+[16:42:46]: ▸ [35mfirebase_database_platform_interface 0.2.6+10 (0.3.1+1 available)[0m
+[16:42:46]: ▸ [35mfirebase_database_web 0.2.6+16 (0.2.7+6 available)[0m
+[16:42:46]: ▸ [35mflutter_lints 5.0.0 (6.0.0 available)[0m
+[16:42:46]: ▸ [35mflutter_local_notifications 18.0.1 (21.0.0 available)[0m
+[16:42:46]: ▸ [35mflutter_local_notifications_linux 5.0.0 (8.0.0 available)[0m
+[16:42:46]: ▸ [35mflutter_local_notifications_platform_interface 8.0.0 (11.0.0 available)[0m
+[16:42:46]: ▸ [35mgoogle_fonts 6.2.1 (8.0.2 available)[0m
+[16:42:46]: ▸ [35mgoogle_mobile_ads 6.0.0 (8.0.0 available)[0m
+[16:42:46]: ▸ [35mgoogle_sign_in 6.3.0 (7.2.0 available)[0m
+[16:42:46]: ▸ [35mgoogle_sign_in_android 6.2.1 (7.2.10 available)[0m
+[16:42:46]: ▸ [35mgoogle_sign_in_ios 5.9.0 (6.3.0 available)[0m
+[16:42:46]: ▸ [35mgoogle_sign_in_platform_interface 2.5.0 (3.1.0 available)[0m
+[16:42:46]: ▸ [35mgoogle_sign_in_web 0.12.4+4 (1.1.3 available)[0m
+[16:42:46]: ▸ [35mhttp 1.3.0 (1.6.0 available)[0m
+[16:42:46]: ▸ [35mimage 4.5.4 (4.8.0 available)[0m
+[16:42:46]: ▸ [35min_app_purchase_android 0.4.0+8 (0.4.0+10 available)[0m
+[16:42:46]: ▸ [35mjson_annotation 4.9.0 (4.11.0 available)[0m
+[16:42:46]: ▸ [35mlints 5.1.1 (6.1.0 available)[0m
+[16:42:46]: ▸ [35mmatcher 0.12.17 (0.12.19 available)[0m
+[16:42:46]: ▸ [35mmaterial_color_utilities 0.11.1 (0.13.0 available)[0m
+[16:42:46]: ▸ [35mmeta 1.17.0 (1.18.2 available)[0m
+[16:42:46]: ▸ [35mpackage_info_plus 9.0.0 (10.1.0 available)[0m
+[16:42:46]: ▸ [35mpackage_info_plus_platform_interface 3.2.1 (4.1.0 available)[0m
+[16:42:46]: ▸ [35mpath_provider_android 2.2.17 (2.3.1 available)[0m
+[16:42:46]: ▸ [35mpath_provider_foundation 2.4.1 (2.6.0 available)[0m
+[16:42:46]: ▸ [35mpetitparser 6.1.0 (7.0.2 available)[0m
+[16:42:46]: ▸ [35mpointycastle 3.9.1 (4.0.0 available)[0m
+[16:42:46]: ▸ [35mposix 6.0.2 (6.5.0 available)[0m
+[16:42:46]: ▸ [35mshare_plus 10.1.4 (13.1.0 available)[0m
+[16:42:46]: ▸ [35mshare_plus_platform_interface 5.0.2 (7.1.0 available)[0m
+[16:42:46]: ▸ [35mshared_preferences 2.5.4 (2.5.5 available)[0m
+[16:42:46]: ▸ [35mshared_preferences_android 2.4.20 (2.4.23 available)[0m
+[16:42:46]: ▸ [35mshared_preferences_platform_interface 2.4.1 (2.4.2 available)[0m
+[16:42:46]: ▸ [35msign_in_with_apple 6.1.4 (7.0.1 available)[0m
+[16:42:46]: ▸ [35msign_in_with_apple_platform_interface 1.1.0 (2.0.0 available)[0m
+[16:42:46]: ▸ [35msign_in_with_apple_web 2.1.1 (3.0.0 available)[0m
+[16:42:46]: ▸ [35msource_span 1.10.1 (1.10.2 available)[0m
+[16:42:46]: ▸ [35mtest_api 0.7.7 (0.7.11 available)[0m
+[16:42:46]: ▸ [35mtimezone 0.10.1 (0.11.0 available)[0m
+[16:42:46]: ▸ [35murl_launcher_android 6.3.28 (6.3.29 available)[0m
+[16:42:46]: ▸ [35murl_launcher_ios 6.4.0 (6.4.1 available)[0m
+[16:42:46]: ▸ [35muuid 4.5.1 (4.5.3 available)[0m
+[16:42:46]: ▸ [35mvector_math 2.2.0 (2.3.0 available)[0m
+[16:42:46]: ▸ [35mvm_service 14.3.1 (15.1.0 available)[0m
+[16:42:46]: ▸ [35mwebview_flutter 4.11.0 (4.13.1 available)[0m
+[16:42:46]: ▸ [35mwebview_flutter_android 4.4.2 (4.11.0 available)[0m
+[16:42:46]: ▸ [35mwebview_flutter_platform_interface 2.11.0 (2.15.1 available)[0m
+[16:42:46]: ▸ [35mwebview_flutter_wkwebview 3.20.0 (3.24.5 available)[0m
+[16:42:46]: ▸ [35mwin32 5.15.0 (6.1.0 available)[0m
+[16:42:46]: ▸ [35mwin32_registry 2.1.0 (3.0.3 available)[0m
+[16:42:46]: ▸ [35mxml 6.5.0 (6.6.1 available)[0m
+[16:42:46]: ▸ [35mGot dependencies![0m
+[16:42:46]: ▸ [35m75 packages have newer versions incompatible with dependency constraints.[0m
+[16:42:46]: ▸ [35mTry `flutter pub outdated` for more information.[0m
+[16:42:47]: ▸ [35mWarning: Building for device with codesigning disabled. You will have to manually codesign before deploying to device.[0m
+[16:42:48]: ▸ [35mBuilding com.motherfatherdiary.app for device (ios-release)...[0m
+[16:42:51]: ▸ [35mWarning: CocoaPods is installed but broken. Skipping pod install.[0m
+[16:42:51]: ▸ [35mYou appear to have CocoaPods installed but it is not working.[0m
+[16:42:51]: ▸ [35mThis can happen if the version of Ruby that CocoaPods was installed with is different from the one being used to invoke it.[0m
+[16:42:51]: ▸ [35mThis can usually be fixed by re-installing CocoaPods.[0m
+[16:42:51]: ▸ [35mFor re-installation instructions, see https://guides.cocoapods.org/using/getting-started.html#installation[0m
+[16:42:51]: ▸ [35mCocoaPods not installed or not in valid state.[0m
++-----------------------------------------------------------+
+|                       [33mLane Context[0m                        |
++--------------------+--------------------------------------+
+| DEFAULT_PLATFORM   | ios                                  |
+| PLATFORM_NAME      | ios                                  |
+| LANE_NAME          | ios deploy                           |
+| SIGH_PROFILE_PATH  | /Users/user/dev/mother-father-diary  |
+|                    | /ios/profiles/AppStore_com.motherfa  |
+|                    | therdiary.app.mobileprovision        |
+| SIGH_PROFILE_PATHS | ["/Users/user/dev/mother-father-dia  |
+|                    | ry/ios/profiles/AppStore_com.mother  |
+|                    | fatherdiary.app.mobileprovision"]    |
+| SIGH_UDID          | 72d7b5ae-33b1-4efa-b13a-0043536a92f  |
+|                    | 8                                    |
+| SIGH_UUID          | 72d7b5ae-33b1-4efa-b13a-0043536a92f  |
+|                    | 8                                    |
+| SIGH_NAME          | com.motherfatherdiary.app AppStore   |
+|                    | 1776929271                           |
+| SIGH_PROFILE_TYPE  | app-store                            |
++--------------------+--------------------------------------+
+[16:42:51]: [31mCalled from Fastfile at line 50[0m
+[16:42:51]: [31m```[0m
+[16:42:51]: [31m    48:	[0m
+[16:42:51]: [31m    49:	    # Flutter 빌드[0m
+[16:42:51]: [31m => 50:	    sh("export PATH=\"/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/4.0.0/bin:/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH\" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign")[0m
+[16:42:51]: [31m    51:	[0m
+[16:42:51]: [31m    52:	    # 아카이브 + IPA 생성[0m
+[16:42:51]: [31m```[0m
+[16:42:51]: [31mExit status of command 'export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/4.0.0/bin:/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign' was 1 instead of 0.
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.59 (1.3.69 available)
+  archive 4.0.7 (4.0.9 available)
+  async 2.12.0 (2.13.1 available)
+  characters 1.4.0 (1.4.1 available)
+  checked_yaml 2.0.3 (2.0.4 available)
+  clarity_flutter 1.7.1 (1.8.0 available)
+  cli_util 0.4.2 (0.5.0 available)
+  cloud_firestore 5.6.12 (6.3.0 available)
+  cloud_firestore_platform_interface 6.6.12 (7.2.0 available)
+  cloud_firestore_web 4.4.12 (5.3.0 available)
+  connectivity_plus 6.1.4 (7.1.1 available)
+  connectivity_plus_platform_interface 2.0.1 (2.1.0 available)
+  cupertino_icons 1.0.8 (1.0.9 available)
+  dbus 0.7.11 (0.7.12 available)
+  device_info_plus 12.3.0 (13.1.0 available)
+  device_info_plus_platform_interface 7.0.3 (8.1.0 available)
+  ffi 2.1.4 (2.2.0 available)
+  firebase_auth 5.7.0 (6.4.0 available)
+  firebase_auth_platform_interface 7.7.3 (8.1.9 available)
+  firebase_auth_web 5.15.3 (6.1.5 available)
+  firebase_core 3.15.2 (4.7.0 available)
+  firebase_core_platform_interface 6.0.2 (6.0.3 available)
+  firebase_core_web 2.24.1 (3.6.0 available)
+  firebase_database 11.3.10 (12.3.0 available)
+  firebase_database_platform_interface 0.2.6+10 (0.3.1+1 available)
+  firebase_database_web 0.2.6+16 (0.2.7+6 available)
+  flutter_lints 5.0.0 (6.0.0 available)
+  flutter_local_notifications 18.0.1 (21.0.0 available)
+  flutter_local_notifications_linux 5.0.0 (8.0.0 available)
+  flutter_local_notifications_platform_interface 8.0.0 (11.0.0 available)
+  google_fonts 6.2.1 (8.0.2 available)
+  google_mobile_ads 6.0.0 (8.0.0 available)
+  google_sign_in 6.3.0 (7.2.0 available)
+  google_sign_in_android 6.2.1 (7.2.10 available)
+  google_sign_in_ios 5.9.0 (6.3.0 available)
+  google_sign_in_platform_interface 2.5.0 (3.1.0 available)
+  google_sign_in_web 0.12.4+4 (1.1.3 available)
+  http 1.3.0 (1.6.0 available)
+  image 4.5.4 (4.8.0 available)
+  in_app_purchase_android 0.4.0+8 (0.4.0+10 available)
+  json_annotation 4.9.0 (4.11.0 available)
+  lints 5.1.1 (6.1.0 available)
+  matcher 0.12.17 (0.12.19 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.2 available)
+  package_info_plus 9.0.0 (10.1.0 available)
+  package_info_plus_platform_interface 3.2.1 (4.1.0 available)
+  path_provider_android 2.2.17 (2.3.1 available)
+  path_provider_foundation 2.4.1 (2.6.0 available)
+  petitparser 6.1.0 (7.0.2 available)
+  pointycastle 3.9.1 (4.0.0 available)
+  posix 6.0.2 (6.5.0 available)
+  share_plus 10.1.4 (13.1.0 available)
+  share_plus_platform_interface 5.0.2 (7.1.0 available)
+  shared_preferences 2.5.4 (2.5.5 available)
+  shared_preferences_android 2.4.20 (2.4.23 available)
+  shared_preferences_platform_interface 2.4.1 (2.4.2 available)
+  sign_in_with_apple 6.1.4 (7.0.1 available)
+  sign_in_with_apple_platform_interface 1.1.0 (2.0.0 available)
+  sign_in_with_apple_web 2.1.1 (3.0.0 available)
+  source_span 1.10.1 (1.10.2 available)
+  test_api 0.7.7 (0.7.11 available)
+  timezone 0.10.1 (0.11.0 available)
+  url_launcher_android 6.3.28 (6.3.29 available)
+  url_launcher_ios 6.4.0 (6.4.1 available)
+  uuid 4.5.1 (4.5.3 available)
+  vector_math 2.2.0 (2.3.0 available)
+  vm_service 14.3.1 (15.1.0 available)
+  webview_flutter 4.11.0 (4.13.1 available)
+  webview_flutter_android 4.4.2 (4.11.0 available)
+  webview_flutter_platform_interface 2.11.0 (2.15.1 available)
+  webview_flutter_wkwebview 3.20.0 (3.24.5 available)
+  win32 5.15.0 (6.1.0 available)
+  win32_registry 2.1.0 (3.0.3 available)
+  xml 6.5.0 (6.6.1 available)
+Got dependencies!
+75 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Warning: Building for device with codesigning disabled. You will have to manually codesign before deploying to device.
+Building com.motherfatherdiary.app for device (ios-release)...
+Warning: CocoaPods is installed but broken. Skipping pod install.
+  You appear to have CocoaPods installed but it is not working.
+  This can happen if the version of Ruby that CocoaPods was installed with is different from the one being used to invoke it.
+  This can usually be fixed by re-installing CocoaPods.
+For re-installation instructions, see https://guides.cocoapods.org/using/getting-started.html#installation
+
+CocoaPods not installed or not in valid state.
+[0m
+
++---------------------------------------------+
+|              [32mfastlane summary[0m               |
++------+------------------------+-------------+
+| Step | Action                 | Time (in s) |
++------+------------------------+-------------+
+| 1    | default_platform       | 0           |
+| 2    | Switch to ios          | 0           |
+|      | setup_api_key lane     |             |
+| 3    | app_store_connect_api  | 0           |
+|      | _key                   |             |
+| 4    | Switch to ios          | 0           |
+|      | increment_version      |             |
+|      | lane                   |             |
+| 5    | Switch to ios          | 0           |
+|      | setup_provisioning     |             |
+|      | lane                   |             |
+| 6    | sigh                   | 1           |
+| 💥   | [31mexport [0m                | 5           |
+|      | [31mPATH="/opt/homebrew/o [0m |             |
+|      | [31mpt/ruby/bin:/opt/home [0m |             |
+|      | [31mbrew/lib/rub[0m           |             |
++------+------------------------+-------------+
+
+[16:42:51]: [31mfastlane finished with errors[0m
+
+Looking for related GitHub issues on fastlane/fastlane...
+
+
+#######################################################################
+# fastlane 2.233.0 is available. You are on 2.232.2.
+# You should use the latest version.
+# Please update using `bundle update fastlane`.
+#######################################################################
+
+[32m2.233.0 Improvements[0m
+* [scan] Fix default_os_version when xcodebuild sdkVersion differs from simctl sdkVersion (#29977) via Felix Lisczyk (@FelixLisczyk)
+* [core] build: move to fastlane-sirp 1.1.0 (#29973) via Connor Tumbleson (@iBotPeaches)
+* fix: use certificate id param on match (#29966) via James Collins (@java-james)
+* [action][swiftlint] Adds '--progress' flag (#21922) via Erik Lippmann (@ObjectiveCesar)
+* [sigh, match] Pass keychain_path through Sigh::Manager to ProvisioningProfile (#29963) via Dmitry Pchelintsev (@Pchol)
+* Support individual api tokens in altool (#29961) via Oliver Fox (@foxware00)
+* [spaceship] Fix getting App Preview Sets with new endpoint (#29960) via Cristian Caruceru (@ccaruceru)
+* [frameit] Change the default iPhone 14 Pro/Pro Max frame colors from `PURPLE` to `BLACK`. (#21927) via Michael Lenaghan (@michaellenaghan)
+* [gym] Add app_name parameter to skip xcodebuild -showBuildSettings (#29953) via 정고은 (@Goeun1001)
+* [deliver, pilot] Add provider_public_id option for altool uploads (#29898) via Hasancan Akgündüz (@hasancanakgunduz)
+* [sigh] add: introduce ability to control codesign page_size (#29952) via Aliaksei Siauko (@asevko)
+* build: assert bin/* contents in built gem to prevent global pollution. (#29915) via Connor Tumbleson (@iBotPeaches)
+* [match] feat(s3_storage): add support for AWS STS credentials (#22139) via monholm (@monholm)
+* [deliver] Initial App Preview (video) upload support for iPhone and iPad (#29831) via Cristian Caruceru (@ccaruceru)
+* [scan] output_remove_retry_attempts should also remove retries when the test is skipped (#29887) via Oliver Fox (@foxware00)
+* [precheck] add 'nsfw' as blocklisted term (#29937) via Jamie (@jtlthe2)
+* [scan] Fix simulator selection when runtime build is missing from installed runtimes (#29894) via Felix Lisczyk (@FelixLisczyk)
+* [gem] move to faraday-retry 1.0.4 (#29944) via Connor Tumbleson (@iBotPeaches)
+* [precheck] document `rules/rules_data/curse_word_hashes` (#29941) via Jamie (@jtlthe2)
+* Add RSpec tests for resign.sh bash functions (#29934) via Sergei Selivanov (@cergfix)
+* build(deps): bump actions/download-artifact from 7 to 8 (#29930) via dependabot[bot] (@dependabot[bot])
+* build(deps): bump actions/upload-artifact from 6 to 7 (#29931) via dependabot[bot] (@dependabot[bot])
+* [ci] remove AppVeyor for Windows tests on GitHub Actions (#29876) via Connor Tumbleson (@iBotPeaches)
+
+[32mPlease update using `bundle update fastlane`[0m
+bundler: failed to load command: fastlane (/Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/bin/fastlane)
+/Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane_core/lib/fastlane_core/ui/interface.rb:153:in 'FastlaneCore::Interface#shell_error!': [31m[!] Exit status of command 'export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/4.0.0/bin:/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign' was 1 instead of 0. (FastlaneCore::Interface::FastlaneShellError)
+Resolving dependencies...
+Downloading packages...
+  _flutterfire_internals 1.3.59 (1.3.69 available)
+  archive 4.0.7 (4.0.9 available)
+  async 2.12.0 (2.13.1 available)
+  characters 1.4.0 (1.4.1 available)
+  checked_yaml 2.0.3 (2.0.4 available)
+  clarity_flutter 1.7.1 (1.8.0 available)
+  cli_util 0.4.2 (0.5.0 available)
+  cloud_firestore 5.6.12 (6.3.0 available)
+  cloud_firestore_platform_interface 6.6.12 (7.2.0 available)
+  cloud_firestore_web 4.4.12 (5.3.0 available)
+  connectivity_plus 6.1.4 (7.1.1 available)
+  connectivity_plus_platform_interface 2.0.1 (2.1.0 available)
+  cupertino_icons 1.0.8 (1.0.9 available)
+  dbus 0.7.11 (0.7.12 available)
+  device_info_plus 12.3.0 (13.1.0 available)
+  device_info_plus_platform_interface 7.0.3 (8.1.0 available)
+  ffi 2.1.4 (2.2.0 available)
+  firebase_auth 5.7.0 (6.4.0 available)
+  firebase_auth_platform_interface 7.7.3 (8.1.9 available)
+  firebase_auth_web 5.15.3 (6.1.5 available)
+  firebase_core 3.15.2 (4.7.0 available)
+  firebase_core_platform_interface 6.0.2 (6.0.3 available)
+  firebase_core_web 2.24.1 (3.6.0 available)
+  firebase_database 11.3.10 (12.3.0 available)
+  firebase_database_platform_interface 0.2.6+10 (0.3.1+1 available)
+  firebase_database_web 0.2.6+16 (0.2.7+6 available)
+  flutter_lints 5.0.0 (6.0.0 available)
+  flutter_local_notifications 18.0.1 (21.0.0 available)
+  flutter_local_notifications_linux 5.0.0 (8.0.0 available)
+  flutter_local_notifications_platform_interface 8.0.0 (11.0.0 available)
+  google_fonts 6.2.1 (8.0.2 available)
+  google_mobile_ads 6.0.0 (8.0.0 available)
+  google_sign_in 6.3.0 (7.2.0 available)
+  google_sign_in_android 6.2.1 (7.2.10 available)
+  google_sign_in_ios 5.9.0 (6.3.0 available)
+  google_sign_in_platform_interface 2.5.0 (3.1.0 available)
+  google_sign_in_web 0.12.4+4 (1.1.3 available)
+  http 1.3.0 (1.6.0 available)
+  image 4.5.4 (4.8.0 available)
+  in_app_purchase_android 0.4.0+8 (0.4.0+10 available)
+  json_annotation 4.9.0 (4.11.0 available)
+  lints 5.1.1 (6.1.0 available)
+  matcher 0.12.17 (0.12.19 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.2 available)
+  package_info_plus 9.0.0 (10.1.0 available)
+  package_info_plus_platform_interface 3.2.1 (4.1.0 available)
+  path_provider_android 2.2.17 (2.3.1 available)
+  path_provider_foundation 2.4.1 (2.6.0 available)
+  petitparser 6.1.0 (7.0.2 available)
+  pointycastle 3.9.1 (4.0.0 available)
+  posix 6.0.2 (6.5.0 available)
+  share_plus 10.1.4 (13.1.0 available)
+  share_plus_platform_interface 5.0.2 (7.1.0 available)
+  shared_preferences 2.5.4 (2.5.5 available)
+  shared_preferences_android 2.4.20 (2.4.23 available)
+  shared_preferences_platform_interface 2.4.1 (2.4.2 available)
+  sign_in_with_apple 6.1.4 (7.0.1 available)
+  sign_in_with_apple_platform_interface 1.1.0 (2.0.0 available)
+  sign_in_with_apple_web 2.1.1 (3.0.0 available)
+  source_span 1.10.1 (1.10.2 available)
+  test_api 0.7.7 (0.7.11 available)
+  timezone 0.10.1 (0.11.0 available)
+  url_launcher_android 6.3.28 (6.3.29 available)
+  url_launcher_ios 6.4.0 (6.4.1 available)
+  uuid 4.5.1 (4.5.3 available)
+  vector_math 2.2.0 (2.3.0 available)
+  vm_service 14.3.1 (15.1.0 available)
+  webview_flutter 4.11.0 (4.13.1 available)
+  webview_flutter_android 4.4.2 (4.11.0 available)
+  webview_flutter_platform_interface 2.11.0 (2.15.1 available)
+  webview_flutter_wkwebview 3.20.0 (3.24.5 available)
+  win32 5.15.0 (6.1.0 available)
+  win32_registry 2.1.0 (3.0.3 available)
+  xml 6.5.0 (6.6.1 available)
+Got dependencies!
+75 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Warning: Building for device with codesigning disabled. You will have to manually codesign before deploying to device.
+Building com.motherfatherdiary.app for device (ios-release)...
+Warning: CocoaPods is installed but broken. Skipping pod install.
+  You appear to have CocoaPods installed but it is not working.
+  This can happen if the version of Ruby that CocoaPods was installed with is different from the one being used to invoke it.
+  This can usually be fixed by re-installing CocoaPods.
+For re-installation instructions, see https://guides.cocoapods.org/using/getting-started.html#installation
+
+CocoaPods not installed or not in valid state.
+[0m
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane_core/lib/fastlane_core/ui/ui.rb:17:in 'FastlaneCore::UI.method_missing'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/helper/sh_helper.rb:80:in 'Fastlane::Actions.sh_control_output'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/helper/sh_helper.rb:16:in 'Fastlane::Actions.sh_no_action'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/fast_file.rb:225:in 'block in Fastlane::FastFile.sh'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/actions/actions_helper.rb:69:in 'Fastlane::Actions.execute_action'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/fast_file.rb:224:in 'Fastlane::FastFile.sh'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/fast_file.rb:216:in 'Fastlane::FastFile#sh'
+	from Fastfile:50:in 'block (2 levels) in Fastlane::FastFile#parsing_binding'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/lane.rb:41:in 'Fastlane::Lane#call'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/runner.rb:49:in 'block in Fastlane::Runner#execute'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/runner.rb:45:in 'Dir.chdir'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/runner.rb:45:in 'Fastlane::Runner#execute'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/lane_manager.rb:46:in 'Fastlane::LaneManager.cruise_lane'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/command_line_handler.rb:34:in 'Fastlane::CommandLineHandler.handle'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/commands_generator.rb:110:in 'block (2 levels) in Fastlane::CommandsGenerator#run'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/commander-4.6.0/lib/commander/command.rb:187:in 'Commander::Command#call'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/commander-4.6.0/lib/commander/command.rb:157:in 'Commander::Command#run'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/commander-4.6.0/lib/commander/runner.rb:444:in 'Commander::Runner#run_active_command'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane_core/lib/fastlane_core/ui/fastlane_runner.rb:124:in 'Commander::Runner#run!'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/commander-4.6.0/lib/commander/delegates.rb:18:in 'Commander::Delegates#run!'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/commands_generator.rb:363:in 'Fastlane::CommandsGenerator#run'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/commands_generator.rb:43:in 'Fastlane::CommandsGenerator.start'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/fastlane/lib/fastlane/cli_tools_distributor.rb:132:in 'Fastlane::CLIToolsDistributor.take_off'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/gems/fastlane-2.232.2/bin/fastlane:23:in '<top (required)>'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/rubygems.rb:304:in 'Kernel#load'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/rubygems.rb:304:in 'Gem.activate_and_load_bin_path'
+	from /Users/user/dev/mother-father-diary/vendor/bundle/ruby/4.0.0/bin/fastlane:25:in '<top (required)>'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/cli/exec.rb:61:in 'Kernel.load'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/cli/exec.rb:61:in 'Bundler::CLI::Exec#kernel_load'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/cli/exec.rb:24:in 'Bundler::CLI::Exec#run'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/cli.rb:504:in 'Bundler::CLI#exec'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/vendor/thor/lib/thor/command.rb:28:in 'Bundler::Thor::Command#run'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/vendor/thor/lib/thor/invocation.rb:127:in 'Bundler::Thor::Invocation#invoke_command'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/vendor/thor/lib/thor.rb:538:in 'Bundler::Thor.dispatch'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/cli.rb:35:in 'Bundler::CLI.dispatch'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/vendor/thor/lib/thor/base.rb:584:in 'Bundler::Thor::Base::ClassMethods#start'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/cli.rb:29:in 'Bundler::CLI.start'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/gems/4.0.0/gems/bundler-4.0.8/exe/bundle:28:in 'block in <top (required)>'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/bundler/friendly_errors.rb:118:in 'Bundler.with_friendly_errors'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/gems/4.0.0/gems/bundler-4.0.8/exe/bundle:20:in '<top (required)>'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/rubygems.rb:304:in 'Kernel#load'
+	from /opt/homebrew/Cellar/ruby/4.0.2/lib/ruby/4.0.0/rubygems.rb:304:in 'Gem.activate_and_load_bin_path'
+	from /opt/homebrew/opt/ruby/bin/bundle:25:in '<main>'

@@ -9,6 +9,12 @@
 
 set -e
 
+# Homebrew Ruby 를 시스템 Ruby 보다 우선시
+export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/lib/ruby/gems/4.0.0/bin:/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH"
+export GEM_HOME="/opt/homebrew/lib/ruby/gems/4.0.0"
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 PLATFORM=${1:-"all"}
 LANE=${2:-"beta"}
 
@@ -36,9 +42,16 @@ fi
 # iOS
 if [ "$PLATFORM" = "ios" ] || [ "$PLATFORM" = "all" ]; then
   echo ""
-  echo "🍎 iOS: Running fastlane $LANE..."
+  echo "🍎 iOS: Pod install..."
   cd ios
   pod install --repo-update
+  cd ..
+
+  echo "🔨 iOS: Flutter build..."
+  flutter build ios --release --no-codesign
+
+  echo "🚀 iOS: Running fastlane $LANE..."
+  cd ios
   bundle exec fastlane "$LANE"
   cd ..
   echo "✅ iOS $LANE complete!"
