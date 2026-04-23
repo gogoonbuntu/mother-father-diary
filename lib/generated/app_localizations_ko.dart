@@ -424,4 +424,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get deleteAccountError => '계정 삭제 중 오류가 발생했습니다. 다시 시도해주세요.';
+
+  @override
+  String get guestLogin => '로그인 없이 둘러보기';
+
+  @override
+  String get guestLoginNote => '게스트 모드에서는 일기가 기기에만 저장됩니다';
 }

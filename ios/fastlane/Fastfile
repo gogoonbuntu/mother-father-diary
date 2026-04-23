@@ -83,6 +83,7 @@ platform :ios do
         add_id_info_tracks_install: false,
         add_id_info_tracks_action: false,
         add_id_info_limits_tracking: true,
+        export_compliance_uses_encryption: false,
       },
     )
 
@@ -191,6 +192,7 @@ platform :ios do
         add_id_info_tracks_install: false,
         add_id_info_tracks_action: false,
         add_id_info_limits_tracking: true,
+        export_compliance_uses_encryption: false,
       },
     )
 

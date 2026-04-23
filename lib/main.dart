@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -42,14 +43,8 @@ Future<void> main() async {
     logLevel: LogLevel.None,
   );
 
-  // 먼저 앱을 띄우고, 나머지 초기화는 백그라운드에서 병렬로 실행
-  runApp(ClarityWidget(
-    app: const MyApp(),
-    clarityConfig: clarityConfig,
-  ));
-
-  // 앱이 뜬 후 백그라운드에서 병렬 초기화 (OpeningBanner 동안 완료됨)
-  Future.wait([
+  // 서비스 초기화를 먼저 완료한 후 앱 실행
+  await Future.wait([
     DiaryService().init(),
     PurchaseService().initialize(),
     NotificationService().init(),
@@ -57,6 +52,12 @@ Future<void> main() async {
       debugPrint('[광고] MobileAds SDK 초기화 완료');
     }),
   ]);
+  debugPrint('[초기화] 모든 서비스 초기화 완료');
+
+  runApp(ClarityWidget(
+    app: const MyApp(),
+    clarityConfig: clarityConfig,
+  ));
 }
 
 // 지원되는 Google Fonts 통합 목록 (한글 완벽 지원 폰트만)

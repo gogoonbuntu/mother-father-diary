@@ -177,5 +177,8 @@
   "deleteAccountFinalTitle": "Final Confirmation",
   "deleteAccountWarning2": "This action cannot be undone. All your diary entries, settings, and account information will be permanently deleted.\n\nAre you sure you want to continue?",
   "deleteAccountConfirm": "Delete Account Permanently",
-  "deleteAccountError": "An error occurred while deleting the account. Please try again."
+  "deleteAccountError": "An error occurred while deleting the account. Please try again.",
+
+  "guestLogin": "Continue without signing in",
+  "guestLoginNote": "In guest mode, diaries are saved only on this device"
 }

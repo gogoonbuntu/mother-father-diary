@@ -177,5 +177,8 @@
   "deleteAccountFinalTitle": "Confirmation finale",
   "deleteAccountWarning2": "Cette action est irréversible. Toutes vos entrées de journal, paramètres et informations de compte seront définitivement supprimés.\n\nVoulez-vous vraiment continuer ?",
   "deleteAccountConfirm": "Supprimer définitivement",
-  "deleteAccountError": "Une erreur est survenue lors de la suppression du compte. Veuillez réessayer."
+  "deleteAccountError": "Une erreur est survenue lors de la suppression du compte. Veuillez réessayer.",
+
+  "guestLogin": "Continuer sans connexion",
+  "guestLoginNote": "En mode invité, les journaux ne sont enregistrés que sur cet appareil"
 }

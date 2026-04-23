@@ -422,4 +422,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deleteAccountError => 'アカウントの削除中にエラーが発生しました。もう一度お試しください。';
+
+  @override
+  String get guestLogin => 'ログインせずに体験する';
+
+  @override
+  String get guestLoginNote => 'ゲストモードでは日記はこのデバイスにのみ保存されます';
 }

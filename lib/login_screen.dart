@@ -129,6 +129,33 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                       ),
                                     ],
+                                    // 게스트 로그인 버튼
+                                    const SizedBox(height: 20),
+                                    const Divider(color: Color(0xFFE0D6D8)),
+                                    const SizedBox(height: 8),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: TextButton(
+                                        onPressed: _handleGuestLogin,
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: const Color(0xFF9E616A),
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              AppLocalizations.of(context)!.guestLogin,
+                                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, fontFamily: _fontFamily),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              AppLocalizations.of(context)!.guestLoginNote,
+                                              style: TextStyle(fontSize: 11, color: Colors.grey.shade500, fontFamily: _fontFamily),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                         ],
@@ -198,6 +225,23 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(msg)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _handleGuestLogin() async {
+    setState(() => _loading = true);
+    try {
+      await FirebaseAuth.instance.signInAnonymously();
+      print('게스트 로그인 성공');
+    } catch (e) {
+      print('게스트 로그인 오류: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.loginError)),
         );
       }
     } finally {

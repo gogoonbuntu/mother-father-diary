@@ -439,4 +439,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get deleteAccountError =>
       'Une erreur est survenue lors de la suppression du compte. Veuillez réessayer.';
+
+  @override
+  String get guestLogin => 'Continuer sans connexion';
+
+  @override
+  String get guestLoginNote =>
+      'En mode invité, les journaux ne sont enregistrés que sur cet appareil';
 }

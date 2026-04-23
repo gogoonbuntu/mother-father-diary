@@ -899,6 +899,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An error occurred while deleting the account. Please try again.'**
   String get deleteAccountError;
+
+  /// No description provided for @guestLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue without signing in'**
+  String get guestLogin;
+
+  /// No description provided for @guestLoginNote.
+  ///
+  /// In en, this message translates to:
+  /// **'In guest mode, diaries are saved only on this device'**
+  String get guestLoginNote;
 }
 
 class _AppLocalizationsDelegate

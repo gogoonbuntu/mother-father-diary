@@ -438,4 +438,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteAccountError =>
       'An error occurred while deleting the account. Please try again.';
+
+  @override
+  String get guestLogin => 'Continue without signing in';
+
+  @override
+  String get guestLoginNote =>
+      'In guest mode, diaries are saved only on this device';
 }

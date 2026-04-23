@@ -177,5 +177,8 @@
   "deleteAccountFinalTitle": "최종 확인",
   "deleteAccountWarning2": "이 작업은 취소할 수 없습니다. 모든 일기, 설정, 계정 정보가 영구적으로 삭제됩니다.\n\n정말 계속하시겠습니까?",
   "deleteAccountConfirm": "계정 영구 삭제",
-  "deleteAccountError": "계정 삭제 중 오류가 발생했습니다. 다시 시도해주세요."
+  "deleteAccountError": "계정 삭제 중 오류가 발생했습니다. 다시 시도해주세요.",
+
+  "guestLogin": "로그인 없이 둘러보기",
+  "guestLoginNote": "게스트 모드에서는 일기가 기기에만 저장됩니다"
 }
