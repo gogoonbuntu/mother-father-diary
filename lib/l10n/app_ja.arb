@@ -167,5 +167,15 @@
   "premiumNoRestore": "復元できる購入はありません。",
 
   "shareCardBranding": "AI日記を書いてみよう ✍️",
-  "shareCardAppName": "ママパパダイアリー"
+  "shareCardAppName": "ママパパダイアリー",
+
+  "appleSignIn": "Appleでサインイン",
+  "deleteAccount": "アカウント削除",
+  "deleteAccountSubtitle": "アカウントとすべてのデータを完全に削除します",
+  "deleteAccountWarning1": "本当にアカウントを削除しますか？\n\nすべての日記データが完全に削除され、復元できません。",
+  "deleteAccountContinue": "続行",
+  "deleteAccountFinalTitle": "最終確認",
+  "deleteAccountWarning2": "この操作は取り消せません。すべての日記、設定、アカウント情報が完全に削除されます。\n\n本当に続けますか？",
+  "deleteAccountConfirm": "アカウントを完全に削除",
+  "deleteAccountError": "アカウントの削除中にエラーが発生しました。もう一度お試しください。"
 }

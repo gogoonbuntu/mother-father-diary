@@ -16,7 +16,6 @@ import 'line_painter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:diary_app/services/purchase_service.dart';
-import 'package:diary_app/premium_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -340,43 +339,8 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                 ),
               ),
             ),
-            // 무료 사용자만 프리미엄 구독 버튼 표시
-            if (!isPremium) ...[
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const PremiumScreen()),
-                    ).then((purchased) {
-                      if (purchased == true && mounted) {
-                        setState(() {});
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('🎉 프리미엄 활성화! 월 300회까지 사용하세요!'),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            backgroundColor: const Color(0xFF7C5CFC),
-                          ),
-                        );
-                      }
-                    });
-                  },
-                  icon: const Icon(Icons.diamond_rounded, size: 18),
-                  label: Text(AppLocalizations.of(context)!.premiumSubscription),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFE8577E),
-                    side: const BorderSide(color: Color(0xFFE8577E), width: 1.5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-              ),
+            // 무료 사용자 안내 (프리미엄 구독은 준비 중이므로 숨김)
             ],
-          ],
         ),
         actions: [
           TextButton(
@@ -1315,14 +1279,7 @@ class _DiaryEntryScreenState extends State<DiaryEntryScreen> with TickerProvider
                           // 잔여 횟수 (길게 누르면 디버그 프리미엄 토글)
                           GestureDetector(
                             onTap: () {
-                              if (!_purchaseService.isPremium) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (_) => const PremiumScreen()),
-                                ).then((purchased) {
-                                  if (purchased == true && mounted) setState(() {});
-                                });
-                              }
+                              // 프리미엄 구독 준비 중 — 탭 무시
                             },
                             onLongPress: () async {
                               // 디버그: 프리미엄 상태 토글

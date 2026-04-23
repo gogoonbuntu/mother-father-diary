@@ -1,0 +1,6 @@
+v1.1.0 Update
+
+• Added Sign in with Apple support
+• Choose between Google Sign-In or Apple Sign-In
+• Security and stability improvements
+• Bug fixes and performance optimizations

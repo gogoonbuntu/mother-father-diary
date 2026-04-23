@@ -395,4 +395,33 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get shareCardAppName => '엄마아빠 다이어리';
+
+  @override
+  String get appleSignIn => 'Apple로 로그인';
+
+  @override
+  String get deleteAccount => '계정 삭제';
+
+  @override
+  String get deleteAccountSubtitle => '계정과 모든 데이터를 영구 삭제합니다';
+
+  @override
+  String get deleteAccountWarning1 =>
+      '정말 계정을 삭제하시겠습니까?\n\n모든 일기 데이터가 영구적으로 삭제되며 복구할 수 없습니다.';
+
+  @override
+  String get deleteAccountContinue => '계속';
+
+  @override
+  String get deleteAccountFinalTitle => '최종 확인';
+
+  @override
+  String get deleteAccountWarning2 =>
+      '이 작업은 취소할 수 없습니다. 모든 일기, 설정, 계정 정보가 영구적으로 삭제됩니다.\n\n정말 계속하시겠습니까?';
+
+  @override
+  String get deleteAccountConfirm => '계정 영구 삭제';
+
+  @override
+  String get deleteAccountError => '계정 삭제 중 오류가 발생했습니다. 다시 시도해주세요.';
 }

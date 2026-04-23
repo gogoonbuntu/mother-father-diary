@@ -393,4 +393,33 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get shareCardAppName => 'ママパパダイアリー';
+
+  @override
+  String get appleSignIn => 'Appleでサインイン';
+
+  @override
+  String get deleteAccount => 'アカウント削除';
+
+  @override
+  String get deleteAccountSubtitle => 'アカウントとすべてのデータを完全に削除します';
+
+  @override
+  String get deleteAccountWarning1 =>
+      '本当にアカウントを削除しますか？\n\nすべての日記データが完全に削除され、復元できません。';
+
+  @override
+  String get deleteAccountContinue => '続行';
+
+  @override
+  String get deleteAccountFinalTitle => '最終確認';
+
+  @override
+  String get deleteAccountWarning2 =>
+      'この操作は取り消せません。すべての日記、設定、アカウント情報が完全に削除されます。\n\n本当に続けますか？';
+
+  @override
+  String get deleteAccountConfirm => 'アカウントを完全に削除';
+
+  @override
+  String get deleteAccountError => 'アカウントの削除中にエラーが発生しました。もう一度お試しください。';
 }

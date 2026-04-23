@@ -407,4 +407,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareCardAppName => 'Mom Dad Diary';
+
+  @override
+  String get appleSignIn => 'Sign in with Apple';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Permanently delete your account and all data';
+
+  @override
+  String get deleteAccountWarning1 =>
+      'Are you sure you want to delete your account?\n\nAll diary entries and data will be permanently deleted and cannot be recovered.';
+
+  @override
+  String get deleteAccountContinue => 'Continue';
+
+  @override
+  String get deleteAccountFinalTitle => 'Final Confirmation';
+
+  @override
+  String get deleteAccountWarning2 =>
+      'This action cannot be undone. All your diary entries, settings, and account information will be permanently deleted.\n\nAre you sure you want to continue?';
+
+  @override
+  String get deleteAccountConfirm => 'Delete Account Permanently';
+
+  @override
+  String get deleteAccountError =>
+      'An error occurred while deleting the account. Please try again.';
 }

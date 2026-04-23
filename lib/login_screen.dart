@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 import 'package:diary_app/generated/app_localizations.dart';
 import 'package:diary_app/main.dart' show kSupportedFonts;
 import 'animated_warm_background.dart';
 import 'theme_selector.dart';
 import 'package:diary_app/google_sign_in_service.dart';
+import 'package:diary_app/apple_sign_in_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -78,56 +80,56 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(height: 34),
                           _loading
                               ? const CircularProgressIndicator(color: Color(0xFFFF8C7A))
-                              : SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton.icon(
-                                    icon: Image.asset(
-                                      'assets/google_logo.png',
-                                      height: 24,
-                                      width: 24,
-                                      errorBuilder: (c, e, s) => const Icon(Icons.login),
+                              : Column(
+                                  children: [
+                                    // Google 로그인 버튼
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton.icon(
+                                        icon: Image.asset(
+                                          'assets/google_logo.png',
+                                          height: 24,
+                                          width: 24,
+                                          errorBuilder: (c, e, s) => const Icon(Icons.login),
+                                        ),
+                                        label: Text(
+                                          AppLocalizations.of(context)!.googleSignIn,
+                                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF9E616A), fontFamily: _fontFamily),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: _bgColor,
+                                          foregroundColor: const Color(0xFF9E616A),
+                                          elevation: 2,
+                                          side: const BorderSide(color: Color(0xFFFFB6A6), width: 1.2),
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                          padding: const EdgeInsets.symmetric(vertical: 16),
+                                        ),
+                                        onPressed: _handleGoogleSignIn,
+                                      ),
                                     ),
-                                    label: Text(
-                                      AppLocalizations.of(context)!.googleSignIn,
-                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF9E616A), fontFamily: _fontFamily),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: _bgColor,
-                                      foregroundColor: const Color(0xFF9E616A),
-                                      elevation: 2,
-                                      side: const BorderSide(color: Color(0xFFFFB6A6), width: 1.2),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                    ),
-                                    onPressed: () async {
-                                      setState(() => _loading = true);
-                                      try {
-                                        final userCredential = await GoogleSignInService.signInWithGoogle();
-                                        // 로그인 성공 시 오류 메시지 표시하지 않음
-                                        if (userCredential == null) {
-                                          // 사용자가 로그인을 취소한 경우
-                                          print('로그인이 취소되었습니다.');
-                                        }
-                                      } catch (e) {
-                                        print('로그인 오류 상세: $e');
-                                        // Firebase Auth가 이미 성공한 경우 에러 표시하지 않음
-                                        final isAlreadySignedIn = FirebaseAuth.instance.currentUser != null;
-                                        if (!isAlreadySignedIn && mounted) {
-                                          String msg;
-                                          if (e.toString().contains('network_offline')) {
-                                            msg = AppLocalizations.of(context)!.networkError;
-                                          } else {
-                                            msg = AppLocalizations.of(context)!.loginError;
-                                          }
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text(msg)),
-                                          );
-                                        }
-                                      } finally {
-                                        if (mounted) setState(() => _loading = false);
-                                      }
-                                    },
-                                  ),
+                                    // Apple 로그인 버튼 (iOS만)
+                                    if (Platform.isIOS) ...[
+                                      const SizedBox(height: 14),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: ElevatedButton.icon(
+                                          icon: const Icon(Icons.apple, size: 26, color: Colors.white),
+                                          label: Text(
+                                            AppLocalizations.of(context)!.appleSignIn,
+                                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white, fontFamily: _fontFamily),
+                                          ),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.black,
+                                            foregroundColor: Colors.white,
+                                            elevation: 2,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                            padding: const EdgeInsets.symmetric(vertical: 16),
+                                          ),
+                                          onPressed: _handleAppleSignIn,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                         ],
                       ),
@@ -150,4 +152,57 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _loading = true);
+    try {
+      final userCredential = await GoogleSignInService.signInWithGoogle();
+      if (userCredential == null) {
+        print('로그인이 취소되었습니다.');
+      }
+    } catch (e) {
+      print('로그인 오류 상세: $e');
+      final isAlreadySignedIn = FirebaseAuth.instance.currentUser != null;
+      if (!isAlreadySignedIn && mounted) {
+        String msg;
+        if (e.toString().contains('network_offline')) {
+          msg = AppLocalizations.of(context)!.networkError;
+        } else {
+          msg = AppLocalizations.of(context)!.loginError;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _handleAppleSignIn() async {
+    setState(() => _loading = true);
+    try {
+      final userCredential = await AppleSignInService.signInWithApple();
+      if (userCredential == null) {
+        print('Apple 로그인이 취소되었습니다.');
+      }
+    } catch (e) {
+      print('Apple 로그인 오류: $e');
+      final isAlreadySignedIn = FirebaseAuth.instance.currentUser != null;
+      if (!isAlreadySignedIn && mounted) {
+        String msg;
+        if (e.toString().contains('network_offline')) {
+          msg = AppLocalizations.of(context)!.networkError;
+        } else {
+          msg = AppLocalizations.of(context)!.loginError;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 }
+

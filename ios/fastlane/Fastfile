@@ -3,7 +3,6 @@ default_platform(:ios)
 platform :ios do
   desc "자동 빌드 넘버 증가"
   private_lane :increment_version do
-    # pubspec.yaml에서 현재 버전 읽기
     pubspec = File.read("../../pubspec.yaml")
     current_version = pubspec.match(/version:\s*(\d+\.\d+\.\d+)\+(\d+)/i)
 
@@ -20,14 +19,104 @@ platform :ios do
     end
   end
 
-  desc "🧪 TestFlight에 업로드"
-  lane :beta do
+  desc "App Store Connect API Key 설정"
+  private_lane :setup_api_key do
+    app_store_connect_api_key(
+      key_id: "9836Y24TS6",
+      issuer_id: "c4154fe4-150a-40c5-b0ca-79d21d850d0f",
+      key_filepath: File.expand_path("../AuthKey_9836Y24TS6.p8", __dir__),
+    )
+  end
+
+  desc "배포용 프로비저닝 프로파일 다운로드"
+  private_lane :setup_provisioning do
+    sigh(
+      app_identifier: "com.motherfatherdiary.app",
+      readonly: true,
+      output_path: "./profiles",
+    )
+  end
+
+  desc "🚀 App Store 배포"
+  lane :deploy do
+    setup_api_key
     increment_version
 
-    # Flutter IPA 빌드
-    sh("cd ../.. && flutter build ipa --release --export-options-plist=ios/ExportOptions.plist")
+    # App Store 프로비저닝 프로파일 다운로드
+    setup_provisioning
+    profile_name = lane_context[SharedValues::SIGH_NAME]
 
-    # TestFlight 업로드
+    # Flutter 빌드
+    sh("export PATH=\"/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH\" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign")
+
+    # 아카이브 + IPA 생성
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store",
+      export_team_id: "29H2TP8N49",
+      output_directory: "../../build/ios/ipa",
+      output_name: "diary_app.ipa",
+      clean: false,
+      export_options: {
+        signingStyle: "manual",
+        teamID: "29H2TP8N49",
+        provisioningProfiles: {
+          "com.motherfatherdiary.app" => profile_name,
+        },
+      },
+    )
+
+    # App Store Connect 업로드
+    upload_to_app_store(
+      ipa: "../../build/ios/ipa/diary_app.ipa",
+      skip_metadata: false,
+      skip_screenshots: false,
+      overwrite_screenshots: true,
+      force: true,
+      submit_for_review: true,
+      automatic_release: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: true,
+        add_id_info_serves_ads: true,
+        add_id_info_tracks_install: false,
+        add_id_info_tracks_action: false,
+        add_id_info_limits_tracking: true,
+      },
+    )
+
+    UI.success("🚀 App Store 심사 제출 완료!")
+  end
+
+  desc "🧪 TestFlight에 업로드"
+  lane :beta do
+    setup_api_key
+    increment_version
+    setup_provisioning
+    profile_name = lane_context[SharedValues::SIGH_NAME]
+
+    sh("export PATH=\"/opt/homebrew/bin:/opt/homebrew/share/flutter/bin:$PATH\" && export LANG=en_US.UTF-8 && export LC_ALL=en_US.UTF-8 && cd ../.. && flutter build ios --release --no-codesign")
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      configuration: "Release",
+      export_method: "app-store",
+      export_team_id: "29H2TP8N49",
+      output_directory: "../../build/ios/ipa",
+      output_name: "diary_app.ipa",
+      clean: false,
+      export_options: {
+        signingStyle: "manual",
+        teamID: "29H2TP8N49",
+        provisioningProfiles: {
+          "com.motherfatherdiary.app" => profile_name,
+        },
+      },
+    )
+
     upload_to_testflight(
       ipa: "../../build/ios/ipa/diary_app.ipa",
       skip_waiting_for_build_processing: true,
@@ -37,28 +126,50 @@ platform :ios do
     UI.success("🎉 TestFlight 업로드 완료!")
   end
 
-  desc "🚀 App Store 배포"
-  lane :deploy do
-    increment_version
+  desc "📤 이미 빌드된 IPA 업로드만"
+  lane :upload_only do
+    setup_api_key
 
-    sh("cd ../.. && flutter build ipa --release --export-options-plist=ios/ExportOptions.plist")
-
-    upload_to_app_store(
+    upload_to_testflight(
       ipa: "../../build/ios/ipa/diary_app.ipa",
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+    )
+
+    UI.success("🚀 TestFlight 업로드 완료!")
+  end
+
+  desc "📸 스크린샷 업로드"
+  lane :upload_screenshots do
+    setup_api_key
+
+    deliver(
+      skip_binary_upload: true,
       skip_metadata: true,
+      skip_screenshots: false,
+      overwrite_screenshots: true,
+      screenshots_path: "./fastlane/screenshots",
+      force: true,
+      submit_for_review: false,
+      precheck_include_in_app_purchases: false,
+    )
+
+    UI.success("📸 스크린샷 업로드 완료!")
+  end
+
+  desc "📝 메타데이터 업로드"
+  lane :upload_metadata do
+    setup_api_key
+
+    deliver(
+      skip_binary_upload: true,
+      skip_metadata: false,
       skip_screenshots: true,
       force: true,
       submit_for_review: false,
+      precheck_include_in_app_purchases: false,
     )
 
-    UI.success("🚀 App Store 업로드 완료!")
-  end
-
-  desc "📸 메타데이터 업로드"
-  lane :metadata do
-    upload_to_app_store(
-      skip_binary_upload: true,
-      force: true,
-    )
+    UI.success("📝 메타데이터 업로드 완료!")
   end
 end

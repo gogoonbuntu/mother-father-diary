@@ -167,5 +167,15 @@
   "premiumNoRestore": "No purchases to restore.",
 
   "shareCardBranding": "Try AI Diary too ✍️",
-  "shareCardAppName": "Mom Dad Diary"
+  "shareCardAppName": "Mom Dad Diary",
+
+  "appleSignIn": "Sign in with Apple",
+  "deleteAccount": "Delete Account",
+  "deleteAccountSubtitle": "Permanently delete your account and all data",
+  "deleteAccountWarning1": "Are you sure you want to delete your account?\n\nAll diary entries and data will be permanently deleted and cannot be recovered.",
+  "deleteAccountContinue": "Continue",
+  "deleteAccountFinalTitle": "Final Confirmation",
+  "deleteAccountWarning2": "This action cannot be undone. All your diary entries, settings, and account information will be permanently deleted.\n\nAre you sure you want to continue?",
+  "deleteAccountConfirm": "Delete Account Permanently",
+  "deleteAccountError": "An error occurred while deleting the account. Please try again."
 }

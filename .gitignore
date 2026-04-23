@@ -75,3 +75,4 @@ appstore-api-key.json
 android/key.properties
 *.jks
 *.keystore
+*.p8

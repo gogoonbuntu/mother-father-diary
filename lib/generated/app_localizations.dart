@@ -845,6 +845,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mom Dad Diary'**
   String get shareCardAppName;
+
+  /// No description provided for @appleSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Apple'**
+  String get appleSignIn;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete your account and all data'**
+  String get deleteAccountSubtitle;
+
+  /// No description provided for @deleteAccountWarning1.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete your account?\n\nAll diary entries and data will be permanently deleted and cannot be recovered.'**
+  String get deleteAccountWarning1;
+
+  /// No description provided for @deleteAccountContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get deleteAccountContinue;
+
+  /// No description provided for @deleteAccountFinalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Confirmation'**
+  String get deleteAccountFinalTitle;
+
+  /// No description provided for @deleteAccountWarning2.
+  ///
+  /// In en, this message translates to:
+  /// **'This action cannot be undone. All your diary entries, settings, and account information will be permanently deleted.\n\nAre you sure you want to continue?'**
+  String get deleteAccountWarning2;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account Permanently'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @deleteAccountError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while deleting the account. Please try again.'**
+  String get deleteAccountError;
 }
 
 class _AppLocalizationsDelegate

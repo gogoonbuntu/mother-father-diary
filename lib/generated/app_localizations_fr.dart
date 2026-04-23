@@ -408,4 +408,35 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get shareCardAppName => 'Journal Papa Maman';
+
+  @override
+  String get appleSignIn => 'Se connecter avec Apple';
+
+  @override
+  String get deleteAccount => 'Supprimer le compte';
+
+  @override
+  String get deleteAccountSubtitle =>
+      'Supprimer définitivement votre compte et toutes vos données';
+
+  @override
+  String get deleteAccountWarning1 =>
+      'Voulez-vous vraiment supprimer votre compte ?\n\nToutes vos entrées de journal seront définitivement supprimées et ne pourront pas être récupérées.';
+
+  @override
+  String get deleteAccountContinue => 'Continuer';
+
+  @override
+  String get deleteAccountFinalTitle => 'Confirmation finale';
+
+  @override
+  String get deleteAccountWarning2 =>
+      'Cette action est irréversible. Toutes vos entrées de journal, paramètres et informations de compte seront définitivement supprimés.\n\nVoulez-vous vraiment continuer ?';
+
+  @override
+  String get deleteAccountConfirm => 'Supprimer définitivement';
+
+  @override
+  String get deleteAccountError =>
+      'Une erreur est survenue lors de la suppression du compte. Veuillez réessayer.';
 }

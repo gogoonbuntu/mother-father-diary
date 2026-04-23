@@ -24,7 +24,7 @@ platform :android do
     end
   end
 
-  desc "🧪 내부 테스트 트랙에 업로드"
+  desc "🔒 비공개 테스트 트랙에 업로드 (기존 테스터 자동 업데이트)"
   lane :beta do
     increment_version
 
@@ -36,9 +36,9 @@ platform :android do
     UI.message("📦 AAB path: #{AAB_PATH}")
     UI.user_error!("AAB 파일을 찾을 수 없습니다: #{AAB_PATH}") unless File.exist?(AAB_PATH)
 
-    # Play Store 내부 테스트 트랙 업로드
+    # Play Store 비공개 테스트 트랙 업로드
     upload_to_play_store(
-      track: "internal",
+      track: "alpha",
       aab: AAB_PATH,
       skip_upload_metadata: true,
       skip_upload_images: true,
@@ -46,7 +46,7 @@ platform :android do
       skip_upload_changelogs: true,
     )
 
-    UI.success("🎉 내부 테스트 트랙에 업로드 완료!")
+    UI.success("🎉 비공개 테스트 트랙에 업로드 완료!")
   end
 
   desc "🚀 프로덕션 배포"

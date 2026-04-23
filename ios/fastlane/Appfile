@@ -1,9 +1,2 @@
-# TODO: App Store Connect API Key 설정 후 아래 주석 해제
-# app_identifier("com.motherfatherdiary.app")
-# apple_id("YOUR_APPLE_ID@email.com")
-# team_id("YOUR_TEAM_ID")
-
-# App Store Connect API Key (권장)
-# api_key_path("../appstore-api-key.json")
-
 app_identifier("com.motherfatherdiary.app")
+team_id("29H2TP8N49")

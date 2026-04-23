@@ -4,6 +4,7 @@ import 'package:diary_app/theme_selector.dart';
 import 'package:diary_app/google_sign_in_service.dart';
 import 'package:diary_app/privacy_info_screen.dart';
 import 'package:diary_app/services/notification_service.dart';
+import 'package:diary_app/services/account_service.dart';
 import 'package:diary_app/main.dart' show globalLocaleNotifier;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,6 +34,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _loggingOut = false;
+  bool _deletingAccount = false;
   late Color _currentColor;
   late String _currentFont;
   bool _notificationEnabled = true;
@@ -361,10 +363,141 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            // 🗑️ 계정 삭제
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.shade200),
+              ),
+              child: ListTile(
+                leading: Icon(Icons.delete_forever_rounded, color: Colors.red.shade600),
+                title: Text(
+                  AppLocalizations.of(context)!.deleteAccount,
+                  style: TextStyle(fontWeight: FontWeight.w600, color: Colors.red.shade700),
+                ),
+                subtitle: Text(
+                  AppLocalizations.of(context)!.deleteAccountSubtitle,
+                  style: TextStyle(fontSize: 12, color: Colors.red.shade400),
+                ),
+                trailing: _deletingAccount
+                    ? const SizedBox(
+                        height: 20, width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Icon(Icons.chevron_right, color: Colors.red.shade400),
+                onTap: _deletingAccount ? null : _handleDeleteAccount,
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  /// 계정 삭제 핸들러 — 2단계 확인 다이얼로그
+  Future<void> _handleDeleteAccount() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    // 1단계: 경고
+    final firstConfirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red.shade600, size: 28),
+            const SizedBox(width: 8),
+            Text(l10n.deleteAccount),
+          ],
+        ),
+        content: Text(l10n.deleteAccountWarning1),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.deleteAccountContinue),
+          ),
+        ],
+      ),
+    );
+
+    if (firstConfirm != true || !mounted) return;
+
+    // 2단계: 최종 확인
+    final finalConfirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text('⚠️ ${l10n.deleteAccountFinalTitle}'),
+        content: Text(l10n.deleteAccountWarning2),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.deleteAccountConfirm),
+          ),
+        ],
+      ),
+    );
+
+    if (finalConfirm != true || !mounted) return;
+
+    // 삭제 실행
+    setState(() => _deletingAccount = true);
+    try {
+      await AccountService.deleteAccount();
+      if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      if (!mounted) return;
+      // requires-recent-login 에러 시 재인증
+      if (e.toString().contains('requires-recent-login')) {
+        final reauthed = await AccountService.reauthenticateWithGoogle();
+        if (reauthed && mounted) {
+          try {
+            await AccountService.deleteAccount();
+            if (!mounted) return;
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          } catch (e2) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.deleteAccountError)),
+              );
+            }
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.deleteAccountError)),
+            );
+          }
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.deleteAccountError)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _deletingAccount = false);
+    }
   }
 
   Widget _buildLanguageChip(BuildContext context, String flag, String label, String langCode) {
