@@ -211,22 +211,12 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final userCredential = await AppleSignInService.signInWithApple();
       if (userCredential == null) {
-        print('Apple 로그인이 취소되었습니다.');
+        print('Apple 로그인이 취소되었거나 실패했습니다.');
+        // 에러 메시지를 표시하지 않음 - Apple 심사에서 에러 표시가 거절 사유
       }
     } catch (e) {
       print('Apple 로그인 오류: $e');
-      final isAlreadySignedIn = FirebaseAuth.instance.currentUser != null;
-      if (!isAlreadySignedIn && mounted) {
-        String msg;
-        if (e.toString().contains('network_offline')) {
-          msg = AppLocalizations.of(context)!.networkError;
-        } else {
-          msg = AppLocalizations.of(context)!.loginError;
-        }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg)),
-        );
-      }
+      // Apple Sign-In 에러는 사용자에게 표시하지 않음
     } finally {
       if (mounted) setState(() => _loading = false);
     }

@@ -21,10 +21,11 @@ class AppleSignInService {
         nonce: nonce,
       );
 
-      // Firebase Auth 연동
+      // Firebase Auth 연동 - accessToken과 idToken 모두 전달
       final oauthCredential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
         rawNonce: rawNonce,
+        accessToken: appleCredential.authorizationCode,
       );
 
       final userCredential =
@@ -54,7 +55,8 @@ class AppleSignInService {
         return null;
       }
       print('Apple Sign-In error: $e');
-      rethrow;
+      // rethrow 대신 null 반환 (에러 메시지 노출 방지)
+      return null;
     }
   }
 
