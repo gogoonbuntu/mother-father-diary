@@ -28,8 +28,15 @@ platform :ios do
     )
   end
 
-  desc "배포용 프로비저닝 프로파일 다운로드"
+  desc "배포용 코드 사이닝 인증서 + 프로비저닝 프로파일"
   private_lane :setup_provisioning do
+    # 배포용 인증서 자동 생성/다운로드 (iOS Distribution은 type 불필요)
+    cert(
+      generate_apple_certs: true,
+      skip_set_partition_list: true,
+    )
+
+    # App Store 프로비저닝 프로파일 다운로드
     sigh(
       app_identifier: "com.motherfatherdiary.app",
       readonly: false,
