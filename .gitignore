@@ -76,3 +76,8 @@ android/key.properties
 *.jks
 *.keystore
 *.p8
+
+# Certificates
+*.cer
+*.p12
+*.certSigningRequest
