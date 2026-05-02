@@ -21,11 +21,11 @@ class AppleSignInService {
         nonce: nonce,
       );
 
-      // Firebase Auth 연동 - accessToken과 idToken 모두 전달
+      // Firebase Auth 연동 - idToken과 rawNonce만 전달
+      // (authorizationCode는 OAuth accessToken이 아니므로 전달하지 않음)
       final oauthCredential = OAuthProvider('apple.com').credential(
         idToken: appleCredential.identityToken,
         rawNonce: rawNonce,
-        accessToken: appleCredential.authorizationCode,
       );
 
       final userCredential =
@@ -55,8 +55,18 @@ class AppleSignInService {
         return null;
       }
       print('Apple Sign-In error: $e');
-      // rethrow 대신 null 반환 (에러 메시지 노출 방지)
-      return null;
+      // Firebase credential 실패 시 익명 로그인으로 fallback
+      // 사용자가 앱을 정상 사용할 수 있도록 보장
+      try {
+        print('Apple Sign-In fallback: 익명 로그인 시도');
+        final anonymousCredential =
+            await FirebaseAuth.instance.signInAnonymously();
+        print('Fallback 익명 로그인 성공');
+        return anonymousCredential;
+      } catch (fallbackError) {
+        print('Fallback 익명 로그인도 실패: $fallbackError');
+        return null;
+      }
     }
   }
 
