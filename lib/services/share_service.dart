@@ -64,7 +64,7 @@ class ShareService {
     // 이미지 + 텍스트 공유
     await Share.shareXFiles(
       [XFile(file.path)],
-      text: '✨ Mother Father Diary로 오늘 하루를 기록해보세요!\n📲 https://play.google.com/store/apps/details?id=com.motherfatherdiary.app',
+      text: '✨ 럭키비키 일기장으로 오늘 하루를 기록해보세요!\n📲 https://play.google.com/store/apps/details?id=com.motherfatherdiary.app',
     );
   }
 
@@ -182,7 +182,7 @@ class ShareService {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  'Mother Father Diary',
+                  '럭키비키 일기장',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
@@ -316,7 +316,7 @@ class ShareService {
       buffer.writeln('');
     }
 
-    buffer.writeln('✨ Mother Father Diary');
+    buffer.writeln('✨ 럭키비키 일기장');
     buffer.writeln('📲 https://play.google.com/store/apps/details?id=com.motherfatherdiary.app');
     return buffer.toString().trimRight();
   }

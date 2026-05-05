@@ -1,5 +1,5 @@
 ═══════════════════════════════════════════
-🚀 Mother Father Diary Deploy
+🚀 럭키비키 일기장 Deploy
   Platform: ios
   Lane:     deploy
 ═══════════════════════════════════════════

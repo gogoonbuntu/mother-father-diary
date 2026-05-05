@@ -394,7 +394,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shareCardBranding => '나도 AI 일기 써보기 ✍️';
 
   @override
-  String get shareCardAppName => '엄마아빠 다이어리';
+  String get shareCardAppName => '럭키비키 일기장';
 
   @override
   String get appleSignIn => 'Apple로 로그인';

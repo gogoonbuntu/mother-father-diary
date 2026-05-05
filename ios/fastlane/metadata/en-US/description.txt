@@ -1,6 +1,6 @@
 Record your day, and AI will transform it warmly.
 
-Mother Father Diary is an AI-powered diary app that helps parents record their daily lives in a warmer, more positive way.
+럭키비키 일기장 is an AI-powered diary app that helps parents record their daily lives in a warmer, more positive way.
 
 ◆ Angel & Devil AI Diary Transformation
 Write an ordinary diary entry, and AI transforms it into two versions:

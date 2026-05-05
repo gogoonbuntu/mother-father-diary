@@ -368,7 +368,7 @@ class _MainScreenState extends State<MainScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: const Text(
-              '✨ Mother Father Diary',
+              '✨ 럭키비키 일기장',
               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, letterSpacing: 0.5),
             ),
             centerTitle: true,

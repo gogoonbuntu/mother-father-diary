@@ -169,7 +169,7 @@ class NotificationService {
   /// 매일 저녁 9시 알림 스케줄
   Future<void> scheduleDailyReminder() async {
     final s = _strings;
-    const title = '✨ Mother Father Diary';
+    const title = '✨ 럭키비키 일기장';
     final body = s['body']!;
 
     final androidDetails = AndroidNotificationDetails(
@@ -264,7 +264,7 @@ class NotificationService {
 
     await _notifications.show(
       9999,
-      '✨ Mother Father Diary',
+      '✨ 럭키비키 일기장',
       s['body']!,
       details,
     );

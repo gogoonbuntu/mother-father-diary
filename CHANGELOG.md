@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the Mother Father Diary app will be documented in this file.
+All notable changes to the 럭키비키 일기장 app will be documented in this file.
 
 ## [1.0.1] - 2025-06-16
 

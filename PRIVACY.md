@@ -1,4 +1,4 @@
-# Privacy Policy for Mother Father Diary
+# Privacy Policy for 럭키비키 일기장
 
 Last updated: June 16, 2025
 

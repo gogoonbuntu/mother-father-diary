@@ -1,5 +1,5 @@
 #!/bin/bash
-# 🚀 Mother Father Diary — One-command deployment
+# 🚀 럭키비키 일기장 — One-command deployment
 # Usage:
 #   ./deploy.sh android beta    # → Play Store 내부 테스트
 #   ./deploy.sh android deploy  # → Play Store 프로덕션
@@ -19,7 +19,7 @@ PLATFORM=${1:-"all"}
 LANE=${2:-"beta"}
 
 echo "═══════════════════════════════════════════"
-echo "🚀 Mother Father Diary Deploy"
+echo "🚀 럭키비키 일기장 Deploy"
 echo "  Platform: $PLATFORM"
 echo "  Lane:     $LANE"
 echo "═══════════════════════════════════════════"
